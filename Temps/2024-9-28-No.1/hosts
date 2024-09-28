@@ -1,0 +1,58 @@
+﻿# Copyright (c) 1993-2009 Microsoft Corp.
+#
+# This is a sample HOSTS file used by Microsoft TCP/IP for Windows.
+#
+# This file contains the mappings of IP addresses to host names. Each
+# entry should be kept on an individual line. The IP address should
+# be placed in the first column followed by the corresponding host name.
+# The IP address and the host name should be separated by at least one
+# space.
+#
+# Additionally, comments (such as these) may be inserted on individual
+# lines or following the machine name denoted by a '#' symbol.
+#
+# For example:
+#
+#      102.54.94.97     rhino.acme.com          # source server
+#       38.25.63.10     x.acme.com              # x client host
+
+# localhost name resolution is handled within DNS itself.
+#	127.0.0.1       localhost
+#	::1             localhost
+
+127.0.0.1 live.refractivesoftware.com # # 
+127.0.0.1 live1.refractivesoftware.com # # 
+127.0.0.1 live2.refractivesoftware.com # # 
+127.0.0.1 live3.refractivesoftware.com # # 
+127.0.0.1 live4.refractivesoftware.com # # 
+127.0.0.1 live5.refractivesoftware.com # # 
+127.0.0.1 live6.refractivesoftware.com # # 
+127.0.0.1 live.octanerender.com # # 
+127.0.0.1 live.octanerender.com/live/v1 # # 
+127.0.0.1 live.octanerender.com/live/v2 # # 
+127.0.0.1 live/v1/live.octanerender.com # # 
+127.0.0.1 live/v2/live.octanerender.com # # 
+127.0.0.1 live1.octanerender.com # # 
+127.0.0.1 live2.octanerender.com # # 
+127.0.0.1 live3.octanerender.com # # 
+127.0.0.1 live4.octanerender.com # # 
+127.0.0.1 live5.octanerender.com # # 
+127.0.0.1 live6.octanerender.com # # 
+127.0.0.1 account.otoy.com # # 
+127.0.0.1 local.otoylocal.com # # 
+127.0.0.1 orc.otoy.com # # 
+127.0.0.1 54.243.210.230 # # 
+127.0.0.1 169.54.33.187 # # 
+127.0.0.1 58.20.196.160 # # 
+127.0.0.1 169.54.129.22 # # 
+127.0.0.1 account.otoy.com/sign_up # # 
+127.0.0.1 bridge.octanerender.com # #
+127.0.0.1 activate.redshift3d.com
+185.199.109.153 github.io
+20.205.243.166 github.com
+
+128.0.255.255 edge.microsoft.com
+128.0.255.255 clients.google.com
+128.0.255.255 clients1.google.com
+128.0.255.255 clients2.google.com
+128.0.255.255 update.googleapis.com
