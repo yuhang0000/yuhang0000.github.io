@@ -18,7 +18,8 @@ on:
 jobs:
   update-file:
     runs-on: ubuntu-latest
-    if: ${{ github.actor == 'yuhang0000' }}
+    # 打點注釋，如果是 github-pages 的話直接不幹了。
+    if: ${{ github.actor != 'github-pages' }}
     
     permissions:
       contents: write
