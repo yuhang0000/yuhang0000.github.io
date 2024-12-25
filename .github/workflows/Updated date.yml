@@ -1,12 +1,20 @@
 name: 自動更新提交日期
 
-# 觸發條件：當有推送（push）事件到 main 分支時觸發此工作流
+# 觸發條件: 等 pages build and deployment 搞完。
 on:
-  push:
-    branches:
-      - main
+  workflow_run:
+    workflows: ["pages-build-deployment"]
+    types:
+      - completed
+      
+# 觸發條件: 當有推送（push）事件到 main 分支時觸發此工作流。
 
-# 定義任務
+# on:
+#   push:
+#     branches:
+#       - main
+
+# 任務: 
 jobs:
   update-file:
     runs-on: ubuntu-latest
@@ -18,7 +26,7 @@ jobs:
       group: ${{ github.workflow }}-${{ github.ref }}
       cancel-in-progress: false
 
-    # 使用 GitHub API 更新文件内容
+    # 使用 GitHub API 更新文件内容。
     steps:
     - name: 創建文件夾
       run: mkdir -p ./Config/
@@ -53,7 +61,7 @@ jobs:
           //嘗試先更新
           try{
 
-            //這裏獲取sha, 完全不會呀😭, 還得感謝通義
+            //這裏獲取sha, 完全不會呀😭, 還得感謝通義。
             let response = await github.rest.repos.getContent({
               ...context.repo,
               path: "Config/UpdateTime.txt"
