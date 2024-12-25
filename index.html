@@ -8,10 +8,10 @@
 
 <body>
 <h1><strong>Welcome to my blog </strong></h1>
-<p>歡迎，這裡是yuhang0000，嫌名字拗口也可以稱呼我：欲行。</p>
+<p>歡迎，這裡是yuhang0000，嫌名字拗口也可以稱呼我: 欲行。</p>
 <p>主營iapp，c4d，aseprite和玩電烙鐵？  </p>
 <p>如你所見，我主混數碼圈的，以及1/4的繪圈。。。</p>
-<p> =͟͟͞͞=͟͟͞͞(●⁰ꈊ⁰● |||)：為什麼這個主頁這麼醜？</p>
+<p> =͟͟͞͞=͟͟͞͞(●⁰ꈊ⁰● |||): 為什麼這個主頁這麼醜？</p>
 <p>因為我不會寫CSS啊啊啊。。。 TwT</p>
 <h3>想來做點啥？</h3>
 <p><a href="./Blog/Index.html">Blog</a></p>
@@ -40,8 +40,34 @@
 <p>小黑盒: @yuhang0000</p>
 <p>&nbsp;</p>
 <h2><a href="./Web/Test.html">測試專案</a></h2>
-<p>此網站的檔案託管在Github上：<a href="https://github.com/yuhang0000/yuhang0000.github.io">跳轉</a></p>
-<p>始於：2024-1-12</p>
-<p>最後一次更新於：2024-12-22</p>
+<p>此網站的檔案託管在Github上: <a href="https://github.com/yuhang0000/yuhang0000.github.io">跳轉</a></p>
+<p>始於: 2024-1-12</p>
+<p id="lastupdatetime">最後一次更新於: 2024-12-22</p>
+<script>
+  //嘗試獲取最後更新日期
+  try{
+    let lastupdatetime = document.getElementById('lastupdatetime');
+    fetch("../Config/UpdateTime.txt")
+    .then(response =>{
+      if(response.ok != true){
+        console.log("Oops! \r\n嘗試獲取最後更新時間失敗了。");
+      }
+      return response.text();
+    })
+    .then(data =>{
+      //notetext.innerText = data;
+      //時間
+      if(data.length > 20){
+      	lastupdatetime.innerText = "獲取更新時間失敗了。"
+      }
+      else{
+      	lastupdatetime.innerText = "最後一次更新於: " + data;
+      }
+    })
+  }
+  catch{
+    console.log("Oops! \r\n嘗試獲取最後更新時間失敗了。")
+  }
+</script>
 </body>
 </html>
