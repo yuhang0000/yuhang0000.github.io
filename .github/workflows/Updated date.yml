@@ -51,8 +51,8 @@ jobs:
               });
           }
           catch(err){
-            console.log("# " + gettime() + " | 遇到错误了欸: \r\n" + err);
+            console.log("# " + gettime() + " | 遇到错误了欸: \r\n" + err.stack);
           }
-          console.log("# " + gettime() + " | 完成! ");
+          console.log("# " + gettime() + " | 完成咯! ");
 
           
