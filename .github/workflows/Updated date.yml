@@ -21,9 +21,9 @@ jobs:
         
           // 引用外部庫
           let fs = require('fs');
-          // let github = require('@actions/github');
+          let github = require('@actions/github');
           // let context = require('@actions/github');
-          let { context, github } = require('@actions/github');
+          // let { context, github } = require('@actions/github');
           
           let now = new Date();
           let nowtime = time.getFullYear() + "-" + (time.getMonth() + 1) + "-" + time.getDate() + " " + String(time.getHours()).padStart(2, '0') + ":" + String(time.getMinutes()).padStart(2, '0') + ":" + String(time.getSeconds()).padStart(2, '0');
