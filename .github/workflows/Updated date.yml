@@ -46,7 +46,7 @@ jobs:
             //這裏獲取sha, 完全不會呀😭, 還得感謝通義
             let response = await github.rest.repos.getContent({
               ...context.repo,
-              path: path
+              path: "config/updatetime.txt"
             });
 
             let sha = response.data.sha;
