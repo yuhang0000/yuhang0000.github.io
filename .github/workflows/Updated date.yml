@@ -18,8 +18,8 @@ on:
 jobs:
   update-file:
     runs-on: ubuntu-latest
-    # 打點注釋，如果部署發起者是 github-pages 的話直接不幹了。
-    if: ${{ github.actor != 'github-pages' }}
+    # 如果部署發起者是 yuhang0000 的話，繼續。
+    if: ${{ github.actor == 'yuhang0000' }}
     
     permissions:
       contents: write
