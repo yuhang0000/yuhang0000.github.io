@@ -13,8 +13,13 @@ jobs:
     permissions:
       contents: write
 
-    steps:
+    # 儅工作流忙時，保持等待。。。
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: false
+
     # 使用 GitHub API 更新文件内容
+    steps:
     - name: 創建文件夾
       run: mkdir -p ./config/
     
@@ -33,6 +38,11 @@ jobs:
           //獲取當前時間
           function gettime(){
             let now = new Date();
+            
+            //時區 +08:00
+            now = now.valueOf() + (3600 * 1000 * 8);
+            now = new Date(now);
+            
             let nowtime = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate() + " " + now.getHours() + ":" + String(now.getMinutes()).padStart(2, '0') + ":" + String(now.getSeconds()).padStart(2, '0');
             return nowtime;
           }
