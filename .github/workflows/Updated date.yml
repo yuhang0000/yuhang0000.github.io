@@ -18,7 +18,7 @@ on:
 jobs:
   update-file:
     runs-on: ubuntu-latest
-    # 打點注釋，如果是 github-pages 的話直接不幹了。
+    # 打點注釋，如果部署發起者是 github-pages 的話直接不幹了。
     if: ${{ github.actor != 'github-pages' }}
     
     permissions:
