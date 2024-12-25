@@ -10,6 +10,8 @@ on:
 jobs:
   update-file:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
     # 使用 GitHub API 更新文件内容
