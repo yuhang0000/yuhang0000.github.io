@@ -38,21 +38,49 @@ jobs:
           }
           
           console.log("# " + gettime() + " | 準備嘗試。。。");
-          
-          try {
-            // 寫入文檔
-            //fs.writeFileSync("${process.env.GITHUB_WORKSPACE}/config", nowtime);
-            let content = Buffer.from(gettime()).toString('base64');
+          let content = Buffer.from(gettime()).toString('base64');
 
-              await github.rest.repos.createOrUpdateFileContents({
-                ...context.repo,
-                path: "config/updatetime.txt",
-                message: "更新最後一次提交日期",
-                content: content,
-                branch: context.ref.replace('refs/heads/', '')
-              });
+          //嘗試先更新
+          try{
+
+            //這裏獲取sha, 完全不會呀😭, 還得感謝通義
+            let response = await github.rest.repos.getContent({
+              ...context.repo,
+              path: path
+            });
+
+            let sha = response.data.sha;
+            
+            await github.rest.repos.createOrUpdateFileContents({
+              ...context.repo,
+              path: "config/updatetime.txt",
+              message: "更新最後一次提交日期",
+              content: content,
+              sha: sha,
+              branch: context.ref.replace('refs/heads/', '')
+            });
           }
           catch(err){
-            console.log("# " + gettime() + " | 遇到错误了欸: \r\n" + err.stack);
+            console.log("# " + gettime() + " | 遇到错误了欸, 嘗試直接創建新文檔: \r\n" + err.stack);
+            trywrite();
           }
-          console.log("# " + gettime() + " | 完成咯! ");
+
+          function trywrite(){
+            try {
+              // 寫入文檔
+              //fs.writeFileSync("${process.env.GITHUB_WORKSPACE}/config", nowtime);
+
+                await github.rest.repos.createOrUpdateFileContents({
+                  ...context.repo,
+                  path: "config/updatetime.txt",
+                  message: "更新最後一次提交日期",
+                  content: content,
+                  branch: context.ref.replace('refs/heads/', '')
+                });
+            }
+            catch(err){
+              console.log("# " + gettime() + " | 遇到错误了欸: \r\n" + err.stack);
+            }
+          }
+          
+          console.log("# " + gettime() + " | 完成咯! ");       
