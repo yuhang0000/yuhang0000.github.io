@@ -28,6 +28,8 @@ jobs:
           let now = new Date();
           let nowtime = time.getFullYear() + "-" + (time.getMonth() + 1) + "-" + time.getDate() + " " + String(time.getHours()).padStart(2, '0') + ":" + String(time.getMinutes()).padStart(2, '0') + ":" + String(time.getSeconds()).padStart(2, '0');
 
+          console.log(nowtime + " | 準備嘗試。。。");
+          
           try {
             // 寫入文檔
             fs.writeFileSync("${process.env.GITHUB_WORKSPACE}/config", nowtime);
