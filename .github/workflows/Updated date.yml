@@ -12,7 +12,7 @@ jobs:
     # 儅工作流忙時，保持等待。。。
     concurrency:
       group: pages-build-deployment-${{ github.ref }}
-      cancel-in-progress: true
+      cancel-in-progress: false
       
     runs-on: ubuntu-latest
     permissions:
