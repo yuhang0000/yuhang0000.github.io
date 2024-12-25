@@ -1,23 +1,26 @@
 name: 自動更新提交日期
 
-# 觸發條件: 當有推送（push）事件到 main 分支時觸發此工作流。
+# 觸發條件: 等 pages build and deployment 搞完。
 on:
-  push:
-    branches:
-      - main  
+  workflow_run:
+    workflows: ["pages-build-deployment"]
+    types:
+      - completed
+      
+# 觸發條件: 當有推送（push）事件到 main 分支時觸發此工作流。
+
+# on:
+#   push:
+#     branches:
+#       - main
 
 # 任務: 
 jobs:
   update-file:
-    # 儅工作流忙時，保持等待。。。
-    concurrency:
-      group: pages-build-deployment-${{ github.ref }}
-      cancel-in-progress: false
-      
     runs-on: ubuntu-latest
+    if: ${{ github.actor == "yuhang0000" }}
     permissions:
       contents: write
-
 
     # 使用 GitHub API 更新文件内容。
     steps:
