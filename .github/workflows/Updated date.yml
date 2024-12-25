@@ -21,7 +21,7 @@ jobs:
         
           // 引用外部庫
           let fs = require('fs');
-          let github = require('@actions/github');
+          // let github = require('@actions/github');
           // let context = require('@actions/github');
           // let { context, github } = require('@actions/github');
           
