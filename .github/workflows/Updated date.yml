@@ -13,6 +13,9 @@ jobs:
 
     steps:
     # 使用 GitHub API 更新文件内容
+    - name: 創建文件夾
+      run: mkdir -p ./config/
+    
     - name: 更新 config/updatetime.txt 文檔
       uses: actions/github-script@v6
       with:
@@ -24,16 +27,20 @@ jobs:
           // let github = require('@actions/github');
           // let context = require('@actions/github');
           // let { context, github } = require('@actions/github');
-          
-          let now = new Date();
-          let nowtime = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate() + " " + String(now.getHours()).padStart(2, '0') + ":" + String(now.getMinutes()).padStart(2, '0') + ":" + String(now.getSeconds()).padStart(2, '0');
 
-          console.log(nowtime + " | 準備嘗試。。。");
+          //獲取當前時間
+          function gettime(){
+            let now = new Date();
+            let nowtime = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate() + " " + String(now.getHours()).padStart(2, '0') + ":" + String(now.getMinutes()).padStart(2, '0') + ":" + String(now.getSeconds()).padStart(2, '0');
+            return nowtime;
+          }
+          
+          console.log("# " + gettime() + " | 準備嘗試。。。");
           
           try {
             // 寫入文檔
-            fs.writeFileSync("${process.env.GITHUB_WORKSPACE}/config", nowtime);
-            let content = Buffer.from(nowtime).toString('base64');
+            //fs.writeFileSync("${process.env.GITHUB_WORKSPACE}/config", nowtime);
+            let content = Buffer.from(gettime()).toString('base64');
 
               await github.rest.repos.createOrUpdateFileContents({
                 ...context.repo,
@@ -44,5 +51,8 @@ jobs:
               });
           }
           catch(err){
-            console.log("错误: \r\n" + err);
+            console.log("# " + gettime() + " | 遇到错误了欸: \r\n" + err);
           }
+          console.log("# " + gettime() + " | 完成! ");
+
+          
