@@ -65,7 +65,7 @@ jobs:
             trywrite();
           }
 
-          function trywrite(){
+          async function trywrite(){
             try {
               // 寫入文檔
               //fs.writeFileSync("${process.env.GITHUB_WORKSPACE}/config", nowtime);
