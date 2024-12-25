@@ -1,12 +1,7 @@
 name: 自動更新提交日期
 
-# 觸發條件: 等 pages build and deployment 搞完。
+# 觸發條件: 當有推送（push）事件到 main 分支時觸發此工作流。
 on:
-  workflow_run:
-    workflows: ["pages-build-deployment"]
-    types:
-      - completed
-  # 觸發條件: 當有推送（push）事件到 main 分支時觸發此工作流。
   push:
     branches:
       - main  
@@ -14,16 +9,15 @@ on:
 # 任務: 
 jobs:
   update-file:
-    # 我的天哪，會死循環誒！
-    if: github.event_name == 'workflow_run' && github.ref == 'refs/heads/main'
+    # 儅工作流忙時，保持等待。。。
+    concurrency:
+      group: pages-build-deployment-${{ github.ref }}
+      cancel-in-progress: true
+      
     runs-on: ubuntu-latest
     permissions:
       contents: write
 
-    # 儅工作流忙時，保持等待。。。
-    concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}
-      cancel-in-progress: false
 
     # 使用 GitHub API 更新文件内容。
     steps:
