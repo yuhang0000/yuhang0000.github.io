@@ -1,0 +1,6 @@
+User-agent: *
+Disallow: /Web/Other/sunny-night.html
+Disallow: /
+Allow: /index.html
+Allow: /Blog/index.html
+Allow: /Web/Archive.html
