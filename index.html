@@ -42,32 +42,49 @@
 <h2><a href="./Web/Test.html">測試專案</a></h2>
 <p>此網站的檔案託管在Github上: <a href="https://github.com/yuhang0000/yuhang0000.github.io">跳轉</a></p>
 <p>始於: 2024-1-12</p>
-<p id="lastupdatetime">最後一次更新於: 2024-12-22</p>
+<p id="lastupdatetime">最後一次更新於: 加載中</p>
 <script>
   //嘗試獲取最後更新日期
-  try{
-    let lastupdatetime = document.getElementById('lastupdatetime');
-    fetch("../Config/UpdateTime.txt")
-    .then(response =>{
-      if(response.ok != true){
-        console.log("Oops! \r\n嘗試獲取最後更新時間失敗了。");
-      }
-      return response.text();
-    })
-    .then(data =>{
-      //notetext.innerText = data;
-      //時間
-      if(data.length > 20){
-      	lastupdatetime.innerText = "獲取更新時間失敗了。"
-      }
-      else{
-      	lastupdatetime.innerText = "最後一次更新於: " + data;
-      }
-    })
-  }
-  catch{
-    console.log("Oops! \r\n嘗試獲取最後更新時間失敗了。")
-  }
+  let lastupdatetime = document.getElementById('lastupdatetime');
+  //fetch("../Config/UpdateTime.txt")
+  fetch("https://api.github.com/repos/yuhang0000/yuhang0000.github.io/commits?per_page=1&page=1")
+  .then(response =>{
+  	if(response.ok != true){
+    	console.log("Oops! \r\n嘗試獲取最後更新時間失敗了。");
+    	lastupdatetime.innerText = "獲取更新時間失敗了。"
+  	}
+  	return response.text();
+  })
+  .then(data =>{
+  	//notetext.innerText = data;
+  	//時間
+  	//console.log(data);
+  	/*if(data.length > 20){
+    	lastupdatetime.innerText = "獲取更新時間失敗了。"
+  	}
+  	else{
+    	lastupdatetime.innerText = "最後一次更新於: " + data;
+  	}
+  	*/
+  	let time = data.substring(data.indexOf("\"date\":") + 9,data.indexOf("\"date\":") + 28);
+  	time = time.replace("T"," ");
+  	time = time.replace("Z","");
+  	time = new Date(time);
+  	time = new Date(time.valueOf() + 28800000);	//正八時區
+  	//怪怪的, 年份居然是從 0 開始計數的
+  	time = (time.getYear() + 1900) + "-" + (time.getMonth() + 1) + "-" + time.getDay() + " " + time.getHours() + ":" + time.getMinutes() + ":" + time.getSeconds();
+  	//怎麽會有 NAN !!!
+  	if(time.indexOf("NaN") != -1){
+    	console.log("Oops! \r\n嘗試獲取最後更新時間失敗了。")
+   		lastupdatetime.innerText = "獲取更新時間失敗了。"
+   		return;
+  	}
+  	lastupdatetime.innerText = "最後一次更新於: " + time;
+  })
+  .catch(ex =>{
+  	console.log("Oops! \r\n嘗試獲取最後更新時間失敗了。")
+  	lastupdatetime.innerText = "獲取更新時間失敗了。"
+  });
 </script>
 </body>
 </html>
