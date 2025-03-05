@@ -72,7 +72,9 @@
   	time = new Date(time);
   	time = new Date(time.valueOf() + 28800000);	//正八時區
   	//怪怪的, 年份居然是從 0 開始計數的
-  	time = (time.getYear() + 1900) + "-" + (time.getMonth() + 1) + "-" + time.getDay() + " " + time.getHours() + ":" + time.getMinutes() + ":" + time.getSeconds();
+  	//好吧, 忘記還有FullYear這方法, 好奇 getDay 和 getDate 有什麽區別欸?
+  	//console.log(time.valueOf());
+  	time = time.getFullYear() + "-" + (time.getMonth() + 1) + "-" + time.getDate() + " " + time.getHours() + ":" + String(time.getMinutes()).padStart(2, '0') + ":" + String(time.getSeconds()).padStart(2, '0');
   	//怎麽會有 NAN !!!
   	if(time.indexOf("NaN") != -1){
     	console.log("Oops! \r\n嘗試獲取最後更新時間失敗了。")
