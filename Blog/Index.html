@@ -34,6 +34,47 @@ a{
 <h1><strong>Blog:</strong></h1>
 <p><a href="../"><<<返回主頁</a></p>
 
+<a name="2025-3-16_19:25"><h3>#2025-3-16 19:25</h3></a>
+<p>
+好耶, 終於把這個脚本寫完了, 不知覺地寫了 1200 行代碼 (啊嘞, 居然寫了這麽多麽)。<br>
+</p>
+<p>
+<a href="../Images/Blog/2025/3-16-No.1/屏幕截图 2025-03-16 011522.png" target="_blank">
+<img src="../Images/Blog/2025/3-16-No.1/屏幕截图 2025-03-16 011522.png" alt="好多" width="200px" height="180px" title="好多">
+</a>
+<a href="../Images/Blog/2025/3-16-No.1/屏幕截图 2025-03-16 010251.png" target="_blank">
+<img src="../Images/Blog/2025/3-16-No.1/屏幕截图 2025-03-16 010251.png" alt="好多" width="320px" height="180px" title="好多">
+</a>
+</p>
+<p>
+徒手學習找開發文檔太麻煩, 還好有AI千問出手相助, 在它面前學習了一推拉庫的新東西,<br>
+當然, 這些業務邏輯還是由自己一個人編寫的, 俺本身就只喜歡自己一個人造輪子, 要是全部交給人工智能寫, 自己還白忙活幹什麽呢??? <br>
+MutationObserver 真好用😋, 但也是真拖慢運行速度😨。<br>
+shadowDOM 真壞, 訪問子節點還得從 shadowRoot 經過。<br> <br>
+嗯, 還是在這裏放放該脚本的修復效果吧: (修復前|後)
+</p>
+<p>
+<a href="../Images/Blog/2025/3-16-No.1/屏幕截图 2025-03-16 010503.png" target="_blank">
+<img src="../Images/Blog/2025/3-16-No.1/屏幕截图 2025-03-16 010503.png" alt="修復前" width="170px" height="180px" title="修復前">
+</a>
+<a href="../Images/Blog/2025/3-16-No.1/屏幕截图 2025-03-16 010310.png" target="_blank">
+<img src="../Images/Blog/2025/3-16-No.1/屏幕截图 2025-03-16 010310.png" alt="修復後" width="240px" height="180px" title="修復後">
+</a>
+</p>
+<p>&nbsp;</p>
+
+<a name="2025-3-16_19:18"><h3>#2025-3-16 19:18</h3></a>
+<p>
+嗯, 這一部分不好折騰, reply 列表加載和聯想搜尋詞不是同時發生的, 要解決這個問題不太好利用 delay 和 MutationObserver , 應爲要涉及大量的文本修改, 濫用監聽器可能會導致性能問題, <br>
+於是乾脆直接原地複製兩份, 只處理副本, 舊節點直接給 Hide 掉罷了.
+</p>
+<p>
+</a>
+<a href="../Images/Blog/2025/3-16-No.1/屏幕截图 2025-03-16 010243.png" target="_blank">
+<img src="../Images/Blog/2025/3-16-No.1/屏幕截图 2025-03-16 010243.png" alt="好多" width="320px" height="180px" title="好多">
+</p>
+<p>&nbsp;</p>
+
 <a name="2025-3-12_21:32"><h3>#2025-3-12 21:32</h3></a>
 <p>
 好吧, 第一次玩 TouHou , 我好弱鷄鵝😭。
