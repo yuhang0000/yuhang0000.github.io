@@ -26,10 +26,22 @@ a:hover{ /* 選擇器不用白不用 */
 	text-decoration: underline;
 	color: #8e0000;
 }
+.note{
+	color: #aaaaaa;
+	font-size: 0.75em;
+	text-align: center;
+}
 .readmore{
 	color:#8757ad;
 	padding:5px;
 	user-select:none;
+}
+.picwithnote{
+	width: 320px;
+	display: flex;
+	justify-content: center;
+	flex-wrap: wrap;
+	padding: 8px
 }
 </style>
 </head>
@@ -37,6 +49,44 @@ a:hover{ /* 選擇器不用白不用 */
 <body>
 <h1><strong>Blog:</strong></h1>
 <p><a href="../"><<<返回主頁</a></p>
+
+<a name="2025-5-13_15:10"><h3>#2025-5-13 15:10</h3></a>
+<h2>使用 jsxer 來反編譯 *.jsxbin 文檔</h2>
+<p>
+在以往反編譯 jsx 文檔時, 所應用的是 Jsxbin_to_Jsx.exe, 但那個程式應爲太久沒維護以至於現在的新型脚本無法反編譯出來;<br>
+<div class="picwithnote">
+	<a href="../Images/Blog/2025/5-13-No.1/屏幕截图 2025-04-02 010404.png" target="_blank">
+	<img src="../Images/Blog/2025/5-13-No.1/屏幕截图 2025-04-02 010404.png" style="height: auto; width: 320px;" alt="反編譯一半就失敗了www" title="反編譯一半就失敗了www">
+	</a>
+	<span class="note">反編譯一半就失敗了www</span>
+</div>
+然後去油土鱉尋找解決方案, 就看到了這部影片: <a href="https://www.youtube.com/watch?v=939Bo5iTxo0" target="_blank">[YouTube] How to Convert JSXBIN to JSX</a> <br>
+總之根據上述影片利用 jsxer 來反編譯這個 *.jsxbin 文檔. <br>
+<br>
+<b>怎麽用捏:</b>
+<ol>
+  <li>先去 Github 的頁面上下載 <a href="https://github.com/AngeloD2022/jsxer" target="_blank">jsxer</a></li>
+  <li>
+    然後在程序解壓目錄下打開 cmd
+    <div class="picwithnote">
+	  <a href="../Images/Blog/2025/5-13-No.1/屏幕截图 2025-05-12 150918.png" target="_blank">
+	    <img src="../Images/Blog/2025/5-13-No.1/屏幕截图 2025-05-12 150918.png" style="height: auto; width: 320px;" alt="Alt + D 直接在地址欄上鍵入 cmd 打開命令提示單元就 OK 啦~"
+	    title="Alt + D 直接在地址欄上鍵入 cmd 打開命令提示單元就 OK 啦~">
+	  </a>
+	  <span class="note">Alt + D 直接在地址欄上鍵入 cmd 打開命令提示單元就 OK 啦~</span>
+    </div>
+  </li>
+  <li>最後在命令提示單元上鍵入: <br><pre class="code" style="margin-top: 8px;">jsxer &lt;jsxbin 文檔所在位置&gt;</pre></li>
+</ol>
+好了, 大功告成啦!<br><br>
+<b>參考連接:</b>
+<ol>
+  <li><a href="https://www.youtube.com/watch?v=939Bo5iTxo0" target="_blank">[YouTube] How to Convert JSXBIN to JSX</a></li>
+  <li><a href="https://github.com/codecopy/jsxbin-to-jsx-converter" target="_blank">jsxbin-to-jsx-converter</a></li>
+  <li><a href="https://github.com/AngeloD2022/jsxer" target="_blank">AngeloD2022 - jsxer</a></li>
+</ol>
+</p>
+<p>&nbsp;</p>
 
 <a name="2025-5-12_01:37"><h3>#2025-5-12 01:37</h3></a>
 <p>
