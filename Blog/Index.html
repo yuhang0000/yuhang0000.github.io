@@ -101,7 +101,8 @@ a:hover{ /* 選擇器不用白不用 */
 
 <!-- 展開更多 -->
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+//document.addEventListener('DOMContentLoaded', function() {
+function readmorebtn(){
 	let button = document.querySelectorAll('.readmore');
 	if (button.length > 0){
 	  	button.forEach(btn => {
@@ -129,7 +130,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			});*/
 	  	});
 	}
-});
+}
 </script>
 <script>
 var bloglist; //列表
@@ -143,20 +144,24 @@ let pagebar_top = pagebar.querySelector('.pagetop');
 let pagebar_bottom = pagebar.querySelector('.pagebottom');
 let pagebar_nums = pagebar.querySelectorAll('.pagenum'); 
 
-//PageBar
-function addagebar(){
-	
-}
 
 //讀取部落格條目
 async function readblog(page = 1){
-	if(page == 0 || page == null){
+	//假如頁碼超出範圍
+	if(page == null || page < 1){
 		page = 1;
 		let url = new URL(window.location.href);
 		url.searchParams.set('page', 1);
 		history.pushState(null,null,url);
 		//return;
 	}
+	else if(page > pageitemnum){
+		page = pageitemnum;
+		let url = new URL(window.location.href);
+		url.searchParams.set('page', pageitemnum);
+		history.pushState(null,null,url);
+	}
+	
 	window.scrollTo(0,0);
 	let blog_body = document.querySelector('.blog_body');
 	for(let num of blog_body.querySelectorAll('.blog_item')){ //移除舊的部落格
@@ -176,9 +181,11 @@ async function readblog(page = 1){
 		num.innerText = num2;
 		num2++;
 	}
+	pagebar_label.innerText = 'Page ' + page + ' of ' + pageitemnum;
 	
+	//分別加載部落格
 	for(let num = (page - 1) * blogliststep ; num < page * blogliststep; num++){
-		if(num == bloglist.length){ //超出列表索引範圍
+		if(num >= bloglist.length){ //超出列表索引範圍
 			break;
 		}
 		await fetch(bloglist[num].trim())
@@ -186,13 +193,15 @@ async function readblog(page = 1){
 				return response.text();
 			})
 			.then(data => {
-				blog_body.innerHTML = '<div class="blog_item">' + blog_body.innerHTML + data + '<p>&nbsp;</p></div>';
+				blog_body.innerHTML = blog_body.innerHTML + '<div class="blog_item">' + data + '<p>&nbsp;</p></div>';
 			})
 			.catch(error => {
 				console.log('oops! \n' + error);
 			});
 	}
 	
+	//展開按鈕
+	readmorebtn();
 }
 
 //讀取部落格列表
@@ -225,24 +234,24 @@ async function readbloglist(){
 async function main(){
 	await readbloglist();
 	let url = new URL(window.location.href);
-	pagebar_label.innerText = 'Page ' + url.searchParams.get('page') + ' of ' + pageitemnum;
+	//pagebar_label.innerText = 'Page ' + url.searchParams.get('page') + ' of ' + pageitemnum;
 	pagebar_top.addEventListener('click', () => { //最新
 		url.searchParams.set('page', 1);
 		history.pushState(null,null,url);
-		pagebar_label.innerText = 'Page ' + url.searchParams.get('page') + ' of ' + pageitemnum;
+		//pagebar_label.innerText = 'Page ' + url.searchParams.get('page') + ' of ' + pageitemnum;
 		readblog(1)
 	});
 	pagebar_bottom.addEventListener('click', () => { //最舊
 		url.searchParams.set('page', pageitemnum);
 		history.pushState(null,null,url);
-		pagebar_label.innerText = 'Page ' + url.searchParams.get('page') + ' of ' + pageitemnum;
+		//pagebar_label.innerText = 'Page ' + url.searchParams.get('page') + ' of ' + pageitemnum;
 		readblog(pageitemnum)
 	});
 	for(let num of pagebar_nums){ //指定頁碼
 		num.addEventListener('click', () => {
 			url.searchParams.set('page', num.innerText);
 			history.pushState(null,null,url);
-			pagebar_label.innerText = 'Page ' + url.searchParams.get('page') + ' of ' + pageitemnum;
+			//pagebar_label.innerText = 'Page ' + url.searchParams.get('page') + ' of ' + pageitemnum;
 			readblog(num.innerText)
 		});
 	}
