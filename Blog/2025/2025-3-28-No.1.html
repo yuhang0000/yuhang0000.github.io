@@ -1,0 +1,16 @@
+<a name="2025-3-28_23:41"><h3>#2025-3-28 23:41</h3></a>
+<p>
+這裏獲取的加密方式有個⑨, 怪怪的。在 <a href="https://learn.microsoft.com/zh-cn/windows/win32/nativewifi/dot11-auth-algorithm">DOT11_AUTH_ALGORITHM 枚举</a> 中, 這裏給出的結果應該是 <span class="mark">WPA3_SAE</span> 。<br>
+反編譯查看這個庫後, 發現原本這裏沒有列舉這個類型, 嗯, 這個庫已經停更這麼多年了, 那個時間段 WPA3 還沒有公佈, 很正常。
+</p>
+<p>
+<a href="../Images/Blog/2025/3-28-No.1/屏幕截图 2025-03-28 104620.png" target="_blank">
+<img src="../Images/Blog/2025/3-28-No.1/屏幕截图 2025-03-28 104620.png" alt="⑨" width="220px" height="180px" title="⑨">
+</a>
+<a href="../Images/Blog/2025/3-28-No.1/屏幕截图 2025-03-28 104747.png" target="_blank">
+<img src="../Images/Blog/2025/3-28-No.1/屏幕截图 2025-03-28 104747.png" alt="DOT11_AUTH_ALGORITHM 枚举" width="320px" height="180px" title="DOT11_AUTH_ALGORITHM 枚举">
+</a>
+<a href="../Images/Blog/2025/3-28-No.1/屏幕截图 2025-03-28 105048.png" target="_blank">
+<img src="../Images/Blog/2025/3-28-No.1/屏幕截图 2025-03-28 105048.png" alt="反編譯后" width="320px" height="180px" title="反編譯后">
+</a>
+</p>

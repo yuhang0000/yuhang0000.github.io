@@ -1,0 +1,36 @@
+<a name="2025-2-17_17:33"><h3>#2025-2-17 17:33</h3></a>
+<p>
+在 C# 中, 如果使用 Environment.TickCount 的話, 儅操縱設備持久運行24天之後，會導致int溢出輸出為負數:
+</p>
+<a href="../Images/Blog/2025/2-17-No.1/屏幕截图 2025-02-16 141312.png" target="_blank">
+<img src="../Images/Blog/2025/2-17-No.1/屏幕截图 2025-02-16 141312.png" alt="使用 Environment.TickCount 的原始代碼部分" width="360px" height="240px" title="使用 Environment.TickCount 的原始代碼部分">
+</a>
+<a href="../Images/Blog/2025/2-17-No.1/屏幕截图 2025-02-16 181818.png" target="_blank">
+<img src="../Images/Blog/2025/2-17-No.1/屏幕截图 2025-02-16 181818.png" alt="溢出了欸" width="320px" height="240px" title="溢出了欸">
+</a>
+<a href="../Images/Blog/2025/2-17-No.1/屏幕截图 2025-02-16 141224.png" target="_blank">
+<img src="../Images/Blog/2025/2-17-No.1/屏幕截图 2025-02-16 141224.png" alt="變成負數了欸" width="240px" height="240px" title="變成負數了欸">
+</a>
+<p>
+從網路上搜尋到的解決方案是把 <span class="mark">Environment.TickCount</span> 給替換爲 <span class="mark">Environment.TickCount64</span> 。<br>
+但是這個方案只支援到 <span class="mark">.NET Core 3.0, 3.1, 5, 6, 7</span> , 并不支援 .NET Farmework 4.8 。
+於是慢慢找, 找到這篇文檔, 調用 WinAPI 來實現相同辦法, 以及這個 API 也有提供64位元的方法: 
+</p>
+<a href="../Images/Blog/2025/2-17-No.1/屏幕截图 2025-02-16 184446.png" target="_blank">
+<img src="../Images/Blog/2025/2-17-No.1/屏幕截图 2025-02-16 184446.png" alt="感謝大佬😭" width="320px" height="180px" title="感謝大佬😭">
+</a>
+<a href="../Images/Blog/2025/2-17-No.1/屏幕截图 2025-02-16 184515.png" target="_blank">
+<img src="../Images/Blog/2025/2-17-No.1/屏幕截图 2025-02-16 184515.png" alt="這裏有提供64位元的方法" width="320px" height="180px" title="這裏有提供64位元的方法">
+</a>
+<p>
+總之, 改完之後, 能夠正常顯示時間戳了 /(≧∇≦)/ 。
+</p>
+<a href="../Images/Blog/2025/2-17-No.1/屏幕截图 2025-02-16 184303.png" target="_blank">
+<img src="../Images/Blog/2025/2-17-No.1/屏幕截图 2025-02-16 184303.png" alt="變更後" width="320px" height="140px" title="變更後">
+</a>
+<p>
+<h3>參閲連接: </h3>
+<a href="https://www.cnblogs.com/jintianhu/archive/2010/09/01/1815031.html" target="_blank">C#中精确计时的一点收获 - 小小娟 - 博客园</a>
+<br>
+<a href="https://learn.microsoft.com/zh-cn/windows/win32/api/sysinfoapi/nf-sysinfoapi-gettickcount64" target="_blank">GetTickCount64 函数 (sysinfoapi.h) - Win32 apps - Microsoft Learn</a>
+</p>

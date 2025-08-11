@@ -1,0 +1,108 @@
+<a name="2024-9-27_01:21"><h3>#2024-9-27 01:21</h3></a>
+<h2>阻止 Edge/Chrome 上拓展外掛程式的自動更新</h2>
+<p>討厭拓展外掛程式會自動更新，導致俺的學習版IDM不能使用 😭: <br></p>
+<a href="../Images/Blog/2024/9-26-No.1/1.png" target="_blank">
+<img src="../Images/Blog/2024/9-26-No.1/1.png" alt="自動更新壞😡" width="320px" height="180px" title="自動更新壞😡">
+</a>
+<p>
+為了關掉這討厭的拓展更新，自己琢磨了一些方法，首先用 Fiddler 抓取瀏覽器的拓展外掛程式更新請求 (以 Edge 舉例)，抓取到這兩條功能變數名稱: <br>
+</p>
+<a class="code">
+update.googleapis.com<br>
+edge.microsoft.com
+</a>
+<p>
+以及拓展程式下 manifest.json 清單裡的 "update_url" : 
+</p>
+<a class="code">
+clients2.google.com
+</a>
+<p><a href="../Images/Blog/2024/9-26-No.1/2.png" target="_blank">
+<img src="../Images/Blog/2024/9-26-No.1/2.png" alt="檢查更新壞😡" width="320px" height="180px" title="檢查更新壞😡">
+</a>
+<a href="../Images/Blog/2024/9-26-No.1/3.png" target="_blank">
+<img src="../Images/Blog/2024/9-26-No.1/3.png" alt="清單文檔壞😡" width="320px" height="180px" title="清單文檔壞😡">
+</a></p>
+<p>
+那麼如何禁止瀏覽器自動更新外掛程式呢，當然是阻止這些網址訪問請求啦。<br>
+先以管理員的方式打開記事本，訪問 Hosts 文檔:  
+</p>
+<a class="code">
+Hosts 檔案在此位址: C:\Windows\System32\drivers\etc\hosts
+</a>
+<p>
+在文件末尾添加這些内容: 
+</p>
+<a class="code">
+127.0.0.1 edge.microsoft.com<br>
+127.0.0.1 clients.google.com<br>
+127.0.0.1 clients1.google.com<br>
+127.0.0.1 clients2.google.com<br>
+127.0.0.1 update.googleapis.com
+</a>
+<p>
+(因為俺有魔法衝浪的需求，這裡改為了 128.0.255.255)，然後 Ctrl + S 儲存。
+</p>
+<a href="../Images/Blog/2024/9-26-No.1/4.png" target="_blank">
+<img src="../Images/Blog/2024/9-26-No.1/4.png" alt="Hosts 壞😡" width="320px" height="180px" title="Hosts 壞😡">
+</a>
+<p>
+Win + R ，輸入 CMD 開啓命令提示字元，鍵入 Ipconfig /flushdns 來重置 DNS 快取記錄，<br>
+嘗試 Ping 下請求網址，如果請求位址是 127.0.0.1 並且返回 "Request timed out." 或者 "請求超時" 的話，那就說明 Hosts 檔案修改成功啦。
+</p>
+<a href="../Images/Blog/2024/9-26-No.1/5.png" target="_blank">
+<img src="../Images/Blog/2024/9-26-No.1/5.png" alt="CMD 壞😡" width="320px" height="180px" title="CMD 壞😡">
+</a>
+<p>
+最後，嘗試重啟下瀏覽器，並訪問拓展外掛程式更新的請求網址，檢查是否能夠拒絕訪問請求。
+</p>
+<a href="../Images/Blog/2024/9-26-No.1/6.png" target="_blank">
+<img src="../Images/Blog/2024/9-26-No.1/6.png" alt="update 壞😡" width="320px" height="180px" title="update 壞😡">
+</a>
+<h3>經常魔法使用互聯網的同志們看這裡: </h3>
+<p>
+因為一些代理軟體通過 127.0.0.1 來轉發網頁請求，會導致規則失效😱，但是不要慌張鴨<br>，
+僅需在 Hosts 文檔裡把 127.0.0.1 改為 128.0.255.255 即可，反正不是公共 IP ，照樣訪問不了。
+</p>
+<p>
+然後在代理軟體里，規則文檔下寫上指定重定向即可，這裡以藍色小貓咪 Clash 🐱 舉例: 
+</p>
+<p>
+首先把訂閱規則上的自動更新給掐了 🚫 (如果你會配置遠端規則自動復寫的話，也可以不用) ，然後進入編輯模式，定位到 "hosts: " (找不到的話，寫上) 鍵入下列文本: 
+</p>
+<pre class="code" style="margin-top: 0px; margin-bottom: 0px">
+hosts: 
+    edge.microsoft.com: 128.0.255.255
+    clients.google.com: 128.0.255.255
+    clients1.google.com: 128.0.255.255
+    clients2.google.com: 128.0.255.255
+    update.googleapis.com: 128.0.255.255
+</pre>
+<!--我的天哪，原來pre標簽這麽好用，我怎麽到現在才知道欸，雖然外邊距看起來怪怪的，但是後期不用手動加上<br>了欸，真好用😋。
+備忘: margin 是外邊距，原始尺寸太大了，直接改回去。-->
+<!-- Style 樣式寫在前面比較好-->
+<p>
+定位到 "rules: " (找不到的話，寫上) 鍵入下列文本: 
+</p>
+<pre class="code">
+rules:
+    - 'DOMAIN-SUFFIX , edge.microsoft.com , DIRECT'
+    - 'DOMAIN-SUFFIX , clients.google.com , DIRECT'
+    - 'DOMAIN-SUFFIX , clients1.google.com , DIRECT'
+    - 'DOMAIN-SUFFIX , clients2.google.com , DIRECT'
+    - 'DOMAIN-SUFFIX , update.googleapis.com , DIRECT'
+</pre>
+<p>
+最後 Ctrl + S 儲存訂閱規則並重啟代理服務即可。
+</p>
+<p><a href="../Images/Blog/2024/9-26-No.1/7.png" target="_blank">
+<img src="../Images/Blog/2024/9-26-No.1/7.png" alt="hosts 壞😡" width="320px" height="180px" title="hosts 壞😡">
+</a>
+<a href="../Images/Blog/2024/9-26-No.1/8.png" target="_blank">
+<img src="../Images/Blog/2024/9-26-No.1/8.png" alt="rules 壞😡" width="320px" height="180px" title="rules 壞😡">
+</a></p>
+<h3>Edge 瀏覽器帳戶、收藏欄和歷史記錄同步出問題的同志看這裡: </h3>
+<p>因為 Ban 掉了 edge.microsoft.com 網址導致 Edge 瀏覽器無法同步數據，要正常訪問並禁用拓展外掛程式自動更新的話，跟著以下步驟來: </p>
+<p>在 Hosts 文檔和 訂閱規則 上，把有關 edge.microsoft.com 的條目刪了，然後把拓展程式替換為 Chrome 商店上所提供的 <span class="mark">*.crx</span> 文檔，<br>
+檢查拓展外掛程式下 manifest.json 清單裡的 "update_url" 條目里，是否為: "clients2.google.com" 。 <br>
+因為 Edge 瀏覽器是根據 "update_url" 條目來更新外掛程式的，把谷歌拓展商店給 Ban 了，照樣會阻止拓展自動更新。</p>

@@ -1,0 +1,67 @@
+<a name="2024-10-23_00:23"><h3>#2024-10-23 00:23</h3></a>
+<p>一個簡單的非線性移動動畫，就花費了整個下午，俺效率好慢。<br>
+暫時寫到這裏啦，還沒有完善好，也許可以來參考一下下??</p>
+<pre class="code">
+//非綫性動畫
+  async function dha2(A,ddd,first,last,time,level,id){
+    //漸入
+    first = first * -1;
+    last = last * -1;
+    let t = 0;
+    time = time / 1;
+    let step = 10 / time;
+    let output;
+    let over = first - last;
+    if(A == "in"){
+      while(time > 0)
+      {
+        time = time - 10;
+        t = t + step;
+        if(t > 1){
+          t = 1;
+        }
+        output = (Math.sin(t * 3.1415926 / 2) * over - first).toFixed(16);
+        console.log("時間" + time);
+        console.log(t);
+        console.log("輸出" + output);
+        if(ddd == "X" || ddd == "x")
+        {
+          id.style.left = output + "px";
+        }
+        else if(ddd == "Y" || ddd == "y")
+        {
+          id.style.top = output + "px";
+        }
+        await delay(10);
+      }
+    }
+    //漸出
+    else{
+      //這裏還沒有寫完
+    }
+    
+    if(ddd == "X" || ddd == "x"){
+      id.style.left = last;
+    }
+    else if(ddd == "X" || ddd == "x"){
+      id.style.top = last;
+    }
+  }
+  
+  //觸發
+  let i0 = document.getElementById('i0');
+  (async function () { dha2("in","X",350,0,1000,1,i0);})();
+</pre>
+<p>
+<a href="../Images/Blog/2024/10-23-No.1/1.png" target="_blank">
+<img src="../Images/Blog/2024/10-23-No.1/1.png" alt="0.1 + 0.2 等於多少呀？答案是 0.30000000000000004 !" width="480px" height="320px" title="0.1 + 0.2 等於多少呀？答案是 0.30000000000000004 !">
+</a>
+</p>
+<p>
+<a href="../Images/Blog/2024/10-23-No.1/2.png" target="_blank">
+<img src="../Images/Blog/2024/10-23-No.1/2.png" alt="摸魚" width="220px" height="320px" title="摸魚">
+</a>
+<a href="../Images/Blog/2024/10-23-No.1/3.png" target="_blank">
+<img src="../Images/Blog/2024/10-23-No.1/3.png" alt="還沒寫完呀" width="280px" height="320px" title="還沒寫完呀">
+</a>
+</p>

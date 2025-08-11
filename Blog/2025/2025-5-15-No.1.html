@@ -1,0 +1,34 @@
+<a name="2025-5-15_23:01"><h3>#2025-5-15 23:01</h3></a>
+<p>
+好, 實現了在配置文檔中讀取多行文本, 最初嘗試是通過在文本頭尾加入 " 引號作爲起始符和截至符
+</p>
+<p>
+<a href="../Images/Blog/2025/5-15-No.1/屏幕截图 2025-05-15 204302.png" target="_blank">
+<img src="../Images/Blog/2025/5-15-No.1/屏幕截图 2025-05-15 204302.png" style="width: 320px; height: auto;" alt="要解析的目標檔案" title="要解析的目標檔案">
+</a>
+<a href="../Images/Blog/2025/5-15-No.1/PixPin_2025-05-15_20-45-01.png" target="_blank">
+<img src="../Images/Blog/2025/5-15-No.1/PixPin_2025-05-15_20-45-01.png" style="width: 320px; height: 180px; object-fit: cover;" alt="aaa寫個大便💩" title="aaa寫個大便💩">
+</a>
+</p>
+<p>
+但做出來之後, 就發現這個 Bug 實在是太多了, 最終還是改用轉義字符的方案, 只讓 value 單行顯示. <br>
+儘管這使得檔案内部很歡亂, 一大串的文字集中在同一行, 但至少目前很穩定, 沒有出現岔子的話, 就先凑合著用吧233. <br>
+(俺絕對不是嬾狗 😇 [確信])
+</p>
+<div style="display: flex;">
+	<div style="display: inline-flex; flex-wrap: wrap; flex-direction: column;">
+		<a href="../Images/Blog/2025/5-15-No.1/屏幕截图 2025-05-15 204644.png" target="_blank">
+		<img src="../Images/Blog/2025/5-15-No.1/屏幕截图 2025-05-15 204644.png" style="width: 320px; height: auto;" alt="創建專門用於儲備轉義字符的字典" title="創建專門用於儲備轉義字符的字典">
+		</a>
+		<a href="../Images/Blog/2025/5-15-No.1/屏幕截图 2025-05-15 205112.png" target="_blank">
+		<img src="../Images/Blog/2025/5-15-No.1/屏幕截图 2025-05-15 205112.png" style="width: 320px; height: auto;" alt="然後循環遍歷字典上的轉義字符並替換掉" title="然後循環遍歷字典上的轉義字符並替換掉">
+		</a>
+		<a href="../Images/Blog/2025/5-15-No.1/屏幕截图 2025-05-15 204624.png" target="_blank">
+		<img src="../Images/Blog/2025/5-15-No.1/屏幕截图 2025-05-15 204624.png" style="width: 320px; height: auto;" alt="最後檔案就儲備為這種單行格式. 還...行吧, 儘管内容全擠在同行顯示顯得有許混亂"
+		title="最後檔案就儲備為這種單行格式. 還...行吧, 儘管内容全擠在同行顯示顯得有許混亂">
+		</a>
+	</div>
+	<a href="../Images/Blog/2025/5-15-No.1/屏幕截图 2025-05-15 204611.png" target="_blank">
+	<img src="../Images/Blog/2025/5-15-No.1/屏幕截图 2025-05-15 204611.png" style="width: 320px; height: auto;" alt="最後也是能夠正常的把配置文檔給解析出來了" title="最後也是能夠正常的把配置文檔給解析出來了">
+	</a>
+</div>	
