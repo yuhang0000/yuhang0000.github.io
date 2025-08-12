@@ -78,6 +78,12 @@ a.link:hover, a.title:hover{ /* 選擇器不用白不用 */
     padding-bottom: 16px;
 	background: #f6f6f6;
 	margin-bottom: 8px;
+	transition: border 0.5s, background 0.5s;
+}
+.blog_item:hover{
+    border-bottom-color: #f0f0f0;
+    border-top-color: #f0f0f0;
+	background: #f9f9f9;
 }
 h3{
 	margin: 0px;
@@ -96,7 +102,7 @@ h3{
 	<div class="pagelabel" style="margin-right: 8px;">Page 1 of 1</div>
 	<div class="pagebtn pagetop">Frist</div>
 	<div class="pagenums" style="display: inline-flex; flex-wrap: nowrap; padding: 0px 8px;">
-		<div class="pagebtn pagenum">1</div>
+		<div class="pagebtn pagenum checked">1</div>
 		<div class="pagebtn pagenum">2</div>
 		<div class="pagebtn pagenum">3</div>
 		<div class="pagebtn pagenum">4</div>
@@ -150,6 +156,7 @@ function readmorebtn(){
 </script>
 <script>
 var bloglist; //列表
+var bloglisturl = './blog.txt'; //主列表地址
 var blogliststep = 10; //每頁讀取個數
 
 //頁碼導航條
@@ -160,6 +167,19 @@ let pagebar_top = pagebar.querySelector('.pagetop');
 let pagebar_bottom = pagebar.querySelector('.pagebottom');
 let pagebar_nums = pagebar.querySelectorAll('.pagenum'); 
 
+function oops(msg, url = null, title = null, key = null, value = null){
+	if(key != null){
+		let url = new URL(window.location.href);
+		url.searchParams.set(key, value);
+		history.pushState(null,title,url);
+	}
+	let blog_body = document.querySelector('.blog_body');
+	let link = ''
+	if(url != null){
+		link = '<div style="padding-top: 8px;">請求連接: <a class="link" href="' + url + '" target="_blank">' + url + '</a></div>';
+	}
+	blog_body.innerHTML = '<div class="blog_item" style="display: inline-block; padding: 8px; white-space: pre-wrap;">' + msg + link + '</div>'
+}
 
 //讀取部落格條目
 async function readblog(page = 1){
@@ -174,10 +194,7 @@ async function readblog(page = 1){
 	
 	//假如沒有任何部落格
 	if(pageitemnum == 0 || pageitemnum == null){
-		let url = new URL(window.location.href);
-		url.searchParams.set('page', 1);
-		history.pushState(null,null,url);
-		blog_body.innerHTML = '<div class="blog_item" style="display: inline-flex; padding: 8px;">這裏好像什麽都木有.</div>'
+		oops('這裏好像什麽都木有.',null,null,'page', 1);
 		return;
 	}
 	
@@ -234,13 +251,24 @@ async function readblog(page = 1){
 		}
 		await fetch(url.trim())
 			.then(response => {
-				return response.text();
+				if(response.ok == true){
+					return response.text();
+				}
+				else{
+					return null;
+				}
 			})
 			.then(data => {
-				blog_body.innerHTML = blog_body.innerHTML + '<div class="blog_item">' + data + '</div>';
+				if(data != null){
+					blog_body.innerHTML = blog_body.innerHTML + '<div class="blog_item">' + data + '</div>';
+				}
+				else{
+					blog_body.innerHTML = blog_body.innerHTML + '<div class="blog_item" style="padding: 8px;">' + '載入失敗哩...' + '</div>';
+				}
 			})
 			.catch(error => {
-				console.log('oops! \n' + error);
+				//debugger;
+				oops('oops! \n  ' + error, url.trim(),null,'page', 1);
 			});
 	}
 	
@@ -251,23 +279,36 @@ async function readblog(page = 1){
 //讀取部落格列表
 async function readbloglist(){
 	try{
-		await fetch('./blog.txt')
+		await fetch(bloglisturl)
 			.then(response => {
-				return response.text();
+				if(response.ok == true){
+					return response.text();
+				}
+				else{
+					oops('oops! \n  (' + response.status + ') ' + response.statusText, response.url,null,'page', 1);
+					return null;
+				}
 			})
 			.then(data => {
 				//console.log(data);
-				bloglist = new Array();
+
+				if(data == null){
+					return false;
+				}
+				
 				//篩選列表
+				bloglist = new Array();
 				for(let list of data.split('\r\n')){
 					if(list == null || list == '' || list == './'){
 						continue;
 					}
 					bloglist.push(list.trim());
 				}
+				
 				//console.log(bloglist);
 				//console.log( bloglist.length / blogliststep );
 				//pageitemnum = parseInt(bloglist.length / blogliststep) + 1;
+				
 				//計算分頁數量
 				pageitemnum = bloglist.length / blogliststep; 
 				if(String(pageitemnum).indexOf('.') != -1){
@@ -275,17 +316,20 @@ async function readbloglist(){
 						pageitemnum = parseInt(pageitemnum) + 1;
 					}
 				}
-				console.log(pageitemnum);
+				//console.log(pageitemnum);
+				
 				//獲取當前頁碼
 				let url = new URL(window.location.href);
 				readblog( url.searchParams.get('page') );
 			})
 			.catch(error => {
-				console.log('oops! \n' + error);
+				oops('oops! \n  ' + error, bloglisturl,null,'page', 1);
+				//console.log('oops! \n' + error);
 			});
 	}
 	catch (ex){
-		console.log('oops! \n' + ex);
+		oops('oops! \n  ' + ex, bloglisturl,null,'page', 1);
+		//console.log('oops! \n' + ex);
 	}
 }
 
