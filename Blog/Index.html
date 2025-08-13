@@ -54,9 +54,17 @@ a.link:hover, a.title:hover{ /* 選擇器不用白不用 */
 .pagebtn{
 	color: #8757ad;
 	cursor: pointer;
+	transition: color 0.5s;
 }
-.pagebtn:hover{
-	color: #47285e;
+.pagebtn:not(.disable):hover{
+	color: #c69fe4;
+}
+.pagebar.disable{
+	color: #666;
+}
+.pagebar.disable .pagebtn{
+	color: #aaa;
+	cursor: not-allowed;
 }
 .pagenum{
 	padding: 4px;
@@ -68,6 +76,9 @@ a.link:hover, a.title:hover{ /* 選擇器不用白不用 */
 .pagenum.hidden{
 	display: none;
 }
+.pagelabel{
+	transition: color 0.5s;
+}
 .blog_item{
 	border-bottom-style: solid;
     border-bottom-color: #eee;
@@ -75,7 +86,7 @@ a.link:hover, a.title:hover{ /* 選擇器不用白不用 */
 	border-top-style: solid;
     border-top-color: #eee;
     border-top-width: 2px;
-    padding-bottom: 16px;
+    padding: 0 8px 16px 8px;
 	background: #f6f6f6;
 	margin-bottom: 8px;
 	transition: border 0.5s, background 0.5s;
@@ -161,13 +172,15 @@ var blogliststep = 10; //每頁讀取個數
 
 //頁碼導航條
 var pageitemnum; //縂頁數
+var pagebar_disable = false;
 let pagebar = document.querySelector('.pagebar');
 let pagebar_label = pagebar.querySelector('.pagelabel');
 let pagebar_top = pagebar.querySelector('.pagetop');
 let pagebar_bottom = pagebar.querySelector('.pagebottom');
 let pagebar_nums = pagebar.querySelectorAll('.pagenum'); 
 
-function oops(msg, url = null, title = null, key = null, value = null){
+//報錯: 訊息, 請求連接, 頁面標題, url 請求鍵, url 請求值, 是否輸出資訊
+function oops(msg, url = null, title = null, key = null, value = null, output = false){
 	if(key != null){
 		let url = new URL(window.location.href);
 		url.searchParams.set(key, value);
@@ -178,12 +191,19 @@ function oops(msg, url = null, title = null, key = null, value = null){
 	if(url != null){
 		link = '<div style="padding-top: 8px;">請求連接: <a class="link" href="' + url + '" target="_blank">' + url + '</a></div>';
 	}
-	blog_body.innerHTML = '<div class="blog_item" style="display: inline-block; padding: 8px; white-space: pre-wrap;">' + msg + link + '</div>'
+	let html = '<div class="blog_item" style="display: inline-block; padding: 8px; white-space: pre-wrap;">' + msg + link + '</div>';
+	if(output == false){
+		blog_body.innerHTML = html;
+	}
+	else{
+		return html;
+	}
 }
 
 //讀取部落格條目
 async function readblog(page = 1){
 	//移除舊的部落格
+	pagebar.classList.add('disable');
 	window.scrollTo(0,0);
 	let blog_body = document.querySelector('.blog_body');
 	for(let num of blog_body.querySelectorAll('.blog_item')){ 
@@ -195,6 +215,7 @@ async function readblog(page = 1){
 	//假如沒有任何部落格
 	if(pageitemnum == 0 || pageitemnum == null){
 		oops('這裏好像什麽都木有.',null,null,'page', 1);
+		pagebar.classList.remove('disable');
 		return;
 	}
 	
@@ -249,7 +270,7 @@ async function readblog(page = 1){
 		if(url == '' || url == null || url == './'){
 			continue;
 		}
-		await fetch(url.trim())
+		await fetch(url.trim(), {cache: 'no-cache'})
 			.then(response => {
 				if(response.ok == true){
 					return response.text();
@@ -260,7 +281,7 @@ async function readblog(page = 1){
 			})
 			.then(data => {
 				if(data != null){
-					blog_body.innerHTML = blog_body.innerHTML + '<div class="blog_item">' + data + '</div>';
+					blog_body.innerHTML = blog_body.innerHTML + '<div class="blog_item" href="' + url.trim() + '">' + data + '</div>';
 				}
 				else{
 					blog_body.innerHTML = blog_body.innerHTML + '<div class="blog_item" style="padding: 8px;">' + '載入失敗哩...' + '</div>';
@@ -268,18 +289,22 @@ async function readblog(page = 1){
 			})
 			.catch(error => {
 				//debugger;
-				oops('oops! \n  ' + error, url.trim(),null,'page', 1);
+				blog_body.innerHTML = blog_body.innerHTML + oops('oops! \n  ' + error, url.trim(),null,'page', 1,true);
+				//pagebar.classList.add('disable');
 			});
 	}
 	
 	//展開按鈕
 	readmorebtn();
+
+	pagebar.classList.remove('disable');
 }
 
 //讀取部落格列表
 async function readbloglist(){
+	pagebar.classList.add('disable');
 	try{
-		await fetch(bloglisturl)
+		await fetch(bloglisturl, {cache: 'no-cache'})
 			.then(response => {
 				if(response.ok == true){
 					return response.text();
@@ -292,7 +317,8 @@ async function readbloglist(){
 			.then(data => {
 				//console.log(data);
 
-				if(data == null){
+				if(data == null){ //獲取失敗了
+					pagebar.classList.remove('disable');
 					return false;
 				}
 				
@@ -324,11 +350,13 @@ async function readbloglist(){
 			})
 			.catch(error => {
 				oops('oops! \n  ' + error, bloglisturl,null,'page', 1);
+				pagebar.classList.remove('disable');
 				//console.log('oops! \n' + error);
 			});
 	}
 	catch (ex){
 		oops('oops! \n  ' + ex, bloglisturl,null,'page', 1);
+		pagebar.setAttribute('disable', 'false');
 		//console.log('oops! \n' + ex);
 	}
 }
@@ -337,27 +365,27 @@ async function readbloglist(){
 async function main(){
 	await readbloglist();
 	let url = new URL(window.location.href);
-	//pagebar_label.innerText = 'Page ' + url.searchParams.get('page') + ' of ' + pageitemnum;
 	pagebar_top.addEventListener('click', () => { //最新
-		url.searchParams.set('page', 1);
-		history.pushState(null,null,url);
-		//pagebar_label.innerText = 'Page ' + url.searchParams.get('page') + ' of ' + pageitemnum;
-		readblog(1)
+		pagebtn_click(1);
 	});
 	pagebar_bottom.addEventListener('click', () => { //最舊
-		url.searchParams.set('page', pageitemnum);
-		history.pushState(null,null,url);
-		//pagebar_label.innerText = 'Page ' + url.searchParams.get('page') + ' of ' + pageitemnum;
-		readblog(pageitemnum)
+		pagebtn_click(pageitemnum);
 	});
 	for(let num of pagebar_nums){ //指定頁碼
 		num.addEventListener('click', () => {
-			url.searchParams.set('page', num.innerText);
-			history.pushState(null,null,url);
-			//pagebar_label.innerText = 'Page ' + url.searchParams.get('page') + ' of ' + pageitemnum;
-			readblog(num.innerText)
+			pagebtn_click(num.innerText);
 		});
 	}
+	//封包了一個導航條點擊跳轉事件.
+	function pagebtn_click(pagenum = 1){
+		if(pagebar.classList.contains('disable') == false){
+			url.searchParams.set('page', pagenum);
+			history.pushState(null,null,url);
+			//pagebar_label.innerText = 'Page ' + url.searchParams.get('page') + ' of ' + pageitemnum;
+			readblog(pagenum)
+		}
+	}
+
 	
 }
 
