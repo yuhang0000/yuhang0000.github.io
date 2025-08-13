@@ -122,7 +122,7 @@ h3{
 	<div class="pagebtn pagebottom">Last</div>
 </div>
 
-<p>2025 - yuhang0000</p>
+<p style="color: #666; font-size: 0.8em; white-space: pre-wrap;">2025 &copy; yuhang0000 - Powered By My hand</p>
 
 <!--
 常用的圖像尺寸: 
@@ -324,7 +324,7 @@ async function readbloglist(){
 				
 				//篩選列表
 				bloglist = new Array();
-				for(let list of data.split('\r\n')){
+				for(let list of data.split('\n')){
 					if(list == null || list == '' || list == './'){
 						continue;
 					}
