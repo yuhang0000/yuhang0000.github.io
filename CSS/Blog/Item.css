@@ -1,0 +1,67 @@
+.code{
+	font-family: monospace;
+	background: #e5e5e5;
+	display: inline-block;
+	padding: 5px;
+	/*我居然會寫style樣式了欸，豪爽😋，備忘: font-family 選擇字體; display 不讓控件中間出現空隙; padding 内邊距
+	 誒，在這裏打注釋不能用 <!-- --> 和 // 欸。 */
+	margin-top: 0px; 
+	margin-bottom: 0px
+}
+.mark{
+	background: #e5e5e5;
+	display: inline-block;
+}
+a.link, a.title{
+	text-decoration: none;
+}
+a.link:hover, a.title:hover{ /* 選擇器不用白不用 */
+	text-decoration: underline;
+	color: #8e0000;
+}
+.note{
+	color: #aaaaaa;
+	font-size: 0.75em;
+	text-align: center;
+}
+.readmore{
+	color:#8757ad;
+	padding:5px;
+	user-select:none;
+}
+.readmore:hover{
+	color: #47285e;
+}
+.picwithnote{
+	width: 320px;
+	display: flex;
+	justify-content: center;
+	flex-wrap: wrap;
+	padding: 8px
+}
+.picwithnote div a{
+	flex: 1;
+	margin: 4px;
+	min-width: 0;
+}
+.blog_item{
+	border-bottom-style: solid;
+    border-bottom-color: #eee;
+    border-bottom-width: 2px;
+	border-top-style: solid;
+    border-top-color: #eee;
+    border-top-width: 2px;
+    padding: 0 8px 16px 8px;
+	background: #f6f6f6;
+	margin-bottom: 8px;
+	transition: border 0.5s, background 0.5s;
+}
+.blog_item:hover{
+    border-bottom-color: #f0f0f0;
+    border-top-color: #f0f0f0;
+	background: #f9f9f9;
+}
+h3{
+	margin: 0px;
+	padding: 16px 0px;
+}

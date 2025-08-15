@@ -1,0 +1,28 @@
+.pagebtn{
+	color: #8757ad;
+	cursor: pointer;
+	transition: color 0.5s;
+}
+.pagebtn:not(.disable):hover{
+	color: #c69fe4;
+}
+.pagebar.disable{
+	color: #666;
+}
+.pagebar.disable .pagebtn{
+	color: #aaa;
+	cursor: not-allowed;
+}
+.pagenum{
+	padding: 4px;
+}
+.pagenum.checked{
+	font-weight: bold;
+	text-decoration: underline;
+}
+.pagenum.hidden{
+	display: none;
+}
+.pagelabel{
+	transition: color 0.5s;
+}
