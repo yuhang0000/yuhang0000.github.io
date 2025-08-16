@@ -1,7 +1,9 @@
 ---
-title=MarkDown 測試
+Title=MarkDown 測試
 Data=2025-8-15 14:02
+Updata=2025-8-16 22:15
 Tag=MarkDown;Test
+Guest=true
 ---
 
 # 標題1
@@ -16,7 +18,7 @@ Tag=MarkDown;Test
 
 ###### 標題6
 
-正文 **加粗** *斜體* ***加粗斜體*** <u>下橫綫</u> ~~剔除綫~~ <mark>高亮</mark> ``代碼塊``  [超級連接](//index.html "訪問主頁") $1+1=10$ 
+正文 **加粗** *斜體* ***加粗斜體*** <u>下橫綫</u> ~~剔除綫~~ <mark>高亮</mark> ``代碼塊``  [超級連接](/index.html "訪問主頁") $1+1=10$ 
 
 ![圖像](./../../../Pictures/logo-title-B.png "圖像標題")
 
@@ -55,9 +57,9 @@ $$
    1. i need to translation some aseprite user script.
    
    2. Maybe I can write some script. 
-- [Blog](//blog/index.html)
+- [Blog](/blog/index.html)
 
-- [Programming](//Web/Programming.html)
+- [Programming](/Web/Programming.html)
   
   - [UserScripts](https://github.com/yuhang0000/UserScripts)
   
@@ -65,9 +67,9 @@ $$
   
   - [CSharp Program](https://github.com/yuhang0000/yuhang0000-Program-Deposit)
 
-- [Archive](//Web/Archive.html)
+- [Archive](/Web/Archive.html)
 
-- [About me](//Web/About.html)
+- [About me](/Web/About.html)
 
 ### 清單
 

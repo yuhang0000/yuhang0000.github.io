@@ -24,7 +24,7 @@
 
 * `Test` 測試項;
 
-* `Web` 其他頁面;
+* `Web` 其他頁面:
   
   * `About.html` 關於俺;
   
@@ -34,7 +34,7 @@
   
   * `Programming.html` 我所編寫/漢化/協助的軟件/插件/脚本的合集;
   
-  * `WebSocketTest.html` 在綫測試 WebSocket;
+  * `WebSocketTest.html` 在綫測試 WebSocket.
 
 * `.gitignore` Git 文檔略過清單;
 

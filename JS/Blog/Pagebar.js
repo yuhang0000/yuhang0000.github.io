@@ -113,7 +113,12 @@ async function readblog(page = 1){
 			})
 			.then(data => {
 				if(data != null){
-					blog_body.innerHTML = blog_body.innerHTML + '<div class="blog_item" href="' + url.trim() + '">' + data + '</div>';
+				  if(url.trim().indexOf('.md') != -1){
+				    blog_body.innerHTML = blog_body.innerHTML + '<div class="blog_item" href="' + url.trim() + '">' + md.read(data) + '</div>'; //MarkDown
+				  }
+				  else{
+				    blog_body.innerHTML = blog_body.innerHTML + '<div class="blog_item" href="' + url.trim() + '">' + data + '</div>'; //HTML
+					}
 				}
 				else{
 					blog_body.innerHTML = blog_body.innerHTML + '<div class="blog_item" style="padding: 8px;">' + '載入失敗哩...' + '</div>';
@@ -135,6 +140,15 @@ async function readblog(page = 1){
 //讀取部落格列表
 async function readbloglist(){
 	pagebar.classList.add('disable');
+	//测试 MarkDown
+	let url = new URL(window.location.href);
+	if(url.searchParams.get('test') != null){
+	  bloglist = ['/Test/Test.md'];
+	  pageitemnum = 1;
+	  pagebar.classList.remove('disable');
+	  readblog(1);
+	  return;
+	}
 	try{
 		await fetch(bloglisturl, {cache: 'no-cache'})
 			.then(response => {
