@@ -19,9 +19,9 @@ class md{
     'guest':true /*是否公開*/ }
     
     //console.log(datas);
-    for(let i = 0; i < datas.length ; i++){
+    for(let i = 0; i < datas.length ; i++){ //每行遍历
       let data = datas[i];
-      console.log(data);
+      //console.log(data);
       
       //檢查元數據
       if(i == 0 && data == "---"){
@@ -55,7 +55,20 @@ class md{
               meta['updata'] = value;
               break;
             case 'tag':
-              meta['tag'] = value;
+              if(value.indexOf(';') != -1){
+                value = value.split(';');
+                for(let iii = 0 ; iii < value.length ; iii++){
+                  value[iii] = value[iii].trim();
+                }
+                meta['tag'] = value;
+              }
+              else /* if(value.indexOf(',') != -1)*/{
+                value = value.split(',');
+                for(let iii = 0 ; iii < value.length ; iii++){
+                  value[iii] = value[iii].trim();
+                }
+                meta['tag'] = value;
+              }
               break;
             case 'guest':
               /*if(value == ''){
@@ -85,6 +98,8 @@ class md{
           continue;
         }
       }
+
+      
       
     }
   }
