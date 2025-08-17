@@ -38,6 +38,8 @@
 
 * `.gitignore` Git 文檔略過清單;
 
+* `.nojekyll` 禁用 jekyll 構建工具;
+
 * `BingSiteAuth.xml` 用於 Bing 搜索引擎收錄的身份校驗文檔;
 
 * `index.html` 站點主入口;
@@ -51,5 +53,3 @@
   
 
 ###### © 2024 - 2025 yuhang0000.  •  Powered By My hand. <br>Content is licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/legalcode.zh-hant) unless otherwise noted.
-
-
