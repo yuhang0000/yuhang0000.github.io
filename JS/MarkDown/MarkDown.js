@@ -94,19 +94,51 @@ class md{
 
         if(lastindex != -1){
           i = lastindex;
-          console.table(meta);
+          //console.table(meta);
           continue;
         }
       }
 
-      
+      //遍歷 # 標題
+      if(data.trim().length > 0){
+        switch (data.trim()[0]){
+          case '#': //標題
+            output = output + md.title(data);
+            break;
+          case '>': //引用
+            break;
+          default: //普通文本
+            break;
+        }
+      }
       
     }
+
+    //輸出 HTML
+    return output;
   }
   
   //標題
   static title(data){
-    
+    let num = 0;
+    let text = '';
+    for(let t of data.trim()){
+      if(t == '#'){
+        num++
+      }
+      else if(num > 6){ //超過 7 個#就不屬於標題
+        return md.paragraph(data);
+      }
+      else{
+        text = text + t;
+      }
+    }
+    return "<h" + num + ">" + text.trim()+ "</h" + num + ">";
+  }
+
+  //普通文本
+  static paragraph(data){
+    return "<p>" + data + "</p>";
   }
   
 }

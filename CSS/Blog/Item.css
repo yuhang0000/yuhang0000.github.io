@@ -61,7 +61,37 @@ a.link:hover, a.title:hover{ /* 選擇器不用白不用 */
     border-top-color: #f0f0f0;
 	background: #f9f9f9;
 }
-h3{
+h1{
 	margin: 0px;
 	padding: 16px 0px;
+	font-size: 2rem;
+}
+h2{
+	margin: 0px;
+	padding: 14px 0px;
+	font-size: 1.75rem;
+}
+h3{
+	margin: 0px;
+	padding: 12px 0px;
+	font-size: 1.5rem;
+}
+h4{
+	margin: 0px;
+	padding: 10px 0px;
+	font-size: 1.25rem;
+}
+h5{
+	margin: 0px;
+	padding: 8px 0px;
+	font-size: 1rem;
+}
+h6{
+	margin: 0px;
+	padding: 6px 0px;
+	font-size: 0.75rem;
+	color: #666;
+}
+p{
+  white-space: pre-wrap;
 }
