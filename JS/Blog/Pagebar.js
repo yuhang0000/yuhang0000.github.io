@@ -1,5 +1,5 @@
 var bloglist; //列表
-var bloglisturl = './blog.txt'; //主列表地址
+var bloglisturl = './Blog.txt'; //主列表地址
 var blogliststep = 10; //每頁讀取個數
 
 //頁碼導航條
