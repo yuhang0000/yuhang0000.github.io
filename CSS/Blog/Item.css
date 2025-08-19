@@ -1,3 +1,4 @@
+/* 代碼塊 */
 .code{
 	font-family: monospace;
 	background: #e5e5e5;
@@ -8,14 +9,16 @@
 	margin-top: 0px; 
 	margin-bottom: 0px
 }
-.mark{
+/* 標記 */
+mark{
 	background: #e5e5e5;
 	display: inline-block;
 }
-a.link, a.title{
+/* 炒鷄連接 */
+a.link{
 	text-decoration: none;
 }
-a.link:hover, a.title:hover{ /* 選擇器不用白不用 */
+a.link:hover{ /* 選擇器不用白不用 */
 	text-decoration: underline;
 	color: #8e0000;
 }
@@ -44,22 +47,42 @@ a.link:hover, a.title:hover{ /* 選擇器不用白不用 */
 	margin: 4px;
 	min-width: 0;
 }
+/* 用來裝部落格的容器 */
 .blog_item{
+  display: flex;
+  flex-direction: column;
 	border-bottom-style: solid;
-    border-bottom-color: #eee;
-    border-bottom-width: 2px;
+  border-bottom-color: #eee;
+  border-bottom-width: 2px;
 	border-top-style: solid;
-    border-top-color: #eee;
-    border-top-width: 2px;
-    padding: 0 8px 16px 8px;
+  border-top-color: #eee;
+  border-top-width: 2px;
+  padding: 0 8px 16px 8px;
 	background: #f6f6f6;
 	margin-bottom: 8px;
 	transition: border 0.5s, background 0.5s;
 }
 .blog_item:hover{
-    border-bottom-color: #f0f0f0;
-    border-top-color: #f0f0f0;
+  border-bottom-color: #f0f0f0;
+  border-top-color: #f0f0f0;
 	background: #f9f9f9;
+}
+/* 正文段落 */
+.blog_item p{
+  white-space: pre-wrap;
+  padding: 0px 32px;
+}
+/* 分割綫 */
+.line{
+  display: block;
+  height: 2px;
+  width: 100%;
+  background: #aaa;
+}
+/* 標題 */
+div.title{
+  display: inline-flex;
+  align-items: center;
 }
 h1{
   white-space: pre-wrap;
@@ -98,12 +121,19 @@ h6{
 	font-size: 0.75rem;
 	color: #666;
 }
-p{
-  white-space: pre-wrap;
+a.title{
+  /* visibility: hidden; */
+  opacity: 0;
+  transition: opacity 0.1s;
+  width: 32px;
+  height: 32px;
+  align-items: center;
+  display: flex;
+  justify-content: flex-end;
+  user-select: none;
+  text-decoration: none;
 }
-.line{
-  display: block;
-  height: 2px;
-  width: 100%;
-  background: #aaa;
+a.title:hover{
+  opacity: 1;
+  /* visibility: visible; */
 }

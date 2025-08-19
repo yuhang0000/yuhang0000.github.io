@@ -108,7 +108,7 @@ class md{
             break;
           case '>': //引用
             break;
-          case '-': //线, 或者列表
+          case '-': //分割綫, 或者列表
             let num = 0;
             for (let t of data.trim()) {
               if (t == "-") {
@@ -156,7 +156,7 @@ class md{
     }
     datatemp.splice(0,1); //前面的 ###### 不要
     text = datatemp.join(' '); //打這麽多注釋, 那麽這裏就凑個數吧 (看不到俺2333)
-    return "<h" + num + ">" + text.trim()+ "</h" + num + ">";
+    return '<div class="title"><a class="title">🔗</a><h' + num + ">" + text.trim()+ '</h' + num + '></div>';
   }
 
   //普通文本
@@ -164,6 +164,7 @@ class md{
     return "<p>" + data + "</p>";
   }
 
+  //分割綫
   static line(){
     return '<div class="line"></div>';
   }
