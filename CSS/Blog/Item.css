@@ -62,31 +62,37 @@ a.link:hover, a.title:hover{ /* 選擇器不用白不用 */
 	background: #f9f9f9;
 }
 h1{
+  white-space: pre-wrap;
 	margin: 0px;
 	padding: 16px 0px;
 	font-size: 2rem;
 }
 h2{
+  white-space: pre-wrap;
 	margin: 0px;
 	padding: 14px 0px;
 	font-size: 1.75rem;
 }
 h3{
+  white-space: pre-wrap;
 	margin: 0px;
 	padding: 12px 0px;
 	font-size: 1.5rem;
 }
 h4{
+  white-space: pre-wrap;
 	margin: 0px;
 	padding: 10px 0px;
 	font-size: 1.25rem;
 }
 h5{
+  white-space: pre-wrap;
 	margin: 0px;
 	padding: 8px 0px;
 	font-size: 1rem;
 }
 h6{
+  white-space: pre-wrap;
 	margin: 0px;
 	padding: 6px 0px;
 	font-size: 0.75rem;
@@ -94,4 +100,10 @@ h6{
 }
 p{
   white-space: pre-wrap;
+}
+.line{
+  display: block;
+  height: 2px;
+  width: 100%;
+  background: #aaa;
 }

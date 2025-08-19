@@ -21,6 +21,7 @@ class md{
     //console.log(datas);
     for(let i = 0; i < datas.length ; i++){ //每行遍历
       let data = datas[i];
+      let outputtemp = ''
       //console.log(data);
       
       //檢查元數據
@@ -99,19 +100,38 @@ class md{
         }
       }
 
-      //遍歷 # 標題
+      //遍歷
       if(data.trim().length > 0){
         switch (data.trim()[0]){
           case '#': //標題
-            output = output + md.title(data);
+            outputtemp = md.title(data);
             break;
           case '>': //引用
             break;
+          case '-': //线, 或者列表
+            let num = 0;
+            for (let t of data.trim()) {
+              if (t == "-") {
+                num++;
+              }
+              else {
+                break;
+              }
+              if(num > 2){
+                outputtemp = md.line();
+              }
+            }
+            break;
           default: //普通文本
+            outputtemp = md.paragraph(data);
             break;
         }
       }
+
       
+      
+      //整合
+      output = output + outputtemp;
     }
 
     //輸出 HTML
@@ -122,23 +142,30 @@ class md{
   static title(data){
     let num = 0;
     let text = '';
-    for(let t of data.trim()){
-      if(t == '#'){
+    let datatemp = data.trim().split(' '); //#標題後面必須是空格
+    for(let i = 0 ; i < datatemp[0].length ; i++) {
+      if(datatemp[0][i] == '#'){
         num++
       }
-      else if(num > 6){ //超過 7 個#就不屬於標題
+      else{ //理論上來説, 截取的第一個字符串全是 #, 若遍歷到非 # 字符説明無效
         return md.paragraph(data);
       }
-      else{
-        text = text + t;
+      if(num > 6){ //最大標簽為 <h6>, num 超過6個以上無效
+        return md.paragraph(data);
       }
     }
+    datatemp.splice(0,1); //前面的 ###### 不要
+    text = datatemp.join(' '); //打這麽多注釋, 那麽這裏就凑個數吧 (看不到俺2333)
     return "<h" + num + ">" + text.trim()+ "</h" + num + ">";
   }
 
   //普通文本
   static paragraph(data){
     return "<p>" + data + "</p>";
+  }
+
+  static line(){
+    return '<div class="line"></div>';
   }
   
 }
