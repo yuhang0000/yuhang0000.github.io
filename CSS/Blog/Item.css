@@ -47,6 +47,10 @@ a.link:hover{ /* 選擇器不用白不用 */
 	margin: 4px;
 	min-width: 0;
 }
+/* 公共屬性 */
+:root{
+  --blog_item_paddingLR: 32px; /* 部落格的父容器兩側的内邊距 */
+}
 /* 用來裝部落格的容器 */
 .blog_item{
   display: flex;
@@ -57,7 +61,8 @@ a.link:hover{ /* 選擇器不用白不用 */
 	border-top-style: solid;
   border-top-color: #eee;
   border-top-width: 2px;
-  padding: 0 8px 16px 8px;
+  /* padding: 0 24px 16px 24px; */
+  padding: 16px var(--blog_item_paddingLR);
 	background: #f6f6f6;
 	margin-bottom: 8px;
 	transition: border 0.5s, background 0.5s;
@@ -71,7 +76,7 @@ a.link:hover{ /* 選擇器不用白不用 */
 /* 正文段落 */
 .blog_item p{
   white-space: pre-wrap;
-  padding: 0px 32px;
+  padding: 0px 0px;
 }
 /* 分割綫 */
 .line{
@@ -79,13 +84,15 @@ a.link:hover{ /* 選擇器不用白不用 */
   height: 2px;
   /* width: 100%; */
   background: #aaa;
-  margin: 0 32px;
+  margin: 0 0px;
 }
 /* 標題 */
 div.title{
   display: inline-flex;
   align-items: center;
   width: fit-content;
+  position: relative;
+  left: calc(var(--blog_item_paddingLR) * -1);
 }
 div.title:hover a.title:not(:hover){
   opacity: 0.3;
@@ -93,37 +100,38 @@ div.title:hover a.title:not(:hover){
 div.title h1, div.title h2, div.title h3, div.title h4, div.title h5, div.title h6{
 	padding-right: 2px;
 	margin: 0px;
-	max-width: calc(100cqw - 64px);
+	margin-left: calc(var(--blog_item_paddingLR) - 2px);;
+	max-width: 100cqw;
 	overflow: hidden;
 }
-h1{
+div.title h1{
   white-space: pre-wrap;
-	padding: 16px 32px;
+	padding: 16px 2px;
 	font-size: 2rem;
 }
-h2{
+div.title h2{
   white-space: pre-wrap;
-	padding: 14px 32px;
+	padding: 14px 2px;
 	font-size: 1.75rem;
 }
-h3{
+div.title h3{
   white-space: pre-wrap;
-	padding: 12px 32px;
+	padding: 12px 2px;
 	font-size: 1.5rem;
 }
-h4{
+div.title h4{
   white-space: pre-wrap;
-	padding: 10px 32px;
+	padding: 10px 2px;
 	font-size: 1.25rem;
 }
-h5{
+div.title h5{
   white-space: pre-wrap;
-	padding: 8px 32px;
+	padding: 8px 2px;
 	font-size: 1rem;
 }
-h6{
+div.title h6{
   white-space: pre-wrap;
-	padding: 6px 32px;
+	padding: 6px 2px;
 	font-size: 0.75rem;
 	color: #666;
 }
@@ -132,13 +140,14 @@ a.title{
   opacity: 0;
   position: absolute;
   transition: opacity 0.1s;
-  width: 28px;
+  width: 24px;
   height: 32px;
   align-items: center;
   display: flex;
   justify-content: flex-end;
   user-select: none;
   text-decoration: none;
+  left: calc(var(--blog_item_paddingLR) - 28px);
 }
 a.title:hover{
   opacity: 1;
