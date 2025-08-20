@@ -61,6 +61,7 @@ a.link:hover{ /* 選擇器不用白不用 */
 	background: #f6f6f6;
 	margin-bottom: 8px;
 	transition: border 0.5s, background 0.5s;
+	container-type: inline-size;
 }
 .blog_item:hover{
   border-bottom-color: #f0f0f0;
@@ -76,56 +77,62 @@ a.link:hover{ /* 選擇器不用白不用 */
 .line{
   display: block;
   height: 2px;
-  width: 100%;
+  /* width: 100%; */
   background: #aaa;
+  margin: 0 32px;
 }
 /* 標題 */
 div.title{
   display: inline-flex;
   align-items: center;
+  width: fit-content;
+}
+div.title:hover a.title:not(:hover){
+  opacity: 0.3;
+}
+div.title h1, div.title h2, div.title h3, div.title h4, div.title h5, div.title h6{
+	padding-right: 2px;
+	margin: 0px;
+	max-width: calc(100cqw - 64px);
+	overflow: hidden;
 }
 h1{
   white-space: pre-wrap;
-	margin: 0px;
-	padding: 16px 0px;
+	padding: 16px 32px;
 	font-size: 2rem;
 }
 h2{
   white-space: pre-wrap;
-	margin: 0px;
-	padding: 14px 0px;
+	padding: 14px 32px;
 	font-size: 1.75rem;
 }
 h3{
   white-space: pre-wrap;
-	margin: 0px;
-	padding: 12px 0px;
+	padding: 12px 32px;
 	font-size: 1.5rem;
 }
 h4{
   white-space: pre-wrap;
-	margin: 0px;
-	padding: 10px 0px;
+	padding: 10px 32px;
 	font-size: 1.25rem;
 }
 h5{
   white-space: pre-wrap;
-	margin: 0px;
-	padding: 8px 0px;
+	padding: 8px 32px;
 	font-size: 1rem;
 }
 h6{
   white-space: pre-wrap;
-	margin: 0px;
-	padding: 6px 0px;
+	padding: 6px 32px;
 	font-size: 0.75rem;
 	color: #666;
 }
 a.title{
   /* visibility: hidden; */
   opacity: 0;
+  position: absolute;
   transition: opacity 0.1s;
-  width: 32px;
+  width: 28px;
   height: 32px;
   align-items: center;
   display: flex;
