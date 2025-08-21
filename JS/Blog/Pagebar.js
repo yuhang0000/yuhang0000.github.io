@@ -23,7 +23,7 @@ function oops(msg, url = null, title = null, key = null, value = null, output = 
 	if(url != null){
 		link = '<div style="padding-top: 8px;">請求連接: <a class="link" href="' + url + '" target="_blank">' + url + '</a></div>';
 	}
-	let html = '<div class="blog_item" style="display: inline-block; padding: 8px; white-space: pre-wrap;">' + msg + link + '</div>';
+	let html = '<div class="blog_item" style="display: inline-block; padding: 8px; white-space: pre-wrap; container-type: normal;">' + msg + link + '</div>';
 	if(output == false){
 		blog_body.innerHTML = html;
 	}

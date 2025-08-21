@@ -1,6 +1,9 @@
 //創建一個類
 class md{
 
+  //公共變數
+  static img404 = '"/Images/404.png"' //缺省的圖像連接
+
   //解析主循環
   static read(datas){
     let output = ''; //暫存輸出對象
@@ -246,6 +249,107 @@ class md{
             break;
         }
       }
+
+      //遍歷查找圖像
+      chartemp = [];
+      charindex = [];
+      for (let t = 0 ; t < outputtemp.length ; t++){
+        switch (outputtemp[t]){
+          case '!':
+            if(t + 1 < outputtemp.length && outputtemp[t + 1] == '['){
+              chartemp.push('![');
+              charindex.push(t);
+              t++;
+            }
+            break;
+          case ']':
+            if(t + 1 < outputtemp.length && outputtemp[t + 1] == '('){
+              chartemp.push('](');
+              charindex.push(t);
+              t++;
+            }
+            break;
+          case ')':
+            chartemp.push(')');
+            charindex.push(t);
+            break;
+        }
+      }
+      //篩選
+      chartemp2 = '![';
+      for(let t = 0 ; t < chartemp.length ; t++){
+        switch (chartemp[t]){
+          case '![':
+            if(chartemp[t] == chartemp2){
+              chartemp2 = '](';
+            }
+            else{
+              chartemp.splice(t,1);
+              charindex.splice(t,1);
+              t--;
+            }
+            break;
+          case '](':
+            if(chartemp[t] == chartemp2){
+              chartemp2 = ')';
+            }
+            else{
+              chartemp.splice(t,1);
+              charindex.splice(t,1);
+              t--;
+            }
+            break;
+          case ')':
+            if(chartemp[t] == chartemp2){
+              chartemp2 = '![';
+            }
+            else{
+              chartemp.splice(t,1);
+              charindex.splice(t,1);
+              t--;
+            }
+            break;
+        }
+      }
+      //合成圖像
+      for(let t = chartemp.length - 1; t > -1 ; t--){
+        let urltitle = outputtemp.substring(charindex[t - 1] + 2, charindex[t]).trim().split(' "');
+        let url = urltitle[0];
+        if(url.length == 0 || url == '"'){ //圖像失蹤了
+          url = md.img404;
+        }
+        else{ //不全雙贏好
+          if(url[0] != '"'){ 
+            url = '"' + url;
+          }
+          if(url[url.length - 1] != '"'){
+            url = url + '"';
+          }
+        }
+        let title = '';
+        if(urltitle.length > 1 && urltitle[1].length > 0){ //如果有標題
+          title = ' title="' + urltitle[1];
+          if(title[title.length - 1] != '"'){
+            title = title + '"';
+          }
+        }
+        let alt = outputtemp.substring(charindex[t - 2] + 2, charindex[t - 1]);
+        if(alt.length == 0){
+          if(url == md.img404 || url == '""'){
+            alt = '圖像失蹤了';
+          }
+          else if(alt.length == 0 && urltitle.length > 1 && urltitle[1].length > 0 && urltitle[1] != '"'){
+            alt = urltitle[1];
+          }
+          else{
+            alt = url.substring(1,url.length - 1);
+          }
+        }
+        let html = '<img src=' + url + title + ' alt="' + alt + '">';
+        outputtemp = outputtemp.substring(0,charindex[t - 2]) + html + outputtemp.substring(charindex[t] + 1);
+        t = t - 2;
+      }
+      
       
       //整合
       output = output + outputtemp;
