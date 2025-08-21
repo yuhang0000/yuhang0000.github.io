@@ -127,8 +127,125 @@ class md{
             break;
         }
       }
-
       
+      //逐字解析
+      let chartemp = []; //暫存字符
+      let charindex = []; //該字符的所在位置
+      for (let t = 0 ; t < outputtemp.length ; t++) {
+        switch (outputtemp[t]){
+          case '*': //要麽加粗, 要麽傾斜, 小孩才會做選擇, 俺全都要
+            if(chartemp.length > 0 && chartemp[chartemp.length - 1].length < 3 && charindex[charindex.length - 1] == t - chartemp[chartemp.length - 1].length){
+              chartemp[chartemp.length - 1] = chartemp[chartemp.length - 1] + '*';
+            }
+            else{
+              chartemp.push(outputtemp[t]);
+              charindex.push(t);
+            }
+            break;
+          case '~': //剔除綫
+            if(chartemp.length > 0 && chartemp[chartemp.length - 1].length < 2 && charindex[charindex.length - 1] == t - chartemp[chartemp.length - 1].length){
+              chartemp[chartemp.length - 1] = chartemp[chartemp.length - 1] + '~';
+            }
+            else{
+              chartemp.push(outputtemp[t]);
+              charindex.push(t);
+            }
+            break;
+          case '$': //那個數學公式
+            chartemp.push(outputtemp[t]);
+            charindex.push(t);
+            break;
+          case '\`': //那個内嵌代碼塊
+            if(chartemp.length > 0 && chartemp[chartemp.length - 1].length < 2 && charindex[charindex.length - 1] == t - chartemp[chartemp.length - 1].length){
+              chartemp[chartemp.length - 1] = chartemp[chartemp.length - 1] + '\`';
+            }
+            else{
+              chartemp.push(outputtemp[t]);
+              charindex.push(t);
+            }
+            break;
+        }
+      }
+      // if(chartemp.length != 0){
+      //   debugger;
+      // }
+      
+      //逐字解析後篩選  *1 *2 *3 ~~ $$ ``
+      let chartemp2 = [-1,-1,-1,-1,-1,-1]; //存儲在 chartemp 的索引, 出現一次填上索引, 再出現就移除, 理論上說, 假如關鍵符不是成對出現的, 那麽這裏必有索引
+      function chartemp2_switch(index, value){ //懶, 直接封裝
+        if(chartemp2[index] == -1){
+          chartemp2[index] = value;
+        }
+        else{
+          chartemp2[index] = -1;
+        }
+      }
+      for(let t = 0 ; t < chartemp.length ; t++){
+        switch (chartemp[t]){
+          case '*':
+            chartemp2_switch(0,t);
+            break;
+          case '**':
+            chartemp2_switch(1,t);
+            break;
+          case '***':
+            chartemp2_switch(2,t);
+            break;
+          case '~~':
+            chartemp2_switch(3,t);
+            break;
+          case '$':
+            chartemp2_switch(4,t);
+            break;
+          case '\`\`':
+            chartemp2_switch(5,t);
+            break;
+        }
+      }
+      //篩選後移除
+      for(let t = chartemp2.length - 1; t > -1 ; t--){
+        if(chartemp2[t] != -1){
+          chartemp.splice(chartemp2[t],1);
+          charindex.splice(chartemp2[t],1);
+        }
+      }
+      //現在開始插入
+      chartemp2 = [0,0,0,0,0,0];
+      function chartemp_ins(index, chartemp2_index, value, offset = 0){ //封裝太好用啦! 在 outputtemp 上的插入位置; chartemp2 寄存器索引; 插入的片段; 向後剔除多少字符
+        value = value.split(',');
+        if(chartemp2[chartemp2_index] == 0){
+          chartemp2[chartemp2_index] = 1;
+          value = value[1];
+        }
+        else{
+          chartemp2[chartemp2_index] = 1;
+          value = value[0];
+        }
+        outputtemp = outputtemp.substring(0,index) + value + outputtemp.substring(index + offset);
+      }
+      for(let t = chartemp.length - 1; t > -1 ; t--){
+        switch (chartemp[t]){
+          case '*': //傾斜
+            chartemp_ins(charindex[t],0,'<i>,</i>',1);
+            break;
+          case '**': //加粗
+            chartemp_ins(charindex[t],1,'<b>,</b>',2);
+            break;
+          case '***': //加粗 + 傾斜
+            chartemp_ins(charindex[t],2,'<b><i>,</i></b>',3);
+            // chartemp_ins(charindex[t],2,'<b>');
+            break;
+          case '~~': //剔除綫
+            chartemp_ins(charindex[t],3,'<del>,</del>',2);
+            break;
+          case '$': //反正就是給數學公示用的
+            chartemp_ins(charindex[t],4,'<span class="math">,</span>',1);
+            break;
+          case '\`\`': //代碼塊
+            chartemp_ins(charindex[t],5,'<code>,</code>',2);
+            break;
+        }
+      }
       
       //整合
       output = output + outputtemp;
