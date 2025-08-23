@@ -311,6 +311,8 @@ class md{
             break;
         }
       }
+      chartemp.splice(chartemp.length - chartemp.length % 3, chartemp.length % 3); //理論上, 總數應該是 3 的公約數
+      charindex.splice(charindex.length - charindex.length % 3, charindex.length % 3);
       //合成圖像
       for(let t = chartemp.length - 1; t > -1 ; t--){
         let urltitle = outputtemp.substring(charindex[t - 1] + 2, charindex[t]).trim().split(' "');
@@ -334,7 +336,7 @@ class md{
           }
         }
         let alt = outputtemp.substring(charindex[t - 2] + 2, charindex[t - 1]);
-        if(alt.length == 0){
+        if(alt.length == 0){ //alt失蹤了怎麽辦呐!
           if(url == md.img404 || url == '""'){
             alt = '圖像失蹤了';
           }
