@@ -250,108 +250,133 @@ class md{
         }
       }
 
-      //遍歷查找圖像
-      chartemp = [];
-      charindex = [];
-      for (let t = 0 ; t < outputtemp.length ; t++){
-        switch (outputtemp[t]){
-          case '!':
-            if(t + 1 < outputtemp.length && outputtemp[t + 1] == '['){
-              chartemp.push('![');
+      //遍歷查找圖像 & 超鏈接
+      function imgorlink(toimg = true) {
+        let key;
+        if(toimg == true){ //圖像與超鏈接的區別是, 圖像起始符是 '![', 而超鏈接起始符是 '['.
+          key = '![';
+        }
+        else{
+          key = '[';
+        }
+        
+        let chartemp = [];
+        let charindex = [];
+        for (let t = 0 ; t < outputtemp.length ; t++){
+          switch (outputtemp[t]){
+            case '!':
+              if(t + 1 < outputtemp.length && outputtemp[t + 1] == '[' && toimg == true){
+                chartemp.push('![');
+                charindex.push(t);
+                t++;
+              }
+              break;
+            case '[':
+              if(toimg == false){
+                chartemp.push('[');
+                charindex.push(t);
+              }
+              break;
+            case ']':
+              if(t + 1 < outputtemp.length && outputtemp[t + 1] == '('){
+                chartemp.push('](');
+                charindex.push(t);
+                t++;
+              }
+              break;
+            case ')':
+              chartemp.push(')');
               charindex.push(t);
-              t++;
-            }
-            break;
-          case ']':
-            if(t + 1 < outputtemp.length && outputtemp[t + 1] == '('){
-              chartemp.push('](');
-              charindex.push(t);
-              t++;
-            }
-            break;
-          case ')':
-            chartemp.push(')');
-            charindex.push(t);
-            break;
+              break;
+          }
         }
-      }
-      //篩選
-      chartemp2 = '![';
-      for(let t = 0 ; t < chartemp.length ; t++){
-        switch (chartemp[t]){
-          case '![':
-            if(chartemp[t] == chartemp2){
-              chartemp2 = '](';
+        //篩選
+        let chartemp2 = key;
+        for(let t = 0 ; t < chartemp.length ; t++){
+          switch (chartemp[t]){
+            case key:
+              if(chartemp[t] == chartemp2){
+                chartemp2 = '](';
+              }
+              else{
+                chartemp.splice(t,1);
+                charindex.splice(t,1);
+                t--;
+              }
+              break;
+            case '](':
+              if(chartemp[t] == chartemp2){
+                chartemp2 = ')';
+              }
+              else{
+                chartemp.splice(t,1);
+                charindex.splice(t,1);
+                t--;
+              }
+              break;
+            case ')':
+              if(chartemp[t] == chartemp2){
+                chartemp2 = key;
+              }
+              else{
+                chartemp.splice(t,1);
+                charindex.splice(t,1);
+                t--;
+              }
+              break;
+          }
+        }
+        chartemp.splice(chartemp.length - chartemp.length % 3, chartemp.length % 3); //理論上, 總數應該是 3 的公約數
+        charindex.splice(charindex.length - charindex.length % 3, charindex.length % 3);
+        //合成圖像
+        for(let t = chartemp.length - 1; t > -1 ; t--){
+          let urltitle = outputtemp.substring(charindex[t - 1] + 2, charindex[t]).trim().split(' "');
+          let url = urltitle[0];
+          if(url.length == 0 || url == '"'){ //圖像失蹤了
+            url = md.img404;
+          }
+          else{ //不全雙贏好
+            if(url[0] != '"'){ 
+              url = '"' + url;
+            }
+            if(url[url.length - 1] != '"'){
+              url = url + '"';
+            }
+          }
+          let title = '';
+          if(urltitle.length > 1 && urltitle[1].length > 0){ //如果有標題
+            title = ' title="' + urltitle[1];
+            if(title[title.length - 1] != '"'){
+              title = title + '"';
+            }
+          }
+          let alt = outputtemp.substring(charindex[t - 2] + key.length, charindex[t - 1]);
+          if(alt.length == 0){ //alt失蹤了怎麽辦呐!
+            if(url == md.img404 || url == '""'){
+              alt = '圖像失蹤了';
+            }
+            else if(alt.length == 0 && urltitle.length > 1 && urltitle[1].length > 0 && urltitle[1] != '"'){
+              alt = urltitle[1];
             }
             else{
-              chartemp.splice(t,1);
-              charindex.splice(t,1);
-              t--;
+              alt = url.substring(1,url.length - 1);
             }
-            break;
-          case '](':
-            if(chartemp[t] == chartemp2){
-              chartemp2 = ')';
-            }
-            else{
-              chartemp.splice(t,1);
-              charindex.splice(t,1);
-              t--;
-            }
-            break;
-          case ')':
-            if(chartemp[t] == chartemp2){
-              chartemp2 = '![';
-            }
-            else{
-              chartemp.splice(t,1);
-              charindex.splice(t,1);
-              t--;
-            }
-            break;
-        }
-      }
-      chartemp.splice(chartemp.length - chartemp.length % 3, chartemp.length % 3); //理論上, 總數應該是 3 的公約數
-      charindex.splice(charindex.length - charindex.length % 3, charindex.length % 3);
-      //合成圖像
-      for(let t = chartemp.length - 1; t > -1 ; t--){
-        let urltitle = outputtemp.substring(charindex[t - 1] + 2, charindex[t]).trim().split(' "');
-        let url = urltitle[0];
-        if(url.length == 0 || url == '"'){ //圖像失蹤了
-          url = md.img404;
-        }
-        else{ //不全雙贏好
-          if(url[0] != '"'){ 
-            url = '"' + url;
           }
-          if(url[url.length - 1] != '"'){
-            url = url + '"';
-          }
-        }
-        let title = '';
-        if(urltitle.length > 1 && urltitle[1].length > 0){ //如果有標題
-          title = ' title="' + urltitle[1];
-          if(title[title.length - 1] != '"'){
-            title = title + '"';
-          }
-        }
-        let alt = outputtemp.substring(charindex[t - 2] + 2, charindex[t - 1]);
-        if(alt.length == 0){ //alt失蹤了怎麽辦呐!
-          if(url == md.img404 || url == '""'){
-            alt = '圖像失蹤了';
-          }
-          else if(alt.length == 0 && urltitle.length > 1 && urltitle[1].length > 0 && urltitle[1] != '"'){
-            alt = urltitle[1];
+          //生成
+          let html;
+          if(toimg == true){
+            html = '<img src=' + url + title + ' alt="' + alt + '">';
           }
           else{
-            alt = url.substring(1,url.length - 1);
+            html = '<a href=' + url + title + ' target="blank_">' + alt + '</a>';
           }
+          outputtemp = outputtemp.substring(0,charindex[t - 2]) + html + outputtemp.substring(charindex[t] + 1); //合并
+          t = t - 2;
         }
-        let html = '<img src=' + url + title + ' alt="' + alt + '">';
-        outputtemp = outputtemp.substring(0,charindex[t - 2]) + html + outputtemp.substring(charindex[t] + 1);
-        t = t - 2;
       }
-      
+      //處理圖像和超鏈接
+      imgorlink(true);
+      imgorlink(false);
       
       //整合
       output = output + outputtemp;
