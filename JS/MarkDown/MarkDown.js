@@ -352,28 +352,43 @@ class md{
           }
           let alt = outputtemp.substring(charindex[t - 2] + key.length, charindex[t - 1]);
           if(alt.length == 0){ //alt失蹤了怎麽辦呐!
-            if(url == md.img404 || url == '""'){
-              alt = '圖像失蹤了';
+            if(toimg == true){ //適用於圖像的解決方案 IMG
+              if(url == md.img404 || url == '""'){
+                alt = '圖像失蹤了';
+              }
+              else if(alt.length == 0 && urltitle.length > 1 && urltitle[1].length > 0 && urltitle[1] != '"'){
+                alt = urltitle[1];
+              }
+              else{
+                alt = url.substring(1,url.length - 1);
+              }
             }
-            else if(alt.length == 0 && urltitle.length > 1 && urltitle[1].length > 0 && urltitle[1] != '"'){
-              alt = urltitle[1];
-            }
-            else{
-              alt = url.substring(1,url.length - 1);
+            else{ //適用於炒鷄連接的解決方案 LINK
+              if(url != md.img404){
+                alt = md.linkfix(url.substring(1,url.length - 1));
+              }
+              else{
+                alt = '無效連接';
+              }
             }
           }
           //生成
           let html;
-          if(toimg == true){
+          if(toimg == true){ //IMG
             html = '<img src=' + url + title + ' alt="' + alt + '">';
           }
-          else{
+          else{ //LINK
+            if(url == md.img404){
+              // url = document.location.href;
+              url = "/Web/404.html";
+            }
             html = '<a href=' + url + title + ' target="blank_">' + alt + '</a>';
           }
           outputtemp = outputtemp.substring(0,charindex[t - 2]) + html + outputtemp.substring(charindex[t] + 1); //合并
           t = t - 2;
         }
       }
+
       //處理圖像和超鏈接
       imgorlink(true);
       imgorlink(false);
@@ -416,5 +431,45 @@ class md{
   static line(){
     return '<div class="line"></div>';
   }
-  
+
+  //連接補全
+  static linkfix(link){
+    link = link.split('/');
+    let docurl = document.location.href.split('/');
+    switch (link[0]){
+      case '.':
+        link.splice(0,1);
+        return docurl.join('/') + '/' + link.join('/');
+        break;
+      case '..':
+        //link.splice(0,1);
+        let num = 0;
+        for(let t of link){
+          if(t == '..'){
+            //link.splice(0,1);
+            num++;
+          }
+          else{
+            break;
+          }
+        }
+        link.splice(0,num);
+        if(docurl.length - num < 3){ //布利姐寫介麽多 .. 幹啥, 總之儅超過 docurl 總數時, 當作 "/" 處理
+          docurl.splice(3);
+        }
+        else{
+          docurl.splice(docurl.length - num);
+        }
+        return docurl.join('/') + '/' + link.join('/');
+        break;
+      case '':
+        docurl.splice(3);
+        return docurl.join('/') + link.join('/');
+        break;
+      default:
+        //link.splice(0,1);
+        return docurl.join('/') + '/' + link.join('/');
+        break;
+    }
+  }
 }
