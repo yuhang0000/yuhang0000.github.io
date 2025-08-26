@@ -103,26 +103,89 @@ class md{
         }
       }
 
+      //數學公式或代碼塊
+      let data_trim = data.trim();
+      if(data_trim.length == 2 && data_trim == '$$'){
+        let lastindex = -1;
+        let mathdiv = '<div class="math">'
+        for(let t = i + 1 ; t < datas.length ; t++){
+          let tt = datas[t];
+          let ttt = tt.trim();
+          if(ttt.length == 2 && ttt == '$$'){
+            lastindex = t++;
+            mathdiv = mathdiv + '</div>';
+            break;
+          }
+          else{
+            mathdiv = mathdiv + tt;
+          }
+        }
+        if(lastindex != -1){
+          i = lastindex;
+          output = output + mathdiv;
+          continue;
+        }
+      }
+      else if(data_trim.length > 2 && data_trim[0] == '\`' && data_trim[1] == '\`' && data_trim[2] == '\`'){
+        let lastindex = -1;
+        let codediv = '<code class="block" lang="' + data_trim.substring(3).trim() + '">'
+        for(let t = i + 1 ; t < datas.length ; t++){
+          let tt = datas[t];
+          let ttt = tt.trim();
+          if(ttt.length == 3 && ttt == '\`\`\`'){
+            lastindex = t++;
+            codediv = codediv + '</code>';
+            break;
+          }
+          else{
+            codediv = codediv + tt + '\n';
+          }
+        }
+        if(lastindex != -1){
+          i = lastindex;
+          output = output + codediv;
+          continue;
+        }
+      }
+
       //遍歷
-      if(data.trim().length > 0){
-        switch (data.trim()[0]){
+      if(data_trim.length > 0){
+        switch (data_trim[0]){
           case '#': //標題
             outputtemp = md.title(data);
             break;
           case '>': //引用
             break;
           case '-': //分割綫, 或者列表
-            let num = 0;
-            for (let t of data.trim()) {
-              if (t == "-") {
-                num++;
+            //let t = data.trim();
+            if(data_trim.length > 2){ //文本長度大於 2
+              let num = 0;
+              for(let tt of data_trim){
+                if(tt == '-'){
+                  num++;
+                }
+                else if(num == 1 && tt == ' '){ //第二個字符為空格説明是列表
+                  num = -1;
+                  break;
+                }
+                //else if(num > 2){ //假如前邊不是 "-" 并且計數大於 2, 那麽説明該段字符末尾出現了除了 "-" 的壞東西 
+                else{
+                  num = 0;
+                  break;
+                }
               }
-              else {
-                break;
+              if(num == -1){ //list
+                //TODO: 列表
               }
-              if(num > 2){
+              else if(num > 2){ //line
                 outputtemp = md.line();
               }
+              else{ //p段落
+                outputtemp = md.paragraph(data);
+              }
+            }
+            else{
+              outputtemp = md.paragraph(data);
             }
             break;
           default: //普通文本
