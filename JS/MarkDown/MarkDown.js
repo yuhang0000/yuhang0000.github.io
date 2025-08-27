@@ -2,7 +2,9 @@
 class md{
 
   //公共變數
-  static img404 = '"/Res/UI/404.png"' //缺省的圖像連接
+  static img404 = '"/Res/UI/404.png"'; //缺省的圖像連接
+  static ver = 'v0.0.1.0827';
+  static version = md.ver;
 
   //解析主循環
   static read(datas){
@@ -129,7 +131,7 @@ class md{
       else if(data_trim.length > 2 && data_trim[0] == '\`' && data_trim[1] == '\`' && data_trim[2] == '\`'){
         let lastindex = -1;
         let lang = data_trim.substring(3).trim();
-        let codediv = '<div class="code_block"><div><span>CSharp</span><img src="/Res/UI/Copy-G.svg"></div><code class="block" lang="' + lang + '">'
+        let codediv = '<div class="code_block"><div><span>CSharp</span><img src="/Resources/UI/Copy-G.svg"></div><code class="block" lang="' + lang + '">'
         for(let t = i + 1 ; t < datas.length ; t++){
           let tt = datas[t];
           let ttt = tt.trim();
@@ -536,4 +538,36 @@ class md{
         break;
     }
   }
+
+  //創建列表
+  static list(data, top = false , bottom = false , type = null){ //傳遞資料, 附加頭 <ul>, 附加尾 </ul>, 有序列表的類型, 儅值為 null 時, 為無序列表, 默認值應當為1
+    let ulorol;
+    if(type == null){ //無序列表
+      ulorol = ['<ul>','</ul>'];
+    }
+    else{ //有序列表
+      type = String(type);
+      if(['A','a','I','i'].indexOf(type) == -1){
+        type = '';
+      }
+      else{
+        type = ' type="' + type + '"';
+      }
+      ulorol = ['<ol' + type + '>','</ol>'];
+    }
+
+    let html = '<li>';
+    if(top == true){
+      html = ulorol[0] + '<li>';
+    }
+    // html = html + data.trim().substring(2) + '</li>';
+    data = data.trim().split(' ');
+    data.splice(0,1);
+    html = html + data.join(' ') + '</li>';
+    if(bottom == true){
+      html = html + ulorol[1];
+    }
+    return html;
+  }
+
 }
