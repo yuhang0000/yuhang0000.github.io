@@ -216,3 +216,7 @@ code.block{
   padding: 4px;
   margin: 4px 0px;
 }
+/* 列表 */
+li{
+  padding: 4px 0px;
+}

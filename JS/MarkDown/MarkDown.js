@@ -178,7 +178,14 @@ class md{
                 }
               }
               if(num == -1){ //list
-                //TODO: 列表
+                if(output.length > 4 && output[output.length - 5] == '<' && output[output.length - 4] == '/' && (output[output.length - 3] == 'u' || output[output.length - 3] == 'o') &&
+                output[output.length - 2] == 'l' && output[output.length - 1] == '>'){ //先看看前邊有沒有現成的列表 (我服了, 這些的是什麽鬼)
+                  output = output.substring(0,output.length - 5);
+                  outputtemp = md.list(data,0,1);
+                }
+                else{
+                  outputtemp = md.list(data,1,1);
+                }
               }
               else if(num > 2){ //line
                 outputtemp = md.line();
