@@ -151,6 +151,35 @@ class md{
         }
       }
 
+      //列表
+      function dolist(youxu = false, offset = 0){ //有序排序, 偏移量
+        let ulorol;
+        if(youxu == false){
+          ulorol = ['<ul>','</ul>'];
+        }
+        else{
+          ulorol = ['<ol>','</ol>'];
+        }
+        let html = ulorol[0];
+        //let lastindex = -1;
+        for(let t = i; t < datas.length ; t++){
+          let tt = datas[t].split(' ');
+          if(tt[0].length > offset && (tt[0].substring(offset) == '-' || tt[0].substring(offset) == '*')){
+            html = html + md.list(datas[t]);
+          }
+          else if(tt[0].trim().length != 0){
+            //outputtemp = html + ulorol[1];
+            //lastindex = t;
+            i = t;
+            return html + ulorol[1];
+          }
+        }
+        /*if(lastindex != -1){
+          i = lastindex;
+        }*/
+        return html + ulorol[1];
+      }
+
       //遍歷
       if(data_trim.length > 0){
         switch (data_trim[0]){
@@ -178,14 +207,15 @@ class md{
                 }
               }
               if(num == -1){ //list
-                if(output.length > 4 && output[output.length - 5] == '<' && output[output.length - 4] == '/' && (output[output.length - 3] == 'u' || output[output.length - 3] == 'o') &&
+                /*if(output.length > 4 && output[output.length - 5] == '<' && output[output.length - 4] == '/' && (output[output.length - 3] == 'u' || output[output.length - 3] == 'o') &&
                 output[output.length - 2] == 'l' && output[output.length - 1] == '>'){ //先看看前邊有沒有現成的列表 (我服了, 這些的是什麽鬼)
                   output = output.substring(0,output.length - 5);
                   outputtemp = md.list(data,0,1);
                 }
                 else{
                   outputtemp = md.list(data,1,1);
-                }
+                }*/
+                outputtemp = dolist();
               }
               else if(num > 2){ //line
                 outputtemp = md.line();
