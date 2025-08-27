@@ -2,7 +2,7 @@
 class md{
 
   //公共變數
-  static img404 = '"/Images/404.png"' //缺省的圖像連接
+  static img404 = '"/Res/UI/404.png"' //缺省的圖像連接
 
   //解析主循環
   static read(datas){
@@ -128,13 +128,14 @@ class md{
       }
       else if(data_trim.length > 2 && data_trim[0] == '\`' && data_trim[1] == '\`' && data_trim[2] == '\`'){
         let lastindex = -1;
-        let codediv = '<code class="block" lang="' + data_trim.substring(3).trim() + '">'
+        let lang = data_trim.substring(3).trim();
+        let codediv = '<div class="code_block"><div><span>CSharp</span><img src="/Res/UI/Copy-G.svg"></div><code class="block" lang="' + lang + '">'
         for(let t = i + 1 ; t < datas.length ; t++){
           let tt = datas[t];
           let ttt = tt.trim();
           if(ttt.length == 3 && ttt == '\`\`\`'){
             lastindex = t++;
-            codediv = codediv + '</code>';
+            codediv = codediv + '</code></div>';
             break;
           }
           else{

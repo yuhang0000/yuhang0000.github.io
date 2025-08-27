@@ -50,6 +50,7 @@ a.link:hover{ /* 選擇器不用白不用 */
 /* 公共屬性 */
 :root{
   --blog_item_paddingLR: 32px; /* 部落格的父容器兩側的内邊距 */
+  --R: 4px; /* 倒角 */
 }
 /* 用來裝部落格的容器 */
 .blog_item{
@@ -153,15 +154,52 @@ a.title:hover{
   opacity: 1;
   /* visibility: visible; */
 }
-/* 代碼塊 */
-code{
+/* 代碼塊内嵌的 */
+code:not(.block){
   display: inline-flex;
-  border-radius: 4px;
+  border-radius: var(--R);
   background: #eee;
   padding: 2px 4px;
   height: 1rem;
   justify-content: center;
   align-items: center;
+}
+/* 大一點的代碼塊 */
+div.code_block{
+  display: inline-flex;
+  flex-direction: column;
+  width: fit-content;
+  border-radius: var(--R);
+  background: #eee;
+}
+div.code_block div{
+  font-size: 0.8em;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 4px;
+  background: #ddd;
+  border-bottom: 1px solid #ccc;
+  border-radius: var(--R) var(--R) 0px 0px;
+}
+div.code_block div span{
+  flex: 1;
+  padding: 2px 8px;
+}
+div.code_block div img{
+  width: 1.2em;
+  height: 1.2em;
+  padding: 4px;
+  border-radius: calc(var(--R) / 2);
+  user-select: none;
+  background: #00000000;
+  transition: background 0.5s;
+}
+div.code_block div img:hover{
+  width: 1.2em;
+  height: 1.2em;
+  user-select: none;
+  background: #00000022;
 }
 code.block{
   white-space: pre-wrap;
