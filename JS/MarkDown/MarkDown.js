@@ -152,7 +152,7 @@ class md{
       }
 
       //列表
-      function dolist(youxu = false, offset = 0){ //有序排序, 偏移量
+      function dolist(youxu = false, offset = 0, start = i){ //有序排序, 偏移量, for 循環其實位置
         let ulorol;
         if(youxu == false){
           ulorol = ['<ul>','</ul>'];
@@ -162,22 +162,43 @@ class md{
         }
         let html = ulorol[0];
         //let lastindex = -1;
-        for(let t = i; t < datas.length ; t++){
-          let tt = datas[t].split(' ');
-          if(tt[0].length > offset && (tt[0].substring(offset) == '-' || tt[0].substring(offset) == '*')){
+        for(let t = start; t < datas.length ; t++){
+          let tt = datas[t];
+          if(tt.trim().length == 0){ //跳過空行
+            continue;
+          }
+          tt = tt.split(' ');
+          if(tt.length > offset && (tt[offset] == '-' || tt[offset] == '*')){
             html = html + md.list(datas[t]);
           }
-          else if(tt[0].trim().length != 0){
-            //outputtemp = html + ulorol[1];
-            //lastindex = t;
-            i = t;
-            return html + ulorol[1];
+          else if(tt.length > offset && tt[offset] == ''){ //嵌套
+            let newoffset = -1;
+            for(let ttt = 0 ; ttt < tt.length ; ttt++){
+              if(tt[ttt] == '-' || tt[ttt] == '*'){
+                newoffset = ttt;
+                break;
+              }
+            }
+            if(newoffset != -1 && newoffset > offset){
+              let temp = dolist(youxu, newoffset, t);
+              html = html + temp[0];
+              t = temp[1];
+            }
+            else{
+              i = t - 1;
+              return [html + ulorol[1], i];
+            }
+          }
+          else{
+            i = t - 1;
+            return [html + ulorol[1], i];
           }
         }
+        //循環到文檔底部
         /*if(lastindex != -1){
           i = lastindex;
         }*/
-        return html + ulorol[1];
+        return [html + ulorol[1], datas.length];
       }
 
       //遍歷
@@ -215,7 +236,7 @@ class md{
                 else{
                   outputtemp = md.list(data,1,1);
                 }*/
-                outputtemp = dolist();
+                outputtemp = dolist()[0];
               }
               else if(num > 2){ //line
                 outputtemp = md.line();
