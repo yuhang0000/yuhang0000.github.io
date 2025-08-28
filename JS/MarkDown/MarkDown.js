@@ -174,17 +174,17 @@ class md{
           else if(tt.length > offset && tt[offset] == ''){ //嵌套
             let newoffset = -1;
             for(let ttt = 0 ; ttt < tt.length ; ttt++){
-              if(tt[ttt] == '-' || tt[ttt] == '*'){
+              if(tt[ttt] == '-' || tt[ttt] == '*'){ //找到新的偏移量
                 newoffset = ttt;
                 break;
               }
             }
-            if(newoffset != -1 && newoffset > offset){
+            if(newoffset != -1 && newoffset > offset){ //嵌套在這裏
               let temp = dolist(youxu, newoffset, t);
               html = html + temp[0];
               t = temp[1];
             }
-            else{
+            else{ //要麽新偏移量小於舊的, 要麽遇到空氣裏.
               i = t - 1;
               return [html + ulorol[1], i];
             }
@@ -198,7 +198,43 @@ class md{
         /*if(lastindex != -1){
           i = lastindex;
         }*/
+        i = datas.length;
         return [html + ulorol[1], datas.length];
+      }
+
+      //引用
+      function doquote(offset = 0, start = i){ //便宜兩, 循環起始位置
+        let html = '<div class="quote">';
+        for(let t = start ; t < datas.length ; t++){
+          let tt = datas[t].trim();
+          if(tt.length == 0){ //跳過空行
+            continue;
+          }
+          else{
+            tt = tt.split(' ');
+            if(tt[offset] == '>'){
+              if(tt.length > offset && tt[offset + 1] == '>'){ //看看後面還有木有
+                let ttt = doquote(offset + 1, t); //嵌套
+                t = ttt[1];
+                html = html + ttt[0];
+              }
+              else{ //不是嵌套
+                tt.splice(0,offset + 1);
+                tt = tt.join(' ')
+                if(tt.length > 0){
+                  html = html + md.paragraph(tt);
+                }
+              }
+            }
+            else{ //結束
+              i = t - 1;
+              return [html + '</div>', i];
+            }
+          }
+        }
+        //直接便利店地段了
+        i = datas.length;
+        return [html + '</div>', datas.length];
       }
 
       //遍歷
@@ -208,6 +244,10 @@ class md{
             outputtemp = md.title(data);
             break;
           case '>': //引用
+            outputtemp = doquote()[0];
+            break;
+          case '*': //列表
+            outputtemp = dolist()[0];
             break;
           case '-': //分割綫, 或者列表
             //let t = data.trim();
