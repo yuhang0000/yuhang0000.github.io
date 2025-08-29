@@ -1,3 +1,4 @@
+var debug = false; //調試模式
 var bloglist; //列表
 var bloglisturl = './Blog.txt'; //主列表地址
 var blogliststep = 10; //每頁讀取個數
@@ -82,7 +83,7 @@ async function readblog(page = 1){
 			num.classList.remove('checked');
 		}
 		//debugger;
-		if(num2 < 1 || num2 > pageitemnum){
+		if(num2 < 1 || num2 > pageitemnum){ //超出頁碼範圍的隱藏
 			num.classList.add('hidden');
 		}
 		else{
@@ -113,10 +114,10 @@ async function readblog(page = 1){
 			})
 			.then(data => {
 				if(data != null){
-				  if(url.trim().indexOf('.md') != -1){
+				  if(url.trim().indexOf('.md') != -1){ //Markdown 文檔
 				    blog_body.innerHTML = blog_body.innerHTML + '<div class="blog_item" href="' + url.trim() + '">' + md.read(data) + '</div>'; //MarkDown
 				  }
-				  else{
+				  else{ //HTML 文檔
 				    blog_body.innerHTML = blog_body.innerHTML + '<div class="blog_item" href="' + url.trim() + '">' + data + '</div>'; //HTML
 					}
 				}
@@ -124,9 +125,14 @@ async function readblog(page = 1){
 					blog_body.innerHTML = blog_body.innerHTML + '<div class="blog_item" style="padding: 8px;">' + '載入失敗哩...' + '</div>';
 				}
 			})
-			.catch(error => {
+			.catch(error => { //抛出異常在這裏
 				//debugger;
-				blog_body.innerHTML = blog_body.innerHTML + oops('oops! \n  ' + error, url.trim(),null,'page', 1,true);
+				if(debug == true){
+				  blog_body.innerHTML = blog_body.innerHTML + oops('oops! \n  ' + error.stack, url.trim(),null,'page', 1,true);
+				}
+				else{
+				  blog_body.innerHTML = blog_body.innerHTML + oops('oops! \n  ' + error, url.trim(),null,'page', 1,true);
+				}
 				//pagebar.classList.add('disable');
 			});
 	}
@@ -142,11 +148,12 @@ async function readbloglist(){
 	pagebar.classList.add('disable');
 	//测试 MarkDown
 	let url = new URL(window.location.href);
-	if(url.searchParams.get('test') != null){
+	if(url.searchParams.get('test') != null){ //測試
 	  bloglist = ['/Test/Test.md'];
 	  pageitemnum = 1;
 	  pagebar.classList.remove('disable');
 	  readblog(1);
+	  debug = true;
 	  return;
 	}
 	try{

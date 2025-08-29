@@ -414,148 +414,9 @@ class md{
         }
       }
 
-      //遍歷查找圖像 & 超鏈接
-      function imgorlink(toimg = true) {
-        let key;
-        if(toimg == true){ //圖像與超鏈接的區別是, 圖像起始符是 '![', 而超鏈接起始符是 '['.
-          key = '![';
-        }
-        else{
-          key = '[';
-        }
-        
-        let chartemp = [];
-        let charindex = [];
-        for (let t = 0 ; t < outputtemp.length ; t++){
-          switch (outputtemp[t]){
-            case '!':
-              if(t + 1 < outputtemp.length && outputtemp[t + 1] == '[' && toimg == true){
-                chartemp.push('![');
-                charindex.push(t);
-                t++;
-              }
-              break;
-            case '[':
-              if(toimg == false){
-                chartemp.push('[');
-                charindex.push(t);
-              }
-              break;
-            case ']':
-              if(t + 1 < outputtemp.length && outputtemp[t + 1] == '('){
-                chartemp.push('](');
-                charindex.push(t);
-                t++;
-              }
-              break;
-            case ')':
-              chartemp.push(')');
-              charindex.push(t);
-              break;
-          }
-        }
-        //篩選
-        let chartemp2 = key;
-        for(let t = 0 ; t < chartemp.length ; t++){
-          switch (chartemp[t]){
-            case key:
-              if(chartemp[t] == chartemp2){
-                chartemp2 = '](';
-              }
-              else{
-                chartemp.splice(t,1);
-                charindex.splice(t,1);
-                t--;
-              }
-              break;
-            case '](':
-              if(chartemp[t] == chartemp2){
-                chartemp2 = ')';
-              }
-              else{
-                chartemp.splice(t,1);
-                charindex.splice(t,1);
-                t--;
-              }
-              break;
-            case ')':
-              if(chartemp[t] == chartemp2){
-                chartemp2 = key;
-              }
-              else{
-                chartemp.splice(t,1);
-                charindex.splice(t,1);
-                t--;
-              }
-              break;
-          }
-        }
-        chartemp.splice(chartemp.length - chartemp.length % 3, chartemp.length % 3); //理論上, 總數應該是 3 的公約數
-        charindex.splice(charindex.length - charindex.length % 3, charindex.length % 3);
-        //合成圖像
-        for(let t = chartemp.length - 1; t > -1 ; t--){
-          let urltitle = outputtemp.substring(charindex[t - 1] + 2, charindex[t]).trim().split(' "');
-          let url = urltitle[0];
-          if(url.length == 0 || url == '"'){ //圖像失蹤了
-            url = md.img404;
-          }
-          else{ //不全雙贏好
-            if(url[0] != '"'){ 
-              url = '"' + url;
-            }
-            if(url[url.length - 1] != '"'){
-              url = url + '"';
-            }
-          }
-          let title = '';
-          if(urltitle.length > 1 && urltitle[1].length > 0){ //如果有標題
-            title = ' title="' + urltitle[1];
-            if(title[title.length - 1] != '"'){
-              title = title + '"';
-            }
-          }
-          let alt = outputtemp.substring(charindex[t - 2] + key.length, charindex[t - 1]);
-          if(alt.length == 0){ //alt失蹤了怎麽辦呐!
-            if(toimg == true){ //適用於圖像的解決方案 IMG
-              if(url == md.img404 || url == '""'){
-                alt = '圖像失蹤了';
-              }
-              else if(alt.length == 0 && urltitle.length > 1 && urltitle[1].length > 0 && urltitle[1] != '"'){
-                alt = urltitle[1];
-              }
-              else{
-                alt = url.substring(1,url.length - 1);
-              }
-            }
-            else{ //適用於炒鷄連接的解決方案 LINK
-              if(url != md.img404){
-                alt = md.linkfix(url.substring(1,url.length - 1));
-              }
-              else{
-                alt = '無效連接';
-              }
-            }
-          }
-          //生成
-          let html;
-          if(toimg == true){ //IMG
-            html = '<img src=' + url + title + ' alt="' + alt + '">';
-          }
-          else{ //LINK
-            if(url == md.img404){
-              // url = document.location.href;
-              url = "/Web/404.html";
-            }
-            html = '<a href=' + url + title + ' target="blank_">' + alt + '</a>';
-          }
-          outputtemp = outputtemp.substring(0,charindex[t - 2]) + html + outputtemp.substring(charindex[t] + 1); //合并
-          t = t - 2;
-        }
-      }
-
       //處理圖像和超鏈接
-      imgorlink(true);
-      imgorlink(false);
+      outputtemp = md.imgorlink(true, outputtemp);
+      outputtemp = md.imgorlink(false, outputtemp);
       
       //整合
       output = output + outputtemp;
@@ -666,6 +527,146 @@ class md{
       html = html + ulorol[1];
     }
     return html;
+  }
+
+  //遍歷查找圖像 & 超鏈接
+  static imgorlink(toimg = true, data) {
+    let key;
+    if(toimg == true){ //圖像與超鏈接的區別是, 圖像起始符是 '![', 而超鏈接起始符是 '['.
+      key = '![';
+    }
+    else{
+      key = '[';
+    }
+    
+    let chartemp = [];
+    let charindex = [];
+    for (let t = 0 ; t < data.length ; t++){
+      switch (data[t]){
+        case '!':
+          if(t + 1 < data.length && data[t + 1] == '[' && toimg == true){
+            chartemp.push('![');
+            charindex.push(t);
+            t++;
+          }
+          break;
+        case '[':
+          if(toimg == false){
+            chartemp.push('[');
+            charindex.push(t);
+          }
+          break;
+        case ']':
+          if(t + 1 < data.length && data[t + 1] == '('){
+            chartemp.push('](');
+            charindex.push(t);
+            t++;
+          }
+          break;
+        case ')':
+          chartemp.push(')');
+          charindex.push(t);
+          break;
+      }
+    }
+    //篩選
+    let chartemp2 = key;
+    for(let t = 0 ; t < chartemp.length ; t++){
+      switch (chartemp[t]){
+        case key:
+          if(chartemp[t] == chartemp2){
+            chartemp2 = '](';
+          }
+          else{
+            chartemp.splice(t,1);
+            charindex.splice(t,1);
+            t--;
+          }
+          break;
+        case '](':
+          if(chartemp[t] == chartemp2){
+            chartemp2 = ')';
+          }
+          else{
+            chartemp.splice(t,1);
+            charindex.splice(t,1);
+            t--;
+          }
+          break;
+        case ')':
+          if(chartemp[t] == chartemp2){
+            chartemp2 = key;
+          }
+          else{
+            chartemp.splice(t,1);
+            charindex.splice(t,1);
+            t--;
+          }
+          break;
+      }
+    }
+    chartemp.splice(chartemp.length - chartemp.length % 3, chartemp.length % 3); //理論上, 總數應該是 3 的公約數
+    charindex.splice(charindex.length - charindex.length % 3, charindex.length % 3);
+    //合成圖像
+    for(let t = chartemp.length - 1; t > -1 ; t--){
+      let urltitle = data.substring(charindex[t - 1] + 2, charindex[t]).trim().split(' "');
+      let url = urltitle[0];
+      if(url.length == 0 || url == '"'){ //圖像失蹤了
+        url = md.img404;
+      }
+      else{ //不全雙贏好
+        if(url[0] != '"'){ 
+          url = '"' + url;
+        }
+        if(url[url.length - 1] != '"'){
+          url = url + '"';
+        }
+      }
+      let title = '';
+      if(urltitle.length > 1 && urltitle[1].length > 0){ //如果有標題
+        title = ' title="' + urltitle[1];
+        if(title[title.length - 1] != '"'){
+          title = title + '"';
+        }
+      }
+      let alt = data.substring(charindex[t - 2] + key.length, charindex[t - 1]);
+      if(alt.length == 0){ //alt失蹤了怎麽辦呐!
+        if(toimg == true){ //適用於圖像的解決方案 IMG
+          if(url == md.img404 || url == '""'){
+            alt = '圖像失蹤了';
+          }
+          else if(alt.length == 0 && urltitle.length > 1 && urltitle[1].length > 0 && urltitle[1] != '"'){
+            alt = urltitle[1];
+          }
+          else{
+            alt = url.substring(1,url.length - 1);
+          }
+        }
+        else{ //適用於炒鷄連接的解決方案 LINK
+          if(url != md.img404){
+            alt = md.linkfix(url.substring(1,url.length - 1));
+          }
+          else{
+            alt = '無效連接';
+          }
+        }
+      }
+      //生成
+      let html;
+      if(toimg == true){ //IMG
+        html = '<img src=' + url + title + ' alt="' + alt + '">';
+      }
+      else{ //LINK
+        if(url == md.img404){
+          // url = document.location.href;
+          url = "/Web/404.html";
+        }
+        html = '<a href=' + url + title + ' target="blank_">' + alt + '</a>';
+      }
+      data = data.substring(0,charindex[t - 2]) + html + data.substring(charindex[t] + 1); //合并
+      t = t - 2;
+    }
+    return data; //輸出
   }
 
 }
