@@ -26,8 +26,12 @@ class md{
     //console.log(datas);
     for(let i = 0; i < datas.length ; i++){ //每行遍历
       let data = datas[i];
-      let outputtemp = ''
+      //let outputtemp = ''
       //console.log(data);
+
+      //公共寄存器
+      let offset_quote = -1; //引用
+      let offset_list = -1; //列表
       
       //檢查元數據
       if(i == 0 && data == "---"){
@@ -151,6 +155,81 @@ class md{
         }
       }
 
+      //解析隊列
+      function duilie(data){
+        let data_trim = data.trim();
+        let outputtemp = '';
+        
+        //遍歷
+        if(data_trim.length > 0){
+          let data_array = data_trim.split(' ');
+          //先檢查 '---' 分割綫
+          if(){
+            
+          }
+          for(){
+            
+          }
+        }
+        
+        if(data_trim.length > 0){
+          switch (data_trim[0]){
+            case '#': //標題
+              outputtemp = md.title(data);
+              break;
+            case '>': //引用
+              outputtemp = doquote()[0];
+              break;
+            case '*': //列表
+              outputtemp = dolist()[0];
+              break;
+            case '-': //分割綫, 或者列表
+              //let t = data.trim();
+              if(data_trim.length > 2){ //文本長度大於 2
+                let num = 0;
+                for(let tt of data_trim){
+                  if(tt == '-'){
+                    num++;
+                  }
+                  else if(num == 1 && tt == ' '){ //第二個字符為空格説明是列表
+                    num = -1;
+                    break;
+                  }
+                  //else if(num > 2){ //假如前邊不是 "-" 并且計數大於 2, 那麽説明該段字符末尾出現了除了 "-" 的壞東西 
+                  else{
+                    num = 0;
+                    break;
+                  }
+                }
+                if(num == -1){ //list
+                  outputtemp = dolist()[0];
+                }
+                else if(num > 2){ //line
+                  outputtemp = md.line();
+                }
+                else{ //p段落
+                  outputtemp = md.paragraph(data);
+                }
+              }
+              else{
+                outputtemp = md.paragraph(data);
+              }
+              break;
+            default: //普通文本
+              outputtemp = md.paragraph(data);
+              break;
+          }
+        }
+        //内斂格式
+        outputtemp = md.inlineformat(outputtemp);
+  
+        //處理圖像和超鏈接
+        outputtemp = md.imgorlink(true, outputtemp);
+        outputtemp = md.imgorlink(false, outputtemp);
+
+        return outputtemp();
+      }
+
       //列表
       function dolist(youxu = false, offset = 0, start = i){ //有序排序, 偏移量, for 循環其實位置
         let ulorol;
@@ -202,16 +281,6 @@ class md{
         return [html + ulorol[1], datas.length];
       }
 
-      //解析隊列
-      function duilie(){
-        //内斂格式
-        outputtemp = md.inlineformat(outputtemp);
-  
-        //處理圖像和超鏈接
-        outputtemp = md.imgorlink(true, outputtemp);
-        outputtemp = md.imgorlink(false, outputtemp);
-      }
-
       //引用
       function doquote(offset = 0, start = i){ //便宜兩, 循環起始位置
         let html = '<div class="quote">';
@@ -246,69 +315,9 @@ class md{
         i = datas.length;
         return [html + '</div>', datas.length];
       }
-
-      //遍歷
-      if(data_trim.length > 0){
-        switch (data_trim[0]){
-          case '#': //標題
-            outputtemp = md.title(data);
-            break;
-          case '>': //引用
-            outputtemp = doquote()[0];
-            break;
-          case '*': //列表
-            outputtemp = dolist()[0];
-            break;
-          case '-': //分割綫, 或者列表
-            //let t = data.trim();
-            if(data_trim.length > 2){ //文本長度大於 2
-              let num = 0;
-              for(let tt of data_trim){
-                if(tt == '-'){
-                  num++;
-                }
-                else if(num == 1 && tt == ' '){ //第二個字符為空格説明是列表
-                  num = -1;
-                  break;
-                }
-                //else if(num > 2){ //假如前邊不是 "-" 并且計數大於 2, 那麽説明該段字符末尾出現了除了 "-" 的壞東西 
-                else{
-                  num = 0;
-                  break;
-                }
-              }
-              if(num == -1){ //list
-                /*if(output.length > 4 && output[output.length - 5] == '<' && output[output.length - 4] == '/' && (output[output.length - 3] == 'u' || output[output.length - 3] == 'o') &&
-                output[output.length - 2] == 'l' && output[output.length - 1] == '>'){ //先看看前邊有沒有現成的列表 (我服了, 這些的是什麽鬼)
-                  output = output.substring(0,output.length - 5);
-                  outputtemp = md.list(data,0,1);
-                }
-                else{
-                  outputtemp = md.list(data,1,1);
-                }*/
-                outputtemp = dolist()[0];
-              }
-              else if(num > 2){ //line
-                outputtemp = md.line();
-              }
-              else{ //p段落
-                outputtemp = md.paragraph(data);
-              }
-            }
-            else{
-              outputtemp = md.paragraph(data);
-            }
-            break;
-          default: //普通文本
-            outputtemp = md.paragraph(data);
-            break;
-        }
-      }
-
-      duilie();
       
       //整合
-      output = output + outputtemp;
+      output = output + duilie(data);
     }
 
     //輸出 HTML
