@@ -8,7 +8,7 @@ class md{
 
   //解析主循環
   static read(datas){
-    let output = ''; //暫存輸出對象
+    let output = []; //暫存輸出對象
     datas = datas.trim().split('\n');
 
     //元數據
@@ -117,40 +117,42 @@ class md{
         for(let t = i + 1 ; t < datas.length ; t++){
           let tt = datas[t];
           let ttt = tt.trim();
-          if(ttt.length == 2 && ttt == '$$'){
+          if(ttt.length == 2 && ttt == '$$'){ //收尾
             lastindex = t++;
             mathdiv = mathdiv + '</div>';
             break;
           }
-          else{
+          else{ //追加
             mathdiv = mathdiv + tt;
           }
         }
-        if(lastindex != -1){
+        if(lastindex != -1){ //輸出
           i = lastindex;
-          output = output + mathdiv;
+          //output = output + mathdiv;
+          output.push(mathdiv);
           continue;
         }
       }
-      else if(data_trim.length > 2 && data_trim[0] == '\`' && data_trim[1] == '\`' && data_trim[2] == '\`'){
+      else if(data_trim.length > 2 && data_trim[0] == '\`' && data_trim[1] == '\`' && data_trim[2] == '\`'){ //CODE
         let lastindex = -1;
         let lang = data_trim.substring(3).trim();
         let codediv = '<div class="code_block"><div><span>CSharp</span><img src="/Resources/UI/Copy-G.svg"></div><code class="block" lang="' + lang + '">'
         for(let t = i + 1 ; t < datas.length ; t++){
           let tt = datas[t];
           let ttt = tt.trim();
-          if(ttt.length == 3 && ttt == '\`\`\`'){
+          if(ttt.length == 3 && ttt == '\`\`\`'){ //收尾
             lastindex = t++;
             codediv = codediv + '</code></div>';
             break;
           }
-          else{
+          else{ //追加
             codediv = codediv + tt + '\n';
           }
         }
-        if(lastindex != -1){
+        if(lastindex != -1){ //輸出
           i = lastindex;
-          output = output + codediv;
+          //output = output + codediv;
+          output.push(codediv);
           continue;
         }
       }
@@ -163,16 +165,46 @@ class md{
         //遍歷
         if(data_trim.length > 0){
           let data_array = data_trim.split(' ');
-          //先檢查 '---' 分割綫
-          if(){
-            
+          //分割綫
+          if(data_array.length == 1 && data_array[0].length > 0){
+            let num = 0;
+            if(data_array[0][0] == '-'){ //---
+              for(let t of data_array[0]){
+                if(t == '-'){
+                  num++;
+                }
+                else{
+                  num = 0;
+                  break;
+                }
+              }
+            }
+            else if(data_array[0][0] == '='){ //===
+              for(let t of data_array[0]){
+                if(t == '='){
+                  num--;
+                }
+                else{
+                  num = 0;
+                  break;
+                }
+              }
+            }
+            //輸出
+            if(num > 2){
+              if(output.length > 0 && datas[i - 1].trim().length != 0){
+                output[output.length - 1] = md.title(output[output.length - 1], 2);
+              }
+              return md.line();
+            }
+            else if(num < -2){
+              if(output.length > 0 && datas[i - 1].trim().length != 0){
+                output[output.length - 1] = md.title(output[output.length - 1], 1);
+              }
+              return md.line();
+            }
           }
-          for(){
-            
-          }
-        }
-        
-        if(data_trim.length > 0){
+
           switch (data_trim[0]){
             case '#': //標題
               outputtemp = md.title(data);
@@ -183,43 +215,19 @@ class md{
             case '*': //列表
               outputtemp = dolist()[0];
               break;
-            case '-': //分割綫, 或者列表
-              //let t = data.trim();
-              if(data_trim.length > 2){ //文本長度大於 2
-                let num = 0;
-                for(let tt of data_trim){
-                  if(tt == '-'){
-                    num++;
-                  }
-                  else if(num == 1 && tt == ' '){ //第二個字符為空格説明是列表
-                    num = -1;
-                    break;
-                  }
-                  //else if(num > 2){ //假如前邊不是 "-" 并且計數大於 2, 那麽説明該段字符末尾出現了除了 "-" 的壞東西 
-                  else{
-                    num = 0;
-                    break;
-                  }
-                }
-                if(num == -1){ //list
-                  outputtemp = dolist()[0];
-                }
-                else if(num > 2){ //line
-                  outputtemp = md.line();
-                }
-                else{ //p段落
-                  outputtemp = md.paragraph(data);
-                }
-              }
-              else{
-                outputtemp = md.paragraph(data);
-              }
+            case '-': //还是列表
+              outputtemp = dolist()[0];
               break;
             default: //普通文本
               outputtemp = md.paragraph(data);
               break;
           }
+          
         }
+        else{
+          return '';
+        }
+        
         //内斂格式
         outputtemp = md.inlineformat(outputtemp);
   
@@ -227,7 +235,7 @@ class md{
         outputtemp = md.imgorlink(true, outputtemp);
         outputtemp = md.imgorlink(false, outputtemp);
 
-        return outputtemp();
+        return outputtemp;
       }
 
       //列表
@@ -317,31 +325,43 @@ class md{
       }
       
       //整合
-      output = output + duilie(data);
+      output.push(duilie(data));
     }
 
     //輸出 HTML
-    return output;
+    return output.join('');
   }
   
   //標題
-  static title(data){
+  static title(data, level){
     let num = 0;
     let text = '';
-    let datatemp = data.trim().split(' '); //#標題後面必須是空格
-    for(let i = 0 ; i < datatemp[0].length ; i++) {
-      if(datatemp[0][i] == '#'){
-        num++
-      }
-      else{ //理論上來説, 截取的第一個字符串全是 #, 若遍歷到非 # 字符説明無效
-        return md.paragraph(data);
-      }
-      if(num > 6){ //最大標簽為 <h6>, num 超過6個以上無效
-        return md.paragraph(data);
-      }
+    if(level != null && level > 0 && level < 7){
+      num = level;
+      text = data;
     }
-    datatemp.splice(0,1); //前面的 ###### 不要
-    text = datatemp.join(' '); //打這麽多注釋, 那麽這裏就凑個數吧 (看不到俺2333)
+    else{
+      let datatemp = data.trim().split(' '); //#標題後面必須是空格
+      for(let i = 0 ; i < datatemp[0].length ; i++) {
+        if(datatemp[0][i] == '#'){
+          num++
+        }
+        else{ //理論上來説, 截取的第一個字符串全是 #, 若遍歷到非 # 字符説明無效
+          return md.paragraph(data);
+        }
+        if(num > 6){ //最大標簽為 <h6>, num 超過6個以上無效
+          return md.paragraph(data);
+        }
+      }
+      datatemp.splice(0,1); //前面的 ###### 不要
+      text = datatemp.join(' '); //打這麽多注釋, 那麽這裏就凑個數吧 (看不到俺2333)
+    }
+    //文檔後處理
+    if(text.length > 0 && text[0] == '<' && text[1] == 'p' && text[2] == '>' &&
+    text[text.length - 4] == '<' && text[text.length - 3] == '/' && text[text.length - 2] == 'p' && text[text.length - 1] == '>')
+    {
+      text = text.substring(3,text.length - 4);
+    }
     return '<div class="title"><a class="title">🔗</a><h' + num + ">" + text.trim()+ '</h' + num + '></div>';
   }
 
