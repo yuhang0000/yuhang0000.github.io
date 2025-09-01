@@ -3,7 +3,7 @@ class md{
 
   //公共變數
   static img404 = '"/Res/UI/404.png"'; //缺省的圖像連接
-  static ver = 'v0.0.1.0827';
+  static ver = 'v0.0.2.0901';
   static version = md.ver;
 
   //解析主循環
@@ -255,7 +255,7 @@ class md{
             continue;
           }
           tt = tt.split(' ');
-          if(tt.length > offset && (tt[offset] == '-' || tt[offset] == '*')){
+          if(tt.length > offset && (tt[offset] == '-' || tt[offset] == '*')){ //追加
             html = html + md.list(datas[t]);
           }
           else if(tt.length > offset && tt[offset] == ''){ //嵌套
@@ -434,14 +434,14 @@ class md{
     }
 
     let html = '<li>';
-    if(top == true){
+    if(top == true){ //追加頭部
       html = ulorol[0] + '<li>';
     }
     // html = html + data.trim().substring(2) + '</li>';
     data = data.trim().split(' ');
     data.splice(0,1);
-    html = html + data.join(' ') + '</li>';
-    if(bottom == true){
+    html = html + md.gougougou(data.join(' ')) + '</li>';
+    if(bottom == true){ //追加尾部
       html = html + ulorol[1];
     }
     return html;
@@ -711,4 +711,26 @@ class md{
     return data;
   }
 
+  //那個大狗狗
+  static gougougou(data){
+    //data = data.trim(); //在列表執行到這裏之前, trim 已經執行過一次了
+    if(data.length > 3 && data[0] == '[' && data[2] == ']' && data[3] == ' '){
+      let html = '<input type="checkbox" disabled';
+      switch(data[1]){
+        case ' ':
+          html = html + '>' + data.substring(3);
+          break;
+        case 'x':
+          html = html + ' checked>' + data.substring(3);
+          break;
+        default:
+          return data;
+      }
+      return html;
+    }
+    else{
+      return data;
+    }
+  }
+  
 }
