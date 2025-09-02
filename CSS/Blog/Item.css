@@ -196,9 +196,6 @@ div.code_block div img{
   transition: background 0.5s;
 }
 div.code_block div img:hover{
-  width: 1.2em;
-  height: 1.2em;
-  user-select: none;
   background: #00000022;
 }
 code.block{
@@ -219,10 +216,24 @@ code.block{
 /* 列表 */
 li{
   padding: 4px 0px;
+  display: flex;
+  align-items: center;
+}
+li:before{
+  content: "•";
+  color: #000;
+  padding: 0px 8px 0px 0px;
 }
 /* 引用 */
 div.quote{
   border-left: 3px solid #aaa;
   padding-left: 16px;
   display: inline-block;
+}
+/* 勾勾 */
+img.gougou{
+  width: auto;
+  height: calc(1em - 0px);
+  user-select: none;
+  padding: 0px 8px 0px 0px;
 }

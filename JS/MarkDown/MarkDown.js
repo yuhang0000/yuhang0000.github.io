@@ -715,13 +715,13 @@ class md{
   static gougougou(data){
     //data = data.trim(); //在列表執行到這裏之前, trim 已經執行過一次了
     if(data.length > 3 && data[0] == '[' && data[2] == ']' && data[3] == ' '){
-      let html = '<input type="checkbox" disabled';
+      let html = '<img class="gougou" src="';
       switch(data[1]){
         case ' ':
-          html = html + '>' + data.substring(3);
+          html = html + '/Resources/UI/nogougou.svg">' + data.substring(3);
           break;
         case 'x':
-          html = html + ' checked>' + data.substring(3);
+          html = html + '/Resources/UI/gougou.svg">' + data.substring(3);
           break;
         default:
           return data;
@@ -734,3 +734,6 @@ class md{
   }
   
 }
+
+//TODO:
+//封裝字符匹配;

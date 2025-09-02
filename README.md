@@ -20,6 +20,8 @@
 
 * `Personal_Logs` 個人資訊;
 
+* `Resources` 資料夾, 暫時用於存放 UI 圖標;
+
 * `Temps` 零食資料夾 (不能吃哦!);
 
 * `Test` 測試項;
