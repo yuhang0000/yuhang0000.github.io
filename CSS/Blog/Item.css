@@ -237,3 +237,15 @@ img.gougou{
   user-select: none;
   padding: 0px 8px 0px 0px;
 }
+/* 脚注 */
+a.footnote{
+  font-size: 0.8rem;
+  position: relative;
+  top: -0.6em;
+  color: cornflowerblue;
+  text-decoration: none;
+}
+a.footnote:hover{
+  text-decoration: underline;
+  color: cadetblue;
+}

@@ -3,12 +3,13 @@ class md{
 
   //公共變數
   static img404 = '"/Res/UI/404.png"'; //缺省的圖像連接
-  static ver = 'v0.0.2.0901';
+  static ver = 'v0.0.2.0903';
   static version = md.ver;
 
   //解析主循環
   static read(datas){
     let output = []; //暫存輸出對象
+    let footnote = []; //暫存脚注
     datas = datas.trim().split('\n');
 
     //元數據
@@ -224,7 +225,7 @@ class md{
           }
           
         }
-        else{
+        else{ //甚麽都木有
           return '';
         }
         
@@ -234,6 +235,9 @@ class md{
         //處理圖像和超鏈接
         outputtemp = md.imgorlink(true, outputtemp);
         outputtemp = md.imgorlink(false, outputtemp);
+
+        //脚注
+        outputtemp = md.footnote(outputtemp, footnote);
 
         return outputtemp;
       }
@@ -579,7 +583,7 @@ class md{
           // url = document.location.href;
           url = "/Web/404.html";
         }
-        html = '<a href=' + url + title + ' target="blank_">' + alt + '</a>';
+        html = '<a href=' + url + title + ' class="link" target="blank_">' + alt + '</a>';
       }
       data = data.substring(0,charindex[t - 2]) + html + data.substring(charindex[t] + 1); //合并
       t = t - 2;
@@ -715,25 +719,120 @@ class md{
   static gougougou(data){
     //data = data.trim(); //在列表執行到這裏之前, trim 已經執行過一次了
     if(data.length > 3 && data[0] == '[' && data[2] == ']' && data[3] == ' '){
-      let html = '<img class="gougou" src="';
       switch(data[1]){
         case ' ':
-          html = html + '/Resources/UI/nogougou.svg">' + data.substring(3);
-          break;
+          return md.checkboxicon() + data.substring(3);
         case 'x':
-          html = html + '/Resources/UI/gougou.svg">' + data.substring(3);
-          break;
+          return md.checkboxicon('v') + data.substring(3);
         default:
           return data;
       }
-      return html;
     }
     else{
       return data;
     }
   }
-  
+
+  //狗狗合集
+  static checkboxicon(style = ''){
+    switch(style){
+      case 'x':
+        return '<img class="gougou" src="/Resources/UI/huaigougou.svg">';
+      case 'v':
+        return '<img class="gougou" src="/Resources/UI/gougou.svg">';
+      case '-':
+        return '<img class="gougou" src="/Resources/UI/uoguog.svg">';
+      default:
+        return '<img class="gougou" src="/Resources/UI/nogougou.svg">';
+    }
+  }
+
+  //脚注
+  static footnote(data, footnotelist){
+    let foot = [];
+    let data_trim = data.trim();
+
+    //先判斷是不是 [^]:
+    /*if(data_trim.length > 0 && data_trim[0] == '[' && data_trim[1] == '^'){
+      let lastindex = -1;
+      for(let i = 0 ; i < data_trim.length ; i++){
+        if(i + 1 < data_trim.length && data_trim[i] == ']' && data_trim[i + 1] == ':'){
+          let note = data_trim.substring(2, i); //截取關鍵詞
+          footnotelist.push('<p class="footnotesub" name="' + note + '">' + data_trim.substring(i + 2) + '</p>');
+          return '';
+        }
+      }
+    }*/
+
+    let tempdump = []; //暫存索引
+    let tempdump2 = []; //暫存符號
+    if(data_trim.length > 0){
+      //先便利
+      for(let i = 0 ; i < data_trim.length ; i++){
+        switch(data_trim[i]){
+          case '[':
+            if(i + 1 < data_trim.length && data_trim[i + 1] == '^'){
+              tempdump.push(i);
+              tempdump2.push('[^');
+              i++;
+            }
+            break;
+          case ']':
+            if(i + 1 < data_trim.length && data_trim[i + 1] == ':'){ //脚注頭
+              tempdump.push(i);
+              tempdump2.push(']:');
+              i++;
+            }
+            else{
+              tempdump.push(i);
+              tempdump2.push(']');
+            }
+            break;
+        }
+      }
+      //篩選
+      let tempkey = ']';
+      for(let i = 0 ; i < tempdump.length ; i++){
+        switch(tempdump2[i]){
+          case '[^':
+            if(tempkey == ']'){
+              tempkey = '[^';
+            }
+            else{
+              tempdump.splice(i,1);
+            }
+            break;
+          case ']':
+            if(tempkey == '[^'){
+              tempkey = ']';
+            }
+            else{
+              tempdump.splice(i,1);
+            }
+            break;
+          case ']:': //脚注頭
+            if(tempkey == '[^'){
+              let note = data_trim.substring(tempdump[i - 1] + 2, tempdump[i]); //截取關鍵詞
+              footnotelist.push('<p class="footnotesub" name="' + note + '">' + data_trim.substring(tempdump[i] + 2).trim() + '</p>');
+              return '';
+            }
+        }
+      }
+      tempdump.splice(tempdump.length - tempdump.length % 2, tempdump.length % 2);
+      tempdump2.splice(tempdump2.length - tempdump2.length % 2, tempdump2.length % 2);
+      //開始
+      for(let i = tempdump.length - 1 ; i > -1 ; i--){
+        let note = data_trim.substring(tempdump[i - 1] + 2, tempdump[i]); //截取關鍵詞
+        data = data_trim.substring(0,tempdump[i - 1]) + '<a class="footnote" href="#' + note + '">' + note + '</a>' + data_trim.substring(tempdump[i] + 1);
+        i--;
+      }
+    }
+        
+    return data
+  }
 }
 
 //TODO:
 //封裝字符匹配;
+//___和***为分割綫
+//~~為剔除綫~~
