@@ -9,7 +9,7 @@ class md{
   //解析主循環
   static read(datas){
     let output = []; //暫存輸出對象
-    let footnote = []; //暫存脚注
+    let footnotelist = []; //暫存脚注
     datas = datas.trim().split('\n');
 
     //元數據
@@ -237,7 +237,7 @@ class md{
         outputtemp = md.imgorlink(false, outputtemp);
 
         //脚注
-        outputtemp = md.footnote(outputtemp, footnote);
+        outputtemp = md.footnote(outputtemp, footnotelist);
 
         return outputtemp;
       }
@@ -333,6 +333,10 @@ class md{
     }
 
     //輸出 HTML
+    if(footnotelist.length > 0){ //追加脚注
+      let footnotehtml = '<ol class="footnotelist">' + footnotelist.join('') + '</ol>';
+      output.push(footnotehtml);
+    }
     return output.join('');
   }
   
@@ -813,7 +817,7 @@ class md{
           case ']:': //脚注頭
             if(tempkey == '[^'){
               let note = data_trim.substring(tempdump[i - 1] + 2, tempdump[i]); //截取關鍵詞
-              footnotelist.push('<p class="footnotesub" name="' + note + '">' + data_trim.substring(tempdump[i] + 2).trim() + '</p>');
+              footnotelist.push('<li class="footnotesub" id="' + note + '"><b>' + note + '</b>: ' + data_trim.substring(tempdump[i] + 2).trim() + '</li>');
               return '';
             }
         }
