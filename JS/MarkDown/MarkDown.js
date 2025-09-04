@@ -208,9 +208,10 @@ class md{
           //封裝
           function readtable(data, head = false){ //傳遞資料, 是否為表頭
             let html = ['<tr>'];
-            let key = ['<td>','</td>'];
-            if(head == true){
-              key = ['<th>','</th>'];
+            let key = ['<td class="','</td>'];
+            if(head == true){ //為表頭
+              key = ['<th class="','</th>'];
+              html = ['<tr class="header">'];
             }
             //if(data.length > 4 && data[0] == '|' && data[data.length - 1] == '|'){
               data = data.split('|');
@@ -220,7 +221,7 @@ class md{
                 if(t > LCR.length){ //超過列數就終止
                   break;
                 }
-                html.push(key[0] + duilie(data[t], true) + key[1]);
+                html.push(key[0] + LCR[t] + '">' + duilie(data[t], true) + key[1]);
               }
               if(data.length < LCR.length){ //列數不夠就往後補
                 for(let t = 0 ; t < data.length - LCR.length ; t++){

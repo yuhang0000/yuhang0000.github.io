@@ -260,3 +260,26 @@ a.footnote:hover{
 .footnotesub{
   
 }
+/* 表格 */
+table{
+  width: fit-content;
+  border-collapse: collapse;
+  margin: 8px 0px;
+  background: #eee;
+}
+th, td{
+  border: 1px solid #bbb;
+  padding: 4px 8px;
+}
+tr.header{
+  background: #ddd;
+}
+td.r{
+  text-align: right;
+}
+td.c{
+  text-align: center;
+}
+td.l{
+  text-align: left;
+}
