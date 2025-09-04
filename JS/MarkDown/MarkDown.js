@@ -834,9 +834,37 @@ class md{
         
     return data
   }
+
+  //HELP!!!
+  static help(){
+    let help = [];
+    help.push('%c適用於 Web 環境的 Markdown 解析器 ' + md.ver);
+    help.push('By: yuhang0000');
+    help.push('');
+    help.push('ver: 列印版本號');
+    help.push('read(data): 解析 Markdown 文檔 | data: 傳遞資料');
+    help.push('title(data, level): 輸出標題 | data: 傳遞資料; level: 標題等級, 默認爲空');
+    help.push('paragraph(data): 輸出 <p> 段落 | data: 傳遞資料');
+    help.push('line(): 輸出分割綫');
+    help.push('linkfix(link): 補全連接 | link: 輸入連接');
+    help.push('               舉個栗子: 當前頁面路徑為 http://localhost/Home/Web/Blog/Index.html');
+    help.push('                         # 輸入 "/Test.md" 返回 "http://localhost/Test.md" ');
+    help.push('                         # 輸入 "./Test.md" 返回 "http://localhost/Home/Web/Blog/Test.md" ');
+    help.push('                         # 輸入 "../Test.md" 返回 "http://localhost/Home/Web/Test.md" ');
+    help.push('                         # 輸入 "../../Test.md" 返回 "http://localhost/Home/Test.md" ');
+    help.push('list(data, top, bottom, type): 用於創捷有序列表和無序列表 | data: 傳遞資料; top: 附加頭 <ul>, 默認為 false; bottom: 附加尾 </ul>, 默認為 false; type: 有序列表的類型, 儅值為 null 時, 為無序列表, 默認值應當為1');
+    help.push('inlineformat(data): 解析並輸出内斂格式的文本 | data: 傳遞資料');
+    help.push('gougougou(data): 解析並輸出任務列表 | data: 傳遞資料');
+    help.push('checkboxicon(style): 輸出複選框圖標 | style: 複選框類型, 可選 " " "-" "v" "x", 默認為 " "');
+    help.push('footnote(data, footnotelist): 解析並輸出脚注或脚注列表 | data: 傳遞資料; footnotelist: 傳遞脚注清單');
+    help.push('help(): 列印此幫助文檔');
+    console.log(help.join('\n'),'color: #0f5290');
+  }
+  
 }
 
 //TODO:
 //封裝字符匹配;
 //___和***为分割綫
 //~~為剔除綫~~
+//幫助主題
