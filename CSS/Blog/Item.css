@@ -220,9 +220,10 @@ li:not(.footnotesub){
   align-items: center;
 }
 li:not(.footnotesub):before{
-  content: "•";
-  color: #000;
-  padding: 0px 8px 0px 0px;
+  content: "●";
+  color: #aaa;
+  padding: 0px 8px 1px 0px;
+  font-size: 0.9rem;
 }
 /* 引用 */
 div.quote{

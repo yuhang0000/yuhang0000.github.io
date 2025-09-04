@@ -33,6 +33,7 @@ class md{
       //公共寄存器
       let offset_quote = -1; //引用
       let offset_list = -1; //列表
+      let tableused = -1; //表格
       
       //檢查元數據
       if(i == 0 && data == "---"){
@@ -110,7 +111,7 @@ class md{
         }
       }
 
-      //數學公式或代碼塊
+      //數學公式或代碼塊或表格
       let data_trim = data.trim();
       if(data_trim.length == 2 && data_trim == '$$'){
         let lastindex = -1;
@@ -157,7 +158,54 @@ class md{
           continue;
         }
       }
-
+      else if(data_trim.length > 4 && data_trim[0] == '|' && data_trim[data_trim.length - 1] == '|'){ //表哥
+        let LCR = []; //暫存列對齊方式
+        let tablesplit = data_trim.split('|'); //拆分單元格
+        tablesplit.splice(0,1); //頭和尾為空的, 移除
+        tablesplit.splice(tablesplit.length - 1,1);
+        //解析对齐方式
+        for(let t of tablesplit){
+          t = t.trim();
+          let num = 0;
+          let ddd = ''; //暂存对齐方位
+          for(let tt of t){ //逐字解析
+            if(num == 0 && tt == ':'){
+              ddd = 'l'; //左对齐
+            }
+            else if(tt == ':'){
+              if(ddd == 'l'){
+                ddd = 'c'; //中对齐
+              }
+              else{
+                ddd = 'r'; //右对齐
+              }
+            }
+            else if(tt == '-'){
+              num++;
+            }
+            else{
+              num = -1;
+              break;
+            }
+          }
+          if(num < 3){ //這不是我表哥
+            LCR = [];
+            break;
+          }
+          else{
+            if(ddd == ''){
+              ddd = 'l'
+            }
+            LCR.push(ddd);
+          }
+        }
+        //开始解析
+        if(LCR.length > 0){
+          debugger;
+          //TODO
+        }
+      }
+      
       //解析隊列
       function duilie(data){
         let data_trim = data.trim();
@@ -169,31 +217,60 @@ class md{
           //分割綫
           if(data_array.length == 1 && data_array[0].length > 0){
             let num = 0;
-            if(data_array[0][0] == '-'){ //---
-              for(let t of data_array[0]){
-                if(t == '-'){
-                  num++;
+            let settitle = false; //是否設置標題
+            switch(data_array[0][0]){
+              case '-': //---
+                for(let t of data_array[0]){
+                  if(t == '-'){
+                    settitle = true;
+                    num++;
+                  }
+                  else{
+                    settitle = false;
+                    num = 0;
+                    break;
+                  }
                 }
-                else{
-                  num = 0;
-                  break;
+                break;
+              case '=': //===
+                for(let t of data_array[0]){
+                  if(t == '='){
+                    settitle = true;
+                    num--;
+                  }
+                  else{
+                    settitle = false;
+                    num = 0;
+                    break;
+                  }
                 }
-              }
-            }
-            else if(data_array[0][0] == '='){ //===
-              for(let t of data_array[0]){
-                if(t == '='){
-                  num--;
+                break;
+              case '*': //***
+                for(let t of data_array[0]){
+                  if(t == '*'){
+                    num++;
+                  }
+                  else{
+                    num = 0;
+                    break;
+                  }
                 }
-                else{
-                  num = 0;
-                  break;
+                break;
+              case '_': //___
+                for(let t of data_array[0]){
+                  if(t == '_'){
+                    num++;
+                  }
+                  else{
+                    num = 0;
+                    break;
+                  }
                 }
-              }
+                break;
             }
             //輸出
             if(num > 2){
-              if(output.length > 0 && datas[i - 1].trim().length != 0){
+              if(settitle == true && output.length > 0 && datas[i - 1].trim().length != 0){ //設置標題
                 output[output.length - 1] = md.title(output[output.length - 1], 2);
               }
               return md.line();
@@ -857,7 +934,7 @@ class md{
     help.push('gougougou(data): 解析並輸出任務列表 | data: 傳遞資料');
     help.push('checkboxicon(style): 輸出複選框圖標 | style: 複選框類型, 可選 " " "-" "v" "x", 默認為 " "');
     help.push('footnote(data, footnotelist): 解析並輸出脚注或脚注列表 | data: 傳遞資料; footnotelist: 傳遞脚注清單');
-    help.push('help(): 列印此幫助文檔');
+    help.push('help(): 列印此幫助');
     console.log(help.join('\n'),'color: #0f5290');
   }
   
@@ -865,6 +942,4 @@ class md{
 
 //TODO:
 //封裝字符匹配;
-//___和***为分割綫
-//~~為剔除綫~~
 //幫助主題
