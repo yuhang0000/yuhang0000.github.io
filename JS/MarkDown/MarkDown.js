@@ -163,21 +163,21 @@ class md{
         let tablesplit = data_trim.split('|'); //拆分單元格
         tablesplit.splice(0,1); //頭和尾為空的, 移除
         tablesplit.splice(tablesplit.length - 1,1);
-        //解析对齐方式
+        //解析對齊方式
         for(let t of tablesplit){
           t = t.trim();
           let num = 0;
-          let ddd = ''; //暂存对齐方位
+          let ddd = ''; //暫存對其方位
           for(let tt of t){ //逐字解析
             if(num == 0 && tt == ':'){
-              ddd = 'l'; //左对齐
+              ddd = 'l'; //左對其
             }
             else if(tt == ':'){
               if(ddd == 'l'){
-                ddd = 'c'; //中对齐
+                ddd = 'c'; //中對其
               }
               else{
-                ddd = 'r'; //右对齐
+                ddd = 'r'; //右對其
               }
             }
             else if(tt == '-'){
@@ -199,20 +199,76 @@ class md{
             LCR.push(ddd);
           }
         }
-        //开始解析
+        //開始解析
         if(LCR.length > 0){
-          debugger;
-          //TODO
+          //debugger;
+          let html = '<table>'; //表哥容器
+          let tableheader = ''; //表哥頭兒
+          let tablesub = []; //表哥兄弟
+          //封裝
+          function readtable(data, head = false){ //傳遞資料, 是否為表頭
+            let html = ['<tr>'];
+            let key = ['<td>','</td>'];
+            if(head == true){
+              key = ['<th>','</th>'];
+            }
+            //if(data.length > 4 && data[0] == '|' && data[data.length - 1] == '|'){
+              data = data.split('|');
+              data.splice(0,1);
+              data.splice(data.length - 1,1);
+              for(let t = 0 ; t < data.length ; t++){
+                if(t > LCR.length){ //超過列數就終止
+                  break;
+                }
+                html.push(key[0] + duilie(data[t], true) + key[1]);
+              }
+              if(data.length < LCR.length){ //列數不夠就往後補
+                for(let t = 0 ; t < data.length - LCR.length ; t++){
+                  html.push(key[0] + '' + key[1]);
+                }
+              }
+            //}
+            html.push('</tr>');
+            return html.join('');
+          }
+          //檢查表頭
+          if(output.length > 0){
+            let header = datas[i - 1].trim();
+            if(header.length > 4 && header[0] == '|' && header[header.length - 1] == '|'){
+              tableheader = readtable(header, true);
+            }
+          }
+          //向下遍歷
+          let lastindex = i + 1;
+          for(let t = i + 1 ; t < datas.length ; t++){
+            let subdata = datas[t].trim();
+            if(subdata.length > 4 && subdata[0] == '|' && subdata[subdata.length - 1] == '|'){
+              tablesub.push(readtable(subdata));
+            }
+            else{ //遍歷到非表哥就終止
+              break;
+            }
+          }
+          //收尾
+          i = lastindex;
+          if(output.length > 0){
+            output[output.length - 1] = html + tableheader + tablesub.join('') + '</table>';
+          }
+          else{
+            output.push(html + tableheader + tablesub.join('') + '</table>');
+          }
+          //debugger;
+          continue;
         }
       }
       
       //解析隊列
-      function duilie(data){
+      function duilie(data, skip = false){ //skip: 跳過遍歷步驟
         let data_trim = data.trim();
         let outputtemp = '';
         
         //遍歷
-        if(data_trim.length > 0){
+        if(data_trim.length > 0 && skip == false){
           let data_array = data_trim.split(' ');
           //分割綫
           if(data_array.length == 1 && data_array[0].length > 0){
@@ -301,6 +357,9 @@ class md{
               break;
           }
           
+        }
+        else if(data_trim.length > 0){ //跳過遍歷步驟之後給 outputtemp 賦值
+          outputtemp = data_trim;
         }
         else{ //甚麽都木有
           return '';
