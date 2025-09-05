@@ -218,14 +218,14 @@ class md{
               data.splice(0,1);
               data.splice(data.length - 1,1);
               for(let t = 0 ; t < data.length ; t++){
-                if(t > LCR.length){ //超過列數就終止
+                if(t > LCR.length - 1){ //超過列數就終止
                   break;
                 }
                 html.push(key[0] + LCR[t] + '">' + duilie(data[t], true) + key[1]);
               }
               if(data.length < LCR.length){ //列數不夠就往後補
-                for(let t = 0 ; t < data.length - LCR.length ; t++){
-                  html.push(key[0] + '' + key[1]);
+                for(let t = 0 ; t < LCR.length - data.length ; t++){
+                  html.push(key[0] + 'l">' + key[1]);
                 }
               }
             //}
