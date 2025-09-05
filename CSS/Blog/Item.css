@@ -74,8 +74,11 @@ a.link:hover{ /* 選擇器不用白不用 */
   border-top-color: #f0f0f0;
 	background: #f9f9f9;
 }
+.blog_item.HTML{
+  display: block;
+}
 /* 正文段落 */
-.blog_item p{
+.blog_item.Markdown p{
   white-space: pre-wrap;
   padding: 0px 0px;
 }
@@ -214,6 +217,15 @@ code.block{
   margin: 4px 0px;
 }
 /* 列表 */
+.blog_item>ul, .blog_item>ol{
+  padding-left: 20px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  margin: 0px;
+}
+ul, ol{
+  padding-left: 24px;
+}
 li:not(.footnotesub){
   padding: 4px 0px;
   display: flex;
@@ -224,6 +236,9 @@ li:not(.footnotesub):before{
   color: #aaa;
   padding: 0px 8px 1px 0px;
   font-size: 0.9rem;
+}
+li{
+  white-space: pre-wrap;
 }
 /* 引用 */
 div.quote{
@@ -282,4 +297,13 @@ td.c{
 }
 td.l{
   text-align: left;
+}
+/* 表格内圖像 */
+td img{
+  max-width: 100%;
+}
+/* 圖像 */
+.blog_item.Markdown img{
+  max-height: 240px;
+  max-width: 100%;
 }

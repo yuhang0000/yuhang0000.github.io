@@ -381,6 +381,9 @@ class md{
 
       //列表
       function dolist(youxu = false, offset = 0, start = i){ //有序排序, 偏移量, for 循環其實位置
+        if(data_trim[1] != ' '){ //跳過非列表
+          return [md.paragraph(data), i];
+        }
         let ulorol;
         if(youxu == false){
           ulorol = ['<ul>','</ul>'];
@@ -762,7 +765,7 @@ class md{
           charindex.push(t);
           break;
         case '\`': //那個内嵌代碼塊
-          if(chartemp.length > 0 && chartemp[chartemp.length - 1].length < 2 && charindex[charindex.length - 1] == t - chartemp[chartemp.length - 1].length){
+          if(chartemp.length > 0 && chartemp[chartemp.length - 1].length < 3 && charindex[charindex.length - 1] == t - chartemp[chartemp.length - 1].length){
             chartemp[chartemp.length - 1] = chartemp[chartemp.length - 1] + '\`';
           }
           else{
@@ -776,8 +779,8 @@ class md{
     //   debugger;
     // }
     
-    //逐字解析後篩選  *1 *2 *3 ~~ $$ ``
-    let chartemp2 = [-1,-1,-1,-1,-1,-1]; //存儲在 chartemp 的索引, 出現一次填上索引, 再出現就移除, 理論上說, 假如關鍵符不是成對出現的, 那麽這裏必有索引
+    //逐字解析後篩選  *1 *2 *3 ~~ $$ `1 `2 `3
+    let chartemp2 = [-1,-1,-1,-1,-1,-1,-1,-1]; //存儲在 chartemp 的索引, 出現一次填上索引, 再出現就移除, 理論上說, 假如關鍵符不是成對出現的, 那麽這裏必有索引
     function chartemp2_switch(index, value){ //懶, 直接封裝
       if(chartemp2[index] == -1){
         chartemp2[index] = value;
@@ -787,26 +790,32 @@ class md{
       }
     }
     for(let t = 0 ; t < chartemp.length ; t++){
-    switch (chartemp[t]){
-      case '*':
-        chartemp2_switch(0,t);
-        break;
-      case '**':
-        chartemp2_switch(1,t);
-        break;
-      case '***':
-        chartemp2_switch(2,t);
-        break;
-      case '~~':
-        chartemp2_switch(3,t);
-        break;
-      case '$':
-        chartemp2_switch(4,t);
-        break;
-      case '\`\`':
-        chartemp2_switch(5,t);
-        break;
-    }
+      switch (chartemp[t]){
+        case '*':
+          chartemp2_switch(0,t);
+          break;
+        case '**':
+          chartemp2_switch(1,t);
+          break;
+        case '***':
+          chartemp2_switch(2,t);
+          break;
+        case '~~':
+          chartemp2_switch(3,t);
+          break;
+        case '$':
+          chartemp2_switch(4,t);
+          break;
+        case '\`':
+          chartemp2_switch(5,t);
+          break;
+        case '\`\`':
+          chartemp2_switch(6,t);
+          break;
+        case '\`\`\`':
+          chartemp2_switch(7,t);
+          break;
+      }
     }
     //篩選後移除
     for(let t = chartemp2.length - 1; t > -1 ; t--){
@@ -816,7 +825,7 @@ class md{
       }
     }
     //現在開始插入
-    chartemp2 = [0,0,0,0,0,0];
+    chartemp2 = [0,0,0,0,0,0,0,0];
     function chartemp_ins(index, chartemp2_index, value, offset = 0){ //封裝太好用啦! 在 outputtemp 上的插入位置; chartemp2 寄存器索引; 插入的片段; 向後剔除多少字符
       value = value.split(',');
       if(chartemp2[chartemp2_index] == 0){
@@ -824,7 +833,7 @@ class md{
         value = value[1];
       }
       else{
-        chartemp2[chartemp2_index] = 1;
+        chartemp2[chartemp2_index] = 0;
         value = value[0];
       }
       data = data.substring(0,index) + value + data.substring(index + offset);
@@ -847,8 +856,14 @@ class md{
         case '$': //反正就是給數學公示用的
           chartemp_ins(charindex[t],4,'<span class="math">,</span>',1);
           break;
-        case '\`\`': //代碼塊
-          chartemp_ins(charindex[t],5,'<code>,</code>',2);
+        case '\`': //代碼塊
+          chartemp_ins(charindex[t],5,'<code>,</code>',1);
+          break;
+        case '\`\`': //還是代碼塊
+          chartemp_ins(charindex[t],6,'<code>,</code>',2);
+          break;
+        case '\`\`\`': //仍然是代碼塊
+          chartemp_ins(charindex[t],7,'<code>,</code>',3);
           break;
       }
     }

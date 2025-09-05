@@ -115,10 +115,10 @@ async function readblog(page = 1){
 			.then(data => {
 				if(data != null){
 				  if(url.trim().indexOf('.md') != -1){ //Markdown 文檔
-				    blog_body.innerHTML = blog_body.innerHTML + '<div class="blog_item" href="' + url.trim() + '">' + md.read(data) + '</div>'; //MarkDown
+				    blog_body.innerHTML = blog_body.innerHTML + '<div class="blog_item Markdown" href="' + url.trim() + '">' + md.read(data) + '</div>'; //MarkDown
 				  }
 				  else{ //HTML 文檔
-				    blog_body.innerHTML = blog_body.innerHTML + '<div class="blog_item" href="' + url.trim() + '">' + data + '</div>'; //HTML
+				    blog_body.innerHTML = blog_body.innerHTML + '<div class="blog_item HTML" href="' + url.trim() + '">' + data + '</div>'; //HTML
 					}
 				}
 				else{
