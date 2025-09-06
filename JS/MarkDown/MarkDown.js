@@ -3,7 +3,7 @@ class md{
 
   //公共變數
   static img404 = '"/Res/UI/404.png"'; //缺省的圖像連接
-  static ver = 'v0.0.2.0903';
+  static ver = 'v0.0.3.0905';
   static version = md.ver;
 
   //解析主循環
@@ -33,7 +33,6 @@ class md{
       //公共寄存器
       let offset_quote = -1; //引用
       let offset_list = -1; //列表
-      let tableused = -1; //表格
       
       //檢查元數據
       if(i == 0 && data == "---"){
@@ -345,13 +344,13 @@ class md{
               outputtemp = md.title(data);
               break;
             case '>': //引用
-              outputtemp = doquote()[0];
+              //outputtemp = md.quote(data);
               break;
             case '*': //列表
-              outputtemp = dolist()[0];
+              outputtemp = dolist();
               break;
             case '-': //还是列表
-              outputtemp = dolist()[0];
+              outputtemp = dolist();
               break;
             default: //普通文本
               outputtemp = md.paragraph(data);
@@ -380,7 +379,7 @@ class md{
       }
 
       //列表
-      function dolist(youxu = false, offset = 0, start = i){ //有序排序, 偏移量, for 循環其實位置
+      function dolist(){ //有序排序, 偏移量, for 循環其實位置
         if(data_trim[1] != ' '){ //跳過非列表
           return [md.paragraph(data), i];
         }
@@ -392,45 +391,12 @@ class md{
           ulorol = ['<ol>','</ol>'];
         }
         let html = ulorol[0];
-        //let lastindex = -1;
-        for(let t = start; t < datas.length ; t++){
-          let tt = datas[t];
-          if(tt.trim().length == 0){ //跳過空行
-            continue;
-          }
-          tt = tt.split(' ');
-          if(tt.length > offset && (tt[offset] == '-' || tt[offset] == '*')){ //追加
-            html = html + md.list(datas[t]);
-          }
-          else if(tt.length > offset && tt[offset] == ''){ //嵌套
-            let newoffset = -1;
-            for(let ttt = 0 ; ttt < tt.length ; ttt++){
-              if(tt[ttt] == '-' || tt[ttt] == '*'){ //找到新的偏移量
-                newoffset = ttt;
-                break;
-              }
-            }
-            if(newoffset != -1 && newoffset > offset){ //嵌套在這裏
-              let temp = dolist(youxu, newoffset, t);
-              html = html + temp[0];
-              t = temp[1];
-            }
-            else{ //要麽新偏移量小於舊的, 要麽遇到空氣裏.
-              i = t - 1;
-              return [html + ulorol[1], i];
-            }
-          }
-          else{
-            i = t - 1;
-            return [html + ulorol[1], i];
-          }
+        //向下遍歷
+        for(let t = i ; i < datas.length ; i++){
+          let data = datas[i];
+          //查找偏移值
+          let datasplit = data.split();
         }
-        //循環到文檔底部
-        /*if(lastindex != -1){
-          i = lastindex;
-        }*/
-        i = datas.length;
-        return [html + ulorol[1], datas.length];
       }
 
       //引用
@@ -591,6 +557,19 @@ class md{
     html = html + md.gougougou(data.join(' ')) + '</li>';
     if(bottom == true){ //追加尾部
       html = html + ulorol[1];
+    }
+    return html;
+  }
+
+  //創建引用
+  static quote(data, top = false , bottom = false){
+    let html = '';
+    if(top == true){
+      html = '<div class="quote">';
+    }
+    html = html + data;
+    if(bottom == true){
+      html = html + '</div>';
     }
     return html;
   }
@@ -1005,6 +984,7 @@ class md{
     help.push('                         # 輸入 "../Test.md" 返回 "http://localhost/Home/Web/Test.md" ');
     help.push('                         # 輸入 "../../Test.md" 返回 "http://localhost/Home/Test.md" ');
     help.push('list(data, top, bottom, type): 用於創捷有序列表和無序列表 | data: 傳遞資料; top: 附加頭 <ul>, 默認為 false; bottom: 附加尾 </ul>, 默認為 false; type: 有序列表的類型, 儅值為 null 時, 為無序列表, 默認值應當為1');
+    help.push('quote(data, top, bottom, type): 用於創捷引用塊 | data: 傳遞資料; top: 附加頭, 默認為 false; bottom: 附加尾, 默認為 false');
     help.push('inlineformat(data): 解析並輸出内斂格式的文本 | data: 傳遞資料');
     help.push('gougougou(data): 解析並輸出任務列表 | data: 傳遞資料');
     help.push('checkboxicon(style): 輸出複選框圖標 | style: 複選框類型, 可選 " " "-" "v" "x", 默認為 " "');
