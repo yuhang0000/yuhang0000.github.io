@@ -378,25 +378,69 @@ class md{
         return outputtemp;
       }
 
+
       //列表
       function dolist(){ //有序排序, 偏移量, for 循環其實位置
+        let offset_list = []; //存儲標簽頭 (要麽 <ul> 要麽 <ol>)
         if(data_trim[1] != ' '){ //跳過非列表
           return [md.paragraph(data), i];
         }
-        let ulorol;
-        if(youxu == false){
-          ulorol = ['<ul>','</ul>'];
-        }
-        else{
-          ulorol = ['<ol>','</ol>'];
-        }
-        let html = ulorol[0];
+        
         //向下遍歷
-        for(let t = i ; i < datas.length ; i++){
-          let data = datas[i];
+        let html = [];
+        for(let t = i ; i < datas.length ; t++){
+          let data = datas[t];
+          if(data.trim().length == 0){ //跳過空行
+            continue;
+          }
+          
           //查找偏移值
-          let datasplit = data.split();
+          let offset = md.getoffset(data); //偏移量
+          let type = offset[1];
+          offset = offset[0];
+          
+          if(offset_list.length < offset){ //升級
+            let num = offset - offset_list.length;
+            for(let tt = 0 ; tt < num ; tt++){
+              if(tt + 1 != num){ //前面缺省為 <ul>
+                html.push('<ul>');
+                offset_list.push('<ul>');
+              }
+              else{
+                if(type == null){
+                  html.push('<ul>');
+                }
+                else{
+                  html.push('<ol>');
+                }
+                offset_list.push(type);
+              }
+            }
+          }
+          if(offset != 0){ //追加在這裏
+            html.push( md.list( duilie(data, true), false, false, type ) );
+          }
+          if(offset_list.length > offset){ //降級
+            let num = offset_list.length - offset;
+            for(let tt = 0 ; tt < num ; tt++){
+              if(offset_list[offset_list.length - 1] == null){ //取最後一個 type, 然後封包
+                html.push('</ul>');
+                offset_list.splice(offset_list.length - 1, 1);
+              }
+              else{
+                html.push('</ol>');
+                offset_list.splice(offset_list.length - 1, 1);
+              }
+            }
+          }
+          if(offset == 0){ //偏移值為 0 時終止循環
+            i = t - 1;
+            break;
+          }
         }
+        
+        //執行到此處説明運行到底部
+        return html.join('');
       }
 
       //引用
@@ -991,6 +1035,29 @@ class md{
     help.push('footnote(data, footnotelist): 解析並輸出脚注或脚注列表 | data: 傳遞資料; footnotelist: 傳遞脚注清單');
     help.push('help(): 列印此幫助');
     console.log(help.join('\n'),'color: #0f5290');
+  }
+
+  //給列表計算偏移值的
+  static getoffset(data){
+    data = data.split(' ');
+    let num = 0;
+    let type = null; //列表類型
+    for(let t of data){
+      if(t == ''){
+        num++;
+      }
+      else if(t == '-' || t == '*'){
+        num = num + 2;
+      }
+      else if(t[t.length - 1] == '.' && isNaN(t) == false){
+        num = num + 2;
+        type = 1;
+      }
+      else{ //截至
+        break;
+      }
+    }
+    return [num / 2, type];
   }
   
 }
