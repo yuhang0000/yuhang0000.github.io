@@ -231,8 +231,14 @@ li:not(.footnotesub){
   display: flex;
   align-items: center;
 }
-li:not(.footnotesub):before{
+ul>li:not(.footnotesub):before{
   content: "●";
+  color: #aaa;
+  padding: 0px 8px 1px 0px;
+  font-size: 0.9rem;
+}
+ol>li:not(.footnotesub):before{
+  content: "1";
   color: #aaa;
   padding: 0px 8px 1px 0px;
   font-size: 0.9rem;

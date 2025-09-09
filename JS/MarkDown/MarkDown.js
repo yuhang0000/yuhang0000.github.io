@@ -380,7 +380,7 @@ class md{
 
 
       //列表
-      function dolist(){ //有序排序, 偏移量, for 循環其實位置
+      function dolist(){
         let offset_list = []; //存儲標簽頭 (要麽 <ul> 要麽 <ol>)
         if(data_trim[1] != ' '){ //跳過非列表
           return [md.paragraph(data), i];
@@ -397,6 +397,7 @@ class md{
           //查找偏移值
           let offset = md.getoffset(data); //偏移量
           let type = offset[1];
+          data = offset[2];
           offset = offset[0];
           
           if(offset_list.length < offset){ //升級
@@ -404,7 +405,7 @@ class md{
             for(let tt = 0 ; tt < num ; tt++){
               if(tt + 1 != num){ //前面缺省為 <ul>
                 html.push('<ul>');
-                offset_list.push('<ul>');
+                offset_list.push(null);
               }
               else{
                 if(type == null){
@@ -416,9 +417,6 @@ class md{
                 offset_list.push(type);
               }
             }
-          }
-          if(offset != 0){ //追加在這裏
-            html.push( md.list( duilie(data, true), false, false, type ) );
           }
           if(offset_list.length > offset){ //降級
             let num = offset_list.length - offset;
@@ -436,6 +434,9 @@ class md{
           if(offset == 0){ //偏移值為 0 時終止循環
             i = t - 1;
             break;
+          }
+          else{ //追加在這裏
+            html.push( md.list( duilie(data, true), false, false, type ) );
           }
         }
         
@@ -596,9 +597,10 @@ class md{
       html = ulorol[0] + '<li>';
     }
     // html = html + data.trim().substring(2) + '</li>';
-    data = data.trim().split(' ');
-    data.splice(0,1);
-    html = html + md.gougougou(data.join(' ')) + '</li>';
+    //data = data.trim().split(' ');
+    //data.splice(0,1);
+    //html = html + md.gougougou(data.join(' ')) + '</li>';
+    html = html + md.gougougou(data.trim()) + '</li>';
     if(bottom == true){ //追加尾部
       html = html + ulorol[1];
     }
@@ -900,9 +902,9 @@ class md{
     if(data.length > 3 && data[0] == '[' && data[2] == ']' && data[3] == ' '){
       switch(data[1]){
         case ' ':
-          return md.checkboxicon() + data.substring(3);
+          return md.checkboxicon() + data.substring(4);
         case 'x':
-          return md.checkboxicon('v') + data.substring(3);
+          return md.checkboxicon('v') + data.substring(4);
         default:
           return data;
       }
@@ -1042,6 +1044,7 @@ class md{
     data = data.split(' ');
     let num = 0;
     let type = null; //列表類型
+    let howlong = 0; //向前裁切多少數組
     for(let t of data){
       if(t == ''){
         num++;
@@ -1056,8 +1059,10 @@ class md{
       else{ //截至
         break;
       }
+      howlong++;
     }
-    return [num / 2, type];
+    data.splice(0, howlong);
+    return [num / 2, type, data.join(' ')]; //偏移值, 列表類型, 截取后數據
   }
   
 }
