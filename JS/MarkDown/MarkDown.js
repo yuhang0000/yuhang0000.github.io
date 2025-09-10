@@ -134,10 +134,10 @@ class md{
           continue;
         }
       }
-      else if(data_trim.length > 2 && data_trim[0] == '\`' && data_trim[1] == '\`' && data_trim[2] == '\`'){ //CODE
+      else if(data_trim.length > 2 && md.charcom(data_trim, '\`\`\`') == true){ //CODE
         let lastindex = -1;
-        let lang = data_trim.substring(3).trim();
-        let codediv = '<div class="code_block"><div><span>CSharp</span><img src="/Resources/UI/Copy-G.svg"></div><code class="block" lang="' + lang + '">'
+        let lang = data_trim.substring(data_trim.lastIndexOf('\`') + 1).trim();
+        let codediv = '<div class="code_block"><div><span>' + lang + '</span><img src="/Resources/UI/Copy-G.svg"></div><code class="block" lang="' + lang + '">'
         for(let t = i + 1 ; t < datas.length ; t++){
           let tt = datas[t];
           let ttt = tt.trim();
@@ -536,8 +536,7 @@ class md{
       text = datatemp.join(' '); //打這麽多注釋, 那麽這裏就凑個數吧 (看不到俺2333)
     }
     //文檔後處理
-    if(text.length > 0 && text[0] == '<' && text[1] == 'p' && text[2] == '>' &&
-    text[text.length - 4] == '<' && text[text.length - 3] == '/' && text[text.length - 2] == 'p' && text[text.length - 1] == '>')
+    if(text.length > 0 && md.charcom(text,'<p>') == true && md.charcom(text,'</p>',true) == true)
     {
       text = text.substring(3,text.length - 4);
     }
@@ -1015,7 +1014,7 @@ class md{
             if(tempkey == '[^'){
               let note = data_trim.substring(tempdump[i - 1] + 2, tempdump[i]); //截取關鍵詞
               footnotelist.push('<li class="footnotesub" id="' + note + '"><b>' + note + '</b>: ' + data_trim.substring(tempdump[i] + 2).trim() + '</li>');
-              return '';
+              return ''; //暫存到脚注列表, 直接返回空字符
             }
         }
       }
@@ -1088,9 +1087,30 @@ class md{
     // }
     return [ Math.trunc(num / 2), type, data.join(' ')]; //偏移值, 列表類型, 截取后數據
   }
+
+  //比較字符
+  static charcom(data, key, end = false) { //傳遞數據; 比較數據; 前&后
+    if(key.length > data.length){ //被比較對象比關鍵詞小就直接 Pass 掉
+      return false;
+    }
+    if(end == false){ //前
+      for(let t = 0 ; t < key.length ; t++){
+        if(data[t] != key[t]){
+          return false;
+        }
+      }
+    }
+    else{ //后
+      for(let t = 1 ; t < key.length + 1; t++){
+        if(data[data.length - t] != key[key.length - t]){
+          return false;
+        }
+      }
+    }
+    return true;
+  }
   
 }
 
 //TODO:
-//封裝字符匹配;
 //幫助主題
