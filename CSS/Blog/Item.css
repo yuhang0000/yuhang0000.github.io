@@ -237,11 +237,17 @@ ul>li:not(.footnotesub):before{
   padding: 0px 8px 1px 0px;
   font-size: 0.9rem;
 }
+.blog_item ol{
+  counter-reset: No;
+}
 ol>li:not(.footnotesub):before{
-  content: "1";
   color: #aaa;
-  padding: 0px 8px 1px 0px;
+  font-weight: normal;
+  padding: 0px 6px 0px 0px;
   font-size: 0.9rem;
+  content: counter(No) ".";
+  counter-increment: No;
+  text-align: right;
 }
 li{
   white-space: pre-wrap;

@@ -353,7 +353,12 @@ class md{
               outputtemp = dolist();
               break;
             default: //普通文本
-              outputtemp = md.paragraph(data);
+              if(data_trim.indexOf('.') != -1 && isNaN( data_trim.substring(0, data_trim.indexOf('.')) ) == false){ //有序列表
+                outputtemp = dolist();
+              }
+              else{
+                outputtemp = md.paragraph(data);
+              }
               break;
           }
           
@@ -383,7 +388,9 @@ class md{
       function dolist(){
         let offset_list = []; //存儲標簽頭 (要麽 <ul> 要麽 <ol>)
         if(data_trim[1] != ' '){ //跳過非列表
-          return [md.paragraph(data), i];
+          if(data_trim.indexOf('.') == -1 && isNaN( data_trim.substring(0, data_trim.indexOf('.')) ) == true){
+            return [md.paragraph(data), i];
+          }
         }
         
         //向下遍歷
@@ -436,6 +443,19 @@ class md{
             break;
           }
           else{ //追加在這裏
+            //在追加之前, 先檢查該列表與上一個列表為同一類型
+            if(type != offset_list[offset_list.length - 1]){
+              if(offset_list[offset_list.length - 1] == null){
+                html.push('</ul>');
+                html.push('<ol>');
+                offset_list[offset_list.length - 1] = type;
+              }
+              else{
+                html.push('</ol>');
+                html.push('<ul>');
+                offset_list[offset_list.length - 1] = type;
+              }
+            }
             html.push( md.list( duilie(data, true), false, false, type ) );
           }
         }
@@ -1062,7 +1082,11 @@ class md{
       howlong++;
     }
     data.splice(0, howlong);
-    return [num / 2, type, data.join(' ')]; //偏移值, 列表類型, 截取后數據
+    // num = num / 2;
+    // if(num.indexOf('.') != -1){ //去除小數點
+    //   num = num.substring(0, num.indexOf('.'));
+    // }
+    return [ Math.trunc(num / 2), type, data.join(' ')]; //偏移值, 列表類型, 截取后數據
   }
   
 }
