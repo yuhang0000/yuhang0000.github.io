@@ -3,7 +3,7 @@ class md{
 
   //公共變數
   static img404 = '"/Res/UI/404.png"'; //缺省的圖像連接
-  static ver = 'v0.0.3.0905';
+  static ver = 'v0.0.4.0915';
   static version = md.ver;
 
   //解析主循環
@@ -135,7 +135,7 @@ class md{
       else if(data_trim.length > 2 && md.charcom(data_trim, '\`\`\`') == true){ //CODE
         let lastindex = -1;
         let lang = data_trim.substring(data_trim.lastIndexOf('\`') + 1).trim();
-        let codediv = '<div class="code_block"><div><span>' + lang + '</span><img src="/Resources/UI/Copy-G.svg"></div><code class="block" lang="' + lang + '">'
+        let codediv = '<div class="code_block"><div><span>' + lang + '</span><img class="copy" src="/Resources/UI/Copy-G.svg"></div><code class="block" lang="' + lang + '">'
         for(let t = i + 1 ; t < datas.length ; t++){
           let tt = datas[t];
           let ttt = tt.trim();
@@ -536,7 +536,39 @@ class md{
       let footnotehtml = '<ol class="footnotelist">' + footnotelist.join('') + '</ol>';
       output.push(footnotehtml);
     }
-    return output.join('');
+    output = output.join('');
+
+    //後處理: 交互
+    let html = document.createElement('div');
+    html.classList.add('Markdown');
+    html.innerHTML = output;
+    //標題描點
+    let titlelist = html.querySelectorAll('div.title');
+    for(let title of titlelist){
+      let text = title.lastChild.innerHTML;
+      title.setAttribute('id', text);
+      let a = title.querySelector('a.title');
+      a.setAttribute('href', '#' + text);
+    }
+    //代碼塊的複製按鈕
+    let code_block = html.querySelectorAll('div.code_block');
+    for(let t of code_block){
+      let btn = t.querySelector('img.copy');
+      btn.addEventListener('click', () => {
+        let code = t.querySelector('code');
+        //code.select();
+        //document.execCommand('copy');
+        try{
+          navigator.clipboard.writeText(code.innerText);
+        }
+        catch{
+          console.error('Oops: 拷貝失敗了...');
+          console.log(code.innerText);
+        }
+      });
+    }
+    
+    return html;
   }
   
   //標題
@@ -1142,3 +1174,5 @@ class md{
 
 //TODO:
 //幫助主題
+//標題描點連接
+//代碼塊拷貝按鈕
