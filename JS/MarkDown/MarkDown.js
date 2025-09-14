@@ -108,7 +108,7 @@ class md{
         }
       }
 
-      //數學公式或代碼塊或表格
+      //數學公式或代碼塊
       let data_trim = data.trim();
       if(data_trim.length == 2 && data_trim == '$$'){
         let lastindex = -1;
@@ -155,7 +155,43 @@ class md{
           continue;
         }
       }
-      else if(data_trim.length > 4 && data_trim[0] == '|' && data_trim[data_trim.length - 1] == '|'){ //表哥
+
+      //引用
+      if(data_trim.length > 0 && data_trim[0] == '>'){
+        let num = 0; //計數
+        let data_array = data_trim.split(' ');
+        for(let t of data_array){
+          if(t == '>'){
+            num++;
+          }
+          else{
+            break;
+          }
+        }
+        //裁剪前面
+        data_array.splice(0,num);
+        data = data_trim = data_array.join(' ');
+        if(num > offset_quote){ //升級
+          for(let t = 0 ; t < num - offset_quote ; t++){
+            output.push('<div class="quote">');
+          }
+        }
+        else if(num < offset_quote){ //降級
+          for(let t = 0 ; t < offset_quote - num ; t++){
+            output.push('</div>');
+          }
+        }
+        offset_quote = num;
+      }
+      else if(offset_quote > 0){ //對引用塊封包
+        for(let t = 0 ; t < offset_quote ; t++){
+            output.push('</div>');
+        }
+        offset_quote = 0;
+      }
+
+      //表哥
+      if(data_trim.length > 4 && data_trim[0] == '|' && data_trim[data_trim.length - 1] == '|'){
         let LCR = []; //暫存列對齊方式
         let tablesplit = data_trim.split('|'); //拆分單元格
         tablesplit.splice(0,1); //頭和尾為空的, 移除
@@ -229,21 +265,49 @@ class md{
             html.push('</tr>');
             return html.join('');
           }
+          //唉... 用來截取 '>' 之後字符的
+          function quote(data){
+            let num = 0;
+            data = data.split(' ');
+            for(let t of data){
+              if(t == '>'){
+                num++;
+              }
+              else{
+                break;
+              }
+            }
+            data.splice(0,num);
+            return [data.join(' '), num];
+          }
           //檢查表頭
           if(output.length > 0){
+            let offset = 0;
             let header = datas[i - 1].trim();
-            if(header.length > 4 && header[0] == '|' && header[header.length - 1] == '|'){
-              tableheader = readtable(header, true);
+            if(offset_quote > 0){ //儅存在引用塊偏移值時
+              header = quote(header);
+              offset = header[1];
+              header = header[0];
+            }
+            if(offset == offset_quote && header.length > 4 && header[0] == '|' && header[header.length - 1] == '|'){
+              tableheader = readtable((header), true);
             }
           }
           //向下遍歷
           let lastindex = i + 1;
           for(let t = i + 1 ; t < datas.length ; t++){
+            let offset = 0;
             let subdata = datas[t].trim();
-            if(subdata.length > 4 && subdata[0] == '|' && subdata[subdata.length - 1] == '|'){
+            if(offset_quote > 0){ //儅存在引用塊偏移值時
+              subdata = quote(subdata);
+              offset = subdata[1];
+              subdata = subdata[0];
+            }
+            if(offset == offset_quote && subdata.length > 4 && subdata[0] == '|' && subdata[subdata.length - 1] == '|'){
               tablesub.push(readtable(subdata));
             }
             else{ //遍歷到非表哥就終止
+              lastindex = t - 1;
               break;
             }
           }
@@ -335,33 +399,6 @@ class md{
               }
               return md.line();
             }
-          }
-
-          //引用
-          if(data_array.length > 0){
-            let num = 0; //計數
-            for(let t of data_array){
-              if(t == '>'){
-                num++;
-              }
-              else{
-                break;
-              }
-            }
-            //裁剪前面
-            data_array.splice(0,num);
-            data = data_trim = data_array.join(' ');
-            if(num > offset_quote){ //升級
-              for(let t = 0 ; t < num - offset_quote ; t++){
-                output.push('<div class="quote">');
-              }
-            }
-            else if(num < offset_quote){ //降級
-              for(let t = 0 ; t < offset_quote - num ; t++){
-                output.push('</div>');
-              }
-            }
-            offset_quote = num;
           }
           
           switch (data_trim[0]){
