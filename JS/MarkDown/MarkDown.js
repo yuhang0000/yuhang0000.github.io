@@ -10,6 +10,7 @@ class md{
   static read(datas){
     let output = []; //暫存輸出對象
     let footnotelist = []; //暫存脚注
+    let offset_quote = 0; //暫存引用偏移量
     datas = datas.trim().split('\n');
 
     //元數據
@@ -30,9 +31,6 @@ class md{
       //let outputtemp = ''
       //console.log(data);
 
-      //公共寄存器
-      let offset_quote = -1; //引用
-      let offset_list = -1; //列表
       
       //檢查元數據
       if(i == 0 && data == "---"){
@@ -339,12 +337,36 @@ class md{
             }
           }
 
+          //引用
+          if(data_array.length > 0){
+            let num = 0; //計數
+            for(let t of data_array){
+              if(t == '>'){
+                num++;
+              }
+              else{
+                break;
+              }
+            }
+            //裁剪前面
+            data_array.splice(0,num);
+            data = data_trim = data_array.join(' ');
+            if(num > offset_quote){ //升級
+              for(let t = 0 ; t < num - offset_quote ; t++){
+                output.push('<div class="quote">');
+              }
+            }
+            else if(num < offset_quote){ //降級
+              for(let t = 0 ; t < offset_quote - num ; t++){
+                output.push('</div>');
+              }
+            }
+            offset_quote = num;
+          }
+          
           switch (data_trim[0]){
             case '#': //標題
               outputtemp = md.title(data);
-              break;
-            case '>': //引用
-              //outputtemp = md.quote(data);
               break;
             case '*': //列表
               outputtemp = dolist();
@@ -356,7 +378,7 @@ class md{
               if(data_trim.indexOf('.') != -1 && isNaN( data_trim.substring(0, data_trim.indexOf('.')) ) == false){ //有序列表
                 outputtemp = dolist();
               }
-              else{
+              else{ //段落
                 outputtemp = md.paragraph(data);
               }
               break;
@@ -383,7 +405,6 @@ class md{
         return outputtemp;
       }
 
-
       //列表
       function dolist(){
         let offset_list = []; //存儲標簽頭 (要麽 <ul> 要麽 <ol>)
@@ -399,6 +420,11 @@ class md{
           let data = datas[t];
           if(data.trim().length == 0){ //跳過空行
             continue;
+          }
+
+          //如果 offset_quote > 0
+          if(offset_quote > 0){
+            data = data.substring(offset_quote * 2);
           }
           
           //查找偏移值
@@ -462,41 +488,6 @@ class md{
         
         //執行到此處説明運行到底部
         return html.join('');
-      }
-
-      //引用
-      function doquote(offset = 0, start = i){ //便宜兩, 循環起始位置
-        let html = '<div class="quote">';
-        for(let t = start ; t < datas.length ; t++){
-          let tt = datas[t].trim();
-          if(tt.length == 0){ //跳過空行
-            continue;
-          }
-          else{
-            tt = tt.split(' ');
-            if(tt[offset] == '>'){
-              if(tt.length > offset && tt[offset + 1] == '>'){ //看看後面還有木有
-                let ttt = doquote(offset + 1, t); //嵌套
-                t = ttt[1];
-                html = html + ttt[0];
-              }
-              else{ //不是嵌套
-                tt.splice(0,offset + 1);
-                tt = tt.join(' ')
-                if(tt.length > 0){
-                  html = html + md.paragraph(tt);
-                }
-              }
-            }
-            else{ //結束
-              i = t - 1;
-              return [html + '</div>', i];
-            }
-          }
-        }
-        //直接便利店地段了
-        i = datas.length;
-        return [html + '</div>', datas.length];
       }
       
       //整合
