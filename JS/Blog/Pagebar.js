@@ -116,10 +116,10 @@ async function readblog(page = 1){
 				if(data != null){
 				  if(url.trim().indexOf('.md') != -1){ //Markdown 文檔
 				    //blog_body.innerHTML = blog_body.innerHTML + '<div class="blog_item Markdown" href="' + url.trim() + '">' + md.read(data) + '</div>'; //MarkDown
-				    let markdownhtml = md.read(data);
-				    markdownhtml.setAttribute('href', url.trim());
-				    markdownhtml.classList.add('blog_item');
-				    blog_body.appendChild(markdownhtml);
+				    let markdown = md.read(data);
+				    markdown[0].setAttribute('href', url.trim());
+				    markdown[0].classList.add('blog_item');
+				    blog_body.appendChild(markdown[0]);
 				  }
 				  else{ //HTML 文檔
 				    blog_body.innerHTML = blog_body.innerHTML + '<div class="blog_item HTML" href="' + url.trim() + '">' + data + '</div>'; //HTML
@@ -153,7 +153,12 @@ async function readbloglist(){
 	//测试 MarkDown
 	let url = new URL(window.location.href);
 	if(url.searchParams.get('test') != null){ //測試
-	  bloglist = ['/Test/Test.md'];
+	  if(url.searchParams.get('test').length == 0){
+	    bloglist = ['/Test/Test.md'];
+	  }
+	  else{
+	    bloglist = [url.searchParams.get('test')];
+	  }
 	  pageitemnum = 1;
 	  pagebar.classList.remove('disable');
 	  readblog(1);

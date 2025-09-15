@@ -45,13 +45,18 @@ class md{
             lastindex = ii;
             break;
           }
-          dataii = dataii.split('=');
+          let splitkey = '=';
+          dataii = dataii.split(splitkey);
           if(dataii.length < 2){ //不是鍵值對説明這不是元數據
-            break;
+            splitkey = ':';
+            dataii = dataii[0].split(splitkey); //嗯, 本身就只有一個數組
+            if(dataii.length < 2){
+              break;
+            }
           }
           let key = dataii[0].toLowerCase(); //鍵統一小寫
           dataii.splice(0,1);
-          let value = dataii.join('=');
+          let value = dataii.join(splitkey);
 
           switch (key){
             case 'title':
@@ -567,8 +572,9 @@ class md{
         }
       });
     }
-    
-    return html;
+
+    //console.table(meta);
+    return [html, meta];
   }
   
   //標題
