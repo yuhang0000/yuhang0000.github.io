@@ -4,7 +4,7 @@ class md{
   //公共變數
   static imglist = { //圖像合集
     '404':'"/Resources/UI/404.png"', //缺省的圖像連接
-    'link':'"/Resources/UI/link2.svg"', //連接
+    'link':'"/Resources/UI/Link2.svg"', //連接
     'copy':'"/Resources/UI/Copy.svg"', //複製
     'date':'"/Resources/UI/Date2.svg"', //日期
     'updata':'"/Resources/UI/Updata.svg"', //更新
@@ -173,6 +173,7 @@ class md{
       //引用
       if(data_trim.length > 0 && data_trim[0] == '>'){
         let num = 0; //計數
+        let padding_left = data.length - data.trimStart().length;
         let data_array = data_trim.split(' ');
         for(let t of data_array){
           if(t == '>'){
@@ -185,9 +186,15 @@ class md{
         //裁剪前面
         data_array.splice(0,num);
         data = data_trim = data_array.join(' ');
+        
         if(num > offset_quote){ //升級
           for(let t = 0 ; t < num - offset_quote ; t++){
-            output.push('<div class="quote">');
+            if(padding_left > 0 && offset_quote == 0){ //向左位移
+              output.push('<div class="quote" style="margin-left: calc(' + Math.trunc(padding_left / 2) + ' * var(--list_margin_left))">');
+            }
+            else{
+              output.push('<div class="quote">');
+            }
           }
         }
         else if(num < offset_quote){ //降級
@@ -459,15 +466,21 @@ class md{
       //列表
       function dolist(){
         let offset_list = []; //存儲標簽頭 (要麽 <ul> 要麽 <ol>)
-        if(data_trim[1] != ' '){ //跳過非列表
-          if(data_trim.indexOf('.') == -1 && isNaN( data_trim.substring(0, data_trim.indexOf('.')) ) == true){
-            return [md.paragraph(data), i];
-          }
+        //跳過非列表 (强迫症害死人)
+        let data1 = data_trim.indexOf(' ');
+        if(data1 != -1){
+          data1 = data_trim.substring(0,data_trim.indexOf(' '));
+        }
+        else{
+          data1 = data_trim;
+        }
+        if(data1 != '-' && data1 != '*' && (data1[data1.length - 1] != '.' || isNaN(data1) == true) ){ 
+          return md.paragraph(data);
         }
         
         //向下遍歷
         let html = [];
-        for(let t = i ; i < datas.length ; t++){
+        for(let t = i ; t < datas.length ; t++){
           let data = datas[t];
           if(data.trim().length == 0){ //跳過空行
             continue;
@@ -516,7 +529,7 @@ class md{
             }
           }
           if(offset == 0){ //偏移值為 0 時終止循環
-            i = t - 1;
+            //i = t - 1;
             break;
           }
           else{ //追加在這裏
@@ -533,6 +546,7 @@ class md{
                 offset_list[offset_list.length - 1] = type;
               }
             }
+            i = t;
             html.push( md.list( duilie(data, true), false, false, type ) );
           }
         }
@@ -564,7 +578,7 @@ class md{
     if(meta['updata'].length > 0){
       header.push('<div class="header_lastupdata" title="更新日期"><img class="header_icon" src=' + md.imglist['updata'] + '>' + meta['updata'] + '</div>');
     }
-    if(meta['tag'].length > 0){
+    if(meta['tag'].length > 0 && meta['tag'][0].length > 0){
       header.push('<div class="header_tags">');
       header.push('<img class="header_icon" src=' + md.imglist['tag'] + '>');
       for(let tag of meta['tag']){
@@ -892,7 +906,7 @@ class md{
     for (let t = 0 ; t < data.length ; t++) {
       switch (data[t]){
         case '*': //要麽加粗, 要麽傾斜, 小孩才會做選擇, 俺全都要
-          if(chartemp.length > 0 && chartemp[chartemp.length - 1].length < 3 && charindex[charindex.length - 1] == t - chartemp[chartemp.length - 1].length){
+          if(chartemp.length > 0 && chartemp[chartemp.length - 1].length < 3 && charindex[charindex.length - 1] == t - chartemp[chartemp.length - 1].length && chartemp[chartemp.length - 1][0] == '*'){
             chartemp[chartemp.length - 1] = chartemp[chartemp.length - 1] + '*';
           }
           else{
@@ -901,7 +915,7 @@ class md{
           }
           break;
         case '~': //剔除綫
-          if(chartemp.length > 0 && chartemp[chartemp.length - 1].length < 2 && charindex[charindex.length - 1] == t - chartemp[chartemp.length - 1].length){
+          if(chartemp.length > 0 && chartemp[chartemp.length - 1].length < 2 && charindex[charindex.length - 1] == t - chartemp[chartemp.length - 1].length && chartemp[chartemp.length - 1][0] == '~'){
             chartemp[chartemp.length - 1] = chartemp[chartemp.length - 1] + '~';
           }
           else{
@@ -914,7 +928,7 @@ class md{
           charindex.push(t);
           break;
         case '\`': //那個内嵌代碼塊
-          if(chartemp.length > 0 && chartemp[chartemp.length - 1].length < 3 && charindex[charindex.length - 1] == t - chartemp[chartemp.length - 1].length){
+          if(chartemp.length > 0 && chartemp[chartemp.length - 1].length < 3 && charindex[charindex.length - 1] == t - chartemp[chartemp.length - 1].length && chartemp[chartemp.length - 1][0] == '\`'){
             chartemp[chartemp.length - 1] = chartemp[chartemp.length - 1] + '\`';
           }
           else{
@@ -1118,7 +1132,7 @@ class md{
           case ']:': //脚注頭
             if(tempkey == '[^'){
               let note = data_trim.substring(tempdump[i - 1] + 2, tempdump[i]); //截取關鍵詞
-              footnotelist.push('<li class="footnotesub" id="' + note + '"><b>' + note + '</b>: ' + data_trim.substring(tempdump[i] + 2).trim() + '</li>');
+              footnotelist.push('<li class="footnotesub" id="' + note + '"><b>' + note + '</b>: ' + data_trim.substring(tempdump[i] + 2, data_trim.lastIndexOf('</p>')).trim() + '</li>');
               return ''; //暫存到脚注列表, 直接返回空字符
             }
         }
@@ -1167,7 +1181,7 @@ class md{
   static getoffset(data){
     data = data.split(' ');
     let num = 0;
-    let type = null; //列表類型
+    let type = 'none'; //列表類型
     let howlong = 0; //向前裁切多少數組
     for(let t of data){
       if(t == ''){
@@ -1175,6 +1189,7 @@ class md{
       }
       else if(t == '-' || t == '*'){
         num = num + 2;
+        type = null;
       }
       else if(t[t.length - 1] == '.' && isNaN(t) == false){
         num = num + 2;
@@ -1184,6 +1199,9 @@ class md{
         break;
       }
       howlong++;
+    }
+    if(type == 'none'){ //沒有返回任何類型, 為非列表
+      num = 0;
     }
     data.splice(0, howlong);
     // num = num / 2;
@@ -1219,5 +1237,5 @@ class md{
 
 //TODO:
 //幫助主題
-//標題描點連接
-//代碼塊拷貝按鈕
+//標題 H1, H2 有下橫綫
+// * * * 也是分割綫

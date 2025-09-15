@@ -50,8 +50,9 @@ a.link:hover{ /* 選擇器不用白不用 */
 /* 公共屬性 */
 :root{
   --blog_item_paddingLR: 32px; /* 部落格的父容器兩側的内邊距 */
-  --R: 4px; /* 倒角 */
+  --list_margin_left: 20px; /* 列表左邊距 */
   --header_padding: 12px; /* 文檔頭的邊距 */
+  --R: 4px; /* 倒角 */
 }
 /* 用來裝部落格的容器 */
 .blog_item{
@@ -69,6 +70,7 @@ a.link:hover{ /* 選擇器不用白不用 */
 	margin-bottom: 8px;
 	transition: border 0.5s, background 0.5s;
 	container-type: inline-size;
+	color: #333;
 }
 .blog_item:hover{
   border-bottom-color: #f0f0f0;
@@ -82,14 +84,16 @@ a.link:hover{ /* 選擇器不用白不用 */
 .blog_item.Markdown p{
   white-space: pre-wrap;
   padding: 0px 0px;
+  margin: 2px 0px;
 }
 /* 分割綫 */
 .line{
   display: block;
-  height: 2px;
+  height: 0px;
   /* width: 100%; */
-  background: #aaa;
-  margin: 0 0px;
+  border-bottom: 1px solid #aaa;
+  /* background: #aaa; */
+  margin: 8px 0px;
 }
 /* 標題 */
 div.title{
@@ -111,27 +115,27 @@ div.title h1, div.title h2, div.title h3, div.title h4, div.title h5, div.title 
 }
 div.title h1{
   white-space: pre-wrap;
-	padding: 16px 2px;
+	padding: 14px 2px;
 	font-size: 2rem;
 }
 div.title h2{
   white-space: pre-wrap;
-	padding: 14px 2px;
+	padding: 12px 2px;
 	font-size: 1.75rem;
 }
 div.title h3{
   white-space: pre-wrap;
-	padding: 12px 2px;
+	padding: 10px 2px;
 	font-size: 1.5rem;
 }
 div.title h4{
   white-space: pre-wrap;
-	padding: 10px 2px;
+	padding: 8px 2px;
 	font-size: 1.25rem;
 }
 div.title h5{
   white-space: pre-wrap;
-	padding: 8px 2px;
+	padding: 6px 2px;
 	font-size: 1rem;
 }
 div.title h6{
@@ -224,16 +228,16 @@ code.block{
 }
 /* 列表 */
 .blog_item>ul, .blog_item>ol{
-  padding-left: 20px;
-  padding-top: 12px;
-  padding-bottom: 12px;
+  padding-left: var(--list_margin_left);
+  padding-top: 8px;
+  padding-bottom: 8px;
   margin: 0px;
 }
 ul, ol{
-  padding-left: 24px;
+  padding-left: var(--list_margin_left);
 }
 li:not(.footnotesub){
-  padding: 4px 0px;
+  padding: 2px 0px;
   display: flex;
   align-items: center;
 }
@@ -284,10 +288,10 @@ a.footnote:hover{
   color: cadetblue;
 }
 /* 脚注列表 */
-.footnotelist{
-  padding-left: 20px;
+ol.footnotelist{
   padding-top: 12px;
-  margin: 0px;
+  padding-bottom: 12px;
+  margin-top: 8px;
   border-top: 1px solid #ddd;
 }
 .footnotesub{
@@ -335,7 +339,7 @@ td img{
   padding-right: var(--header_padding);
   display: inline-flex;
   align-items: center;
-  color: #333;
+  color: #555;
 }
 .header .header_tag_sub{
   padding-right: calc(var(--header_padding) / 2);
@@ -353,8 +357,9 @@ td img{
   padding-right: calc(var(--header_padding) / 2);
 }
 .header .header_title{
-  padding-top: 16px;
-  padding-bottom: 12px;
+  /* padding-top: 16px; */
+  /* padding-bottom: 12px; */
+  padding: 12px 0px;
   margin: 0px;
 }
 .header{
