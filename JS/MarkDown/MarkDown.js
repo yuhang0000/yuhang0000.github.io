@@ -2,7 +2,14 @@
 class md{
 
   //公共變數
-  static img404 = '"/Res/UI/404.png"'; //缺省的圖像連接
+  static imglist = { //圖像合集
+    '404':'"/Resources/UI/404.png"', //缺省的圖像連接
+    'link':'"/Resources/UI/link2.svg"', //連接
+    'copy':'"/Resources/UI/Copy.svg"', //複製
+    'date':'"/Resources/UI/Date2.svg"', //日期
+    'updata':'"/Resources/UI/Updata.svg"', //更新
+    'tag':'"/Resources/UI/Tag.svg"', //標簽
+  }
   static ver = 'v0.0.4.0915';
   static version = md.ver;
 
@@ -20,10 +27,12 @@ class md{
     let tag; //標簽
     let guest = true; //是否公開*/
     let meta = { 'title':'', //標題
-    'data':'', //寫作日期
+    'date':'', //寫作日期
     'updata':'', //最後更新日期
-    'tag':'', //標簽
-    'guest':true /*是否公開*/ }
+    'tag':[], //標簽
+    'guest':true, //是否公開
+    'titlelist':[], //標題列表
+    }
     
     //console.log(datas);
     for(let i = 0; i < datas.length ; i++){ //每行遍历
@@ -63,7 +72,7 @@ class md{
               meta['title'] = value;
               break;
             case 'data':
-              meta['data'] = value;
+              meta['date'] = value;
               break;
             case 'updata':
               meta['updata'] = value;
@@ -140,7 +149,7 @@ class md{
       else if(data_trim.length > 2 && md.charcom(data_trim, '\`\`\`') == true){ //CODE
         let lastindex = -1;
         let lang = data_trim.substring(data_trim.lastIndexOf('\`') + 1).trim();
-        let codediv = '<div class="code_block"><div><span>' + lang + '</span><img class="copy" src="/Resources/UI/Copy-G.svg"></div><code class="block" lang="' + lang + '">'
+        let codediv = '<div class="code_block"><div><span>' + lang + '</span><img class="copy" src=' + md.imglist['copy'] + '></div><code class="block" lang="' + lang + '">'
         for(let t = i + 1 ; t < datas.length ; t++){
           let tt = datas[t];
           let ttt = tt.trim();
@@ -536,11 +545,39 @@ class md{
       output.push(duilie(data));
     }
 
-    //輸出 HTML
     if(footnotelist.length > 0){ //追加脚注
       let footnotehtml = '<ol class="footnotelist">' + footnotelist.join('') + '</ol>';
       output.push(footnotehtml);
     }
+    
+    let header = ['<div class="header">']; //文檔頭
+    if(meta['title'].length > 0){ //追加大標題
+      header.push('<h1 class="header_title">' + meta['title'] + '</h1>');
+    }
+    else if(meta['date'].length > 0){ //標題不存在就用時間吧
+      header.push('<h1 class="header_title">' + meta['date'] + '</h1>');
+    }
+    header.push('<div class="header_info">'); //追加信息
+    if(meta['date'].length > 0){
+      header.push('<div class="header_date" title="建立日期"><img class="header_icon" src=' + md.imglist['date'] + '>' + meta['date'] + '</div>');
+    }
+    if(meta['updata'].length > 0){
+      header.push('<div class="header_lastupdata" title="更新日期"><img class="header_icon" src=' + md.imglist['updata'] + '>' + meta['updata'] + '</div>');
+    }
+    if(meta['tag'].length > 0){
+      header.push('<div class="header_tags">');
+      header.push('<img class="header_icon" src=' + md.imglist['tag'] + '>');
+      for(let tag of meta['tag']){
+        header.push('<a class="header_tag_sub">' + tag + '</a>');
+      }
+      header.push('</div>');
+    }
+    header.push('</div></div>');
+    if(header.length > 3){ //合并文檔頭
+      output.unshift(header.join(''));
+    }
+    
+    //輸出 HTML
     output = output.join('');
 
     //後處理: 交互
@@ -550,10 +587,12 @@ class md{
     //標題描點
     let titlelist = html.querySelectorAll('div.title');
     for(let title of titlelist){
-      let text = title.lastChild.innerHTML;
+      let text = title.lastChild.innerText;
+      let level = title.lastChild.localName;
       title.setAttribute('id', text);
       let a = title.querySelector('a.title');
       a.setAttribute('href', '#' + text);
+      meta['titlelist'].push([level,text]); //追加標題列表
     }
     //代碼塊的複製按鈕
     let code_block = html.querySelectorAll('div.code_block');
@@ -572,7 +611,7 @@ class md{
         }
       });
     }
-
+    
     //console.table(meta);
     return [html, meta];
   }
@@ -602,11 +641,11 @@ class md{
       text = datatemp.join(' '); //打這麽多注釋, 那麽這裏就凑個數吧 (看不到俺2333)
     }
     //文檔後處理
-    if(text.length > 0 && md.charcom(text,'<p>') == true && md.charcom(text,'</p>',true) == true)
+    if(text.length > 0 && md.charcom(text,'<p>') == true && md.charcom(text,'</p>',true) == true) //剔除 P 段落
     {
       text = text.substring(3,text.length - 4);
     }
-    return '<div class="title"><a class="title">🔗</a><h' + num + ">" + text.trim()+ '</h' + num + '></div>';
+    return '<div class="title"><a class="title"><img src=' + md.imglist['link'] + '></a><h' + num + ">" + text.trim()+ '</h' + num + '></div>';
   }
 
   //普通文本
@@ -788,7 +827,7 @@ class md{
       let urltitle = data.substring(charindex[t - 1] + 2, charindex[t]).trim().split(' "');
       let url = urltitle[0];
       if(url.length == 0 || url == '"'){ //圖像失蹤了
-        url = md.img404;
+        url = md.imglist['404'];
       }
       else{ //不全雙贏好
         if(url[0] != '"'){ 
@@ -808,7 +847,7 @@ class md{
       let alt = data.substring(charindex[t - 2] + key.length, charindex[t - 1]);
       if(alt.length == 0){ //alt失蹤了怎麽辦呐!
         if(toimg == true){ //適用於圖像的解決方案 IMG
-          if(url == md.img404 || url == '""'){
+          if(url == md.imglist['404'] || url == '""'){
             alt = '圖像失蹤了';
           }
           else if(alt.length == 0 && urltitle.length > 1 && urltitle[1].length > 0 && urltitle[1] != '"'){
@@ -819,7 +858,7 @@ class md{
           }
         }
         else{ //適用於炒鷄連接的解決方案 LINK
-          if(url != md.img404){
+          if(url != md.imglist['404']){
             alt = md.linkfix(url.substring(1,url.length - 1));
           }
           else{
@@ -833,7 +872,7 @@ class md{
         html = '<img src=' + url + title + ' alt="' + alt + '">';
       }
       else{ //LINK
-        if(url == md.img404){
+        if(url == md.imglist['404']){
           // url = document.location.href;
           url = "/Web/404.html";
         }

@@ -51,6 +51,7 @@ a.link:hover{ /* 選擇器不用白不用 */
 :root{
   --blog_item_paddingLR: 32px; /* 部落格的父容器兩側的内邊距 */
   --R: 4px; /* 倒角 */
+  --header_padding: 12px; /* 文檔頭的邊距 */
 }
 /* 用來裝部落格的容器 */
 .blog_item{
@@ -157,6 +158,10 @@ a.title:hover{
   opacity: 1;
   /* visibility: visible; */
 }
+a.title img{
+  width: 1em;
+  height: 1em;
+}
 /* 代碼塊内嵌的 */
 code:not(.block){
   display: inline-flex;
@@ -190,6 +195,7 @@ div.code_block div span{
   padding: 2px 8px;
 }
 div.code_block div img{
+  opacity: 0.7;
   width: 1.2em;
   height: 1.2em;
   padding: 4px;
@@ -319,3 +325,50 @@ td img{
   max-height: 240px;
   max-width: 100%;
 }
+/* 文檔頭 */
+.header .header_info, .header .header_tags{
+  display: inline-flex;
+  align-items: center;
+  flex-direction: row;
+}
+.header .header_date, .header .header_lastupdata{
+  padding-right: var(--header_padding);
+  display: inline-flex;
+  align-items: center;
+  color: #333;
+}
+.header .header_tag_sub{
+  padding-right: calc(var(--header_padding) / 2);
+  color: #640000;
+}
+.header .header_tag_sub:hover{
+  text-decoration: underline;
+  color: #990000;
+  cursor: pointer;
+}
+.header .header_icon{
+  width: 1em;
+  height: 1em;
+  padding-left: 2px;
+  padding-right: calc(var(--header_padding) / 2);
+}
+.header .header_title{
+  padding-top: 16px;
+  padding-bottom: 12px;
+  margin: 0px;
+}
+.header{
+  padding-bottom: 8px;
+  border-bottom: 1px solid #ddd;
+}
+/* .header .header_date:before{ */
+  /* content: ''; */
+  /* width: 1em; */
+  /* height: 1em; */
+  /* background: url(/Resources/UI/Date.svg); */
+  /* background-size: 100% 100%; */
+  /* display: inline-block; */
+  /* position: relative; */
+  /* top: 1px; */
+  /* left: -3px; */
+/* } */
