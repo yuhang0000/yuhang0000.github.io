@@ -9,8 +9,12 @@ class md{
     'date':'"/Resources/UI/Date2.svg"', //日期
     'updata':'"/Resources/UI/Updata.svg"', //更新
     'tag':'"/Resources/UI/Tag.svg"', //標簽
+    'uoguog':'"/Resources/UI/uoguog.svg"', //複選框: -
+    'gougou':'"/Resources/UI/gougou.svg"', //複選框: v
+    'nogougou':'"/Resources/UI/nogougou.svg"', //複選框: 空的
+    'huaigougou':'"/Resources/UI/huaigougou.svg"', //複選框: x
   }
-  static ver = 'v0.0.4.0915';
+  static ver = 'v0.0.5.0916';
   static version = md.ver;
 
   //解析主循環
@@ -149,7 +153,7 @@ class md{
       else if(data_trim.length > 2 && md.charcom(data_trim, '\`\`\`') == true){ //CODE
         let lastindex = -1;
         let lang = data_trim.substring(data_trim.lastIndexOf('\`') + 1).trim();
-        let codediv = '<div class="code_block"><div><span>' + lang + '</span><img class="copy" src=' + md.imglist['copy'] + '></div><code class="block" lang="' + lang + '">'
+        let codediv = '<div class="code_block"><div><span>' + lang + '</span>' + md.uiicon('copy',['copy']) + '</div><code class="block" lang="' + lang + '">'
         for(let t = i + 1 ; t < datas.length ; t++){
           let tt = datas[t];
           let ttt = tt.trim();
@@ -353,76 +357,45 @@ class md{
         //遍歷
         if(data_trim.length > 0 && skip == false){
           let data_array = data_trim.split(' ');
+          let firstcham = data_trim[0]; //取首個字符
+          
           //分割綫
-          if(data_array.length == 1 && data_array[0].length > 0){
+          if(firstcham == '=' || firstcham == '-' || firstcham == '*' || firstcham == '_'){
             let num = 0;
-            let settitle = false; //是否設置標題
-            switch(data_array[0][0]){
-              case '-': //---
-                for(let t of data_array[0]){
-                  if(t == '-'){
-                    settitle = true;
-                    num++;
-                  }
-                  else{
-                    settitle = false;
-                    num = 0;
-                    break;
-                  }
+            let settitle = 0; //标题等級
+            let data_nospace = data_array.join('');
+            if(data_nospace.length > 2){
+              switch (firstcham){ //設置標題等級
+                case '=':
+                  settitle = 1;
+                  break
+                case '-':
+                  settitle = 2;
+                  break
+              }
+              for(let t of data_array.join('')){ //直接合并空格, 畢竟 * * * 這類也算分割綫
+                if(t == firstcham){
+                  num++;
                 }
-                break;
-              case '=': //===
-                for(let t of data_array[0]){
-                  if(t == '='){
-                    settitle = true;
-                    num--;
-                  }
-                  else{
-                    settitle = false;
-                    num = 0;
-                    break;
-                  }
+                else{
+                  num = 0;
+                  break;
                 }
-                break;
-              case '*': //***
-                for(let t of data_array[0]){
-                  if(t == '*'){
-                    num++;
-                  }
-                  else{
-                    num = 0;
-                    break;
-                  }
-                }
-                break;
-              case '_': //___
-                for(let t of data_array[0]){
-                  if(t == '_'){
-                    num++;
-                  }
-                  else{
-                    num = 0;
-                    break;
-                  }
-                }
-                break;
+              }
             }
             //輸出
             if(num > 2){
-              if(settitle == true && output.length > 0 && datas[i - 1].trim().length != 0){ //設置標題
-                output[output.length - 1] = md.title(output[output.length - 1], 2);
+              if(settitle > 0 && output.length > 0 && datas[i - 1].trim().length != 0){ //設置標題
+                output[output.length - 1] = md.title(output[output.length - 1], settitle);
+                return '';
               }
-              return md.line();
-            }
-            else if(num < -2){
-              if(output.length > 0 && datas[i - 1].trim().length != 0){
-                output[output.length - 1] = md.title(output[output.length - 1], 1);
+              else{
+                return md.line();
               }
-              return md.line();
             }
           }
           
-          switch (data_trim[0]){
+          switch (firstcham){
             case '#': //標題
               outputtemp = md.title(data);
               break;
@@ -573,14 +546,14 @@ class md{
     }
     header.push('<div class="header_info">'); //追加信息
     if(meta['date'].length > 0){
-      header.push('<div class="header_date" title="建立日期"><img class="header_icon" src=' + md.imglist['date'] + '>' + meta['date'] + '</div>');
+      header.push('<div class="header_date" title="建立日期">' + md.uiicon('date',['header_icon']) + meta['date'] + '</div>');
     }
     if(meta['updata'].length > 0){
-      header.push('<div class="header_lastupdata" title="更新日期"><img class="header_icon" src=' + md.imglist['updata'] + '>' + meta['updata'] + '</div>');
+      header.push('<div class="header_lastupdata" title="更新日期">' + md.uiicon('updata',['header_icon']) + meta['updata'] + '</div>');
     }
     if(meta['tag'].length > 0 && meta['tag'][0].length > 0){
       header.push('<div class="header_tags">');
-      header.push('<img class="header_icon" src=' + md.imglist['tag'] + '>');
+      header.push(md.uiicon('tag',['header_icon']));
       for(let tag of meta['tag']){
         header.push('<a class="header_tag_sub">' + tag + '</a>');
       }
@@ -659,7 +632,12 @@ class md{
     {
       text = text.substring(3,text.length - 4);
     }
-    return '<div class="title"><a class="title"><img src=' + md.imglist['link'] + '></a><h' + num + ">" + text.trim()+ '</h' + num + '></div>';
+    let html = '<div class="title"><a class="title"><img class="ui_icon" src=' + md.imglist['link'] + '></a><h' + num + ">" + text.trim()+ '</h' + num + '></div>';
+    //H1 H2 有分割綫
+    if(num < 3){
+      html = html + md.line();
+    }
+    return html;
   }
 
   //普通文本
@@ -1056,13 +1034,13 @@ class md{
   static checkboxicon(style = ''){
     switch(style){
       case 'x':
-        return '<img class="gougou" src="/Resources/UI/huaigougou.svg">';
+        return md.uiicon('huaigougou', ['gougou']);
       case 'v':
-        return '<img class="gougou" src="/Resources/UI/gougou.svg">';
+        return md.uiicon('gougou', ['gougou']);
       case '-':
-        return '<img class="gougou" src="/Resources/UI/uoguog.svg">';
+        return md.uiicon('uoguog', ['gougou']);
       default:
-        return '<img class="gougou" src="/Resources/UI/nogougou.svg">';
+        return md.uiicon('nogougou', ['gougou']);
     }
   }
 
@@ -1232,10 +1210,22 @@ class md{
     }
     return true;
   }
-  
+
+  //圖標
+  static uiicon(type, classlist){ //圖標類型; 附加 class 屬性
+    let src = md.imglist[type];
+    if(src == null){
+      src = md.imglist['404'];
+    }
+    if(classlist.length > 0){
+      classlist = ' ' + classlist.join(' '); 
+    }
+    else{
+      classlist = '';
+    }
+    return '<img class="ui_icon' + classlist + '" src=' + src + '>';
+  }
 }
 
 //TODO:
 //幫助主題
-//標題 H1, H2 有下橫綫
-// * * * 也是分割綫
