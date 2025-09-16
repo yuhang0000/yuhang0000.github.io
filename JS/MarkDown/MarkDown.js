@@ -16,6 +16,10 @@ class md{
   }
   static ver = 'v0.0.5.0916';
   static version = md.ver;
+  static ESC = { //轉義字符
+    '<':'&lt;',
+    '>':'&gt;',
+  }
 
   //解析主循環
   static read(datas){
@@ -130,46 +134,46 @@ class md{
       let data_trim = data.trim();
       if(data_trim.length == 2 && data_trim == '$$'){
         let lastindex = -1;
-        let mathdiv = '<div class="math">'
+        let mathdiv = ['<div class="math">'];
         for(let t = i + 1 ; t < datas.length ; t++){
           let tt = datas[t];
           let ttt = tt.trim();
           if(ttt.length == 2 && ttt == '$$'){ //收尾
             lastindex = t++;
-            mathdiv = mathdiv + '</div>';
+            mathdiv.push('</div>');
             break;
           }
           else{ //追加
-            mathdiv = mathdiv + tt;
+            mathdiv.push( md.doesc(tt) );
           }
         }
         if(lastindex != -1){ //輸出
           i = lastindex;
           //output = output + mathdiv;
-          output.push(mathdiv);
+          output.push(mathdiv.join(''));
           continue;
         }
       }
       else if(data_trim.length > 2 && md.charcom(data_trim, '\`\`\`') == true){ //CODE
         let lastindex = -1;
         let lang = data_trim.substring(data_trim.lastIndexOf('\`') + 1).trim();
-        let codediv = '<div class="code_block"><div><span>' + lang + '</span>' + md.uiicon('copy',['copy']) + '</div><code class="block" lang="' + lang + '">'
+        let codediv = ['<div class="code_block"><div><span>' + lang + '</span>' + md.uiicon('copy',['copy']) + '</div><code class="block" lang="' + lang + '">']
         for(let t = i + 1 ; t < datas.length ; t++){
           let tt = datas[t];
           let ttt = tt.trim();
           if(ttt.length == 3 && ttt == '\`\`\`'){ //收尾
             lastindex = t++;
-            codediv = codediv + '</code></div>';
+            codediv.push('</code></div>');
             break;
           }
           else{ //追加
-            codediv = codediv + tt + '\n';
+            codediv.push(md.doesc(tt) + '\n');
           }
         }
         if(lastindex != -1){ //輸出
           i = lastindex;
           //output = output + codediv;
-          output.push(codediv);
+          output.push(codediv.join(''));
           continue;
         }
       }
@@ -878,137 +882,36 @@ class md{
 
   //一拖拉庫的内斂格式在這裏
   static inlineformat(data){
-    //逐字解析
-    let chartemp = []; //暫存字符
-    let charindex = []; //該字符的所在位置
-    for (let t = 0 ; t < data.length ; t++) {
-      switch (data[t]){
-        case '*': //要麽加粗, 要麽傾斜, 小孩才會做選擇, 俺全都要
-          if(chartemp.length > 0 && chartemp[chartemp.length - 1].length < 3 && charindex[charindex.length - 1] == t - chartemp[chartemp.length - 1].length && chartemp[chartemp.length - 1][0] == '*'){
-            chartemp[chartemp.length - 1] = chartemp[chartemp.length - 1] + '*';
+    function doit(key,ins,doesc = false){ //關鍵詞; 插入内容; 是否轉義字符
+      let html = [];
+      let data_array= data.split(key); //拆分片段
+      if(data_array.length < 2){ //長度不夠不符合
+        return;
+      }
+      if(data_array.length % 2 == 0){ //為偶數時, 合并后兩項
+        data_array[data_array.length - 2] = data_array[data_array.length - 2] + key + data_array[data_array.length - 1];
+        data_array.splice(data_array.length - 1,1);
+      }
+      for(let t = 0 ; t < data_array.length ; t++){ //拼好句
+        html.push(data_array[t]);
+        if(t % 2 == 0 && t != data_array.length - 1){ //頭
+          html.push(ins[0]);
+        }
+        if(t % 2 == 1){ //尾
+          if(doesc == true){ //封裝尾部時先轉義字符
+            html[html.length - 1] = md.doesc(html[html.length - 1]);
           }
-          else{
-            chartemp.push(data[t]);
-            charindex.push(t);
-          }
-          break;
-        case '~': //剔除綫
-          if(chartemp.length > 0 && chartemp[chartemp.length - 1].length < 2 && charindex[charindex.length - 1] == t - chartemp[chartemp.length - 1].length && chartemp[chartemp.length - 1][0] == '~'){
-            chartemp[chartemp.length - 1] = chartemp[chartemp.length - 1] + '~';
-          }
-          else{
-            chartemp.push(data[t]);
-            charindex.push(t);
-          }
-          break;
-        case '$': //那個數學公式
-          chartemp.push(data[t]);
-          charindex.push(t);
-          break;
-        case '\`': //那個内嵌代碼塊
-          if(chartemp.length > 0 && chartemp[chartemp.length - 1].length < 3 && charindex[charindex.length - 1] == t - chartemp[chartemp.length - 1].length && chartemp[chartemp.length - 1][0] == '\`'){
-            chartemp[chartemp.length - 1] = chartemp[chartemp.length - 1] + '\`';
-          }
-          else{
-            chartemp.push(data[t]);
-            charindex.push(t);
-          }
-          break;
+          html.push(ins[1]);
+        }
       }
+      data = html.join('');
     }
-    // if(chartemp.length != 0){
-    //   debugger;
-    // }
-    
-    //逐字解析後篩選  *1 *2 *3 ~~ $$ `1 `2 `3
-    let chartemp2 = [-1,-1,-1,-1,-1,-1,-1,-1]; //存儲在 chartemp 的索引, 出現一次填上索引, 再出現就移除, 理論上說, 假如關鍵符不是成對出現的, 那麽這裏必有索引
-    function chartemp2_switch(index, value){ //懶, 直接封裝
-      if(chartemp2[index] == -1){
-        chartemp2[index] = value;
-      }
-      else{
-        chartemp2[index] = -1;
-      }
+    let keys = ['\`\`\`','\`\`','\`','$','***','**','*','~~'];
+    let inss = ['<code>,</code>','<code>,</code>','<code>,</code>','<span class="math">,</span>','<b><i>,</i></b>','<b>,</b>','<i>,</i>','<del>,</del>'];
+    let doescs = [true,true,true,true,false,false,false,false];
+    for(let t = 0 ; t < keys.length ; t++){ //遍歷
+      doit(keys[t], inss[t].split(','), doescs[t]);
     }
-    for(let t = 0 ; t < chartemp.length ; t++){
-      switch (chartemp[t]){
-        case '*':
-          chartemp2_switch(0,t);
-          break;
-        case '**':
-          chartemp2_switch(1,t);
-          break;
-        case '***':
-          chartemp2_switch(2,t);
-          break;
-        case '~~':
-          chartemp2_switch(3,t);
-          break;
-        case '$':
-          chartemp2_switch(4,t);
-          break;
-        case '\`':
-          chartemp2_switch(5,t);
-          break;
-        case '\`\`':
-          chartemp2_switch(6,t);
-          break;
-        case '\`\`\`':
-          chartemp2_switch(7,t);
-          break;
-      }
-    }
-    //篩選後移除
-    for(let t = chartemp2.length - 1; t > -1 ; t--){
-      if(chartemp2[t] != -1){
-        chartemp.splice(chartemp2[t],1);
-        charindex.splice(chartemp2[t],1);
-      }
-    }
-    //現在開始插入
-    chartemp2 = [0,0,0,0,0,0,0,0];
-    function chartemp_ins(index, chartemp2_index, value, offset = 0){ //封裝太好用啦! 在 outputtemp 上的插入位置; chartemp2 寄存器索引; 插入的片段; 向後剔除多少字符
-      value = value.split(',');
-      if(chartemp2[chartemp2_index] == 0){
-        chartemp2[chartemp2_index] = 1;
-        value = value[1];
-      }
-      else{
-        chartemp2[chartemp2_index] = 0;
-        value = value[0];
-      }
-      data = data.substring(0,index) + value + data.substring(index + offset);
-    }
-    for(let t = chartemp.length - 1; t > -1 ; t--){
-      switch (chartemp[t]){
-        case '*': //傾斜
-          chartemp_ins(charindex[t],0,'<i>,</i>',1);
-          break;
-        case '**': //加粗
-          chartemp_ins(charindex[t],1,'<b>,</b>',2);
-          break;
-        case '***': //加粗 + 傾斜
-          chartemp_ins(charindex[t],2,'<b><i>,</i></b>',3);
-          // chartemp_ins(charindex[t],2,'<b>');
-          break;
-        case '~~': //剔除綫
-          chartemp_ins(charindex[t],3,'<del>,</del>',2);
-          break;
-        case '$': //反正就是給數學公示用的
-          chartemp_ins(charindex[t],4,'<span class="math">,</span>',1);
-          break;
-        case '\`': //代碼塊
-          chartemp_ins(charindex[t],5,'<code>,</code>',1);
-          break;
-        case '\`\`': //還是代碼塊
-          chartemp_ins(charindex[t],6,'<code>,</code>',2);
-          break;
-        case '\`\`\`': //仍然是代碼塊
-          chartemp_ins(charindex[t],7,'<code>,</code>',3);
-          break;
-      }
-    }
-    //輸出
     return data;
   }
 
@@ -1225,6 +1128,19 @@ class md{
     }
     return '<img class="ui_icon' + classlist + '" src=' + src + '>';
   }
+
+  //轉移字符
+  static doesc(data){
+    let keys = Object.keys(md.ESC)
+    for(let key of keys){
+      // while(data.indexOf(key) != -1){
+      //   data = data.replace(key, md.ESC[key]);
+      // }
+      data = data.split(key).join(md.ESC[key]);
+    }
+    return data;
+  }
+  
 }
 
 //TODO:
