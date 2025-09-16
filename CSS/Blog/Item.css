@@ -197,6 +197,9 @@ code:not(.block){
   justify-content: center;
   align-items: center;
 }
+table code:not(.block){
+  background: #fff;
+}
 /* 大一點的代碼塊 */
 div.code_block{
   display: inline-flex;
