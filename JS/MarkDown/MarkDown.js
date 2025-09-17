@@ -7,14 +7,14 @@ class md{
     'link':'"/Resources/UI/Link2.svg"', //連接
     'copy':'"/Resources/UI/Copy.svg"', //複製
     'date':'"/Resources/UI/Date2.svg"', //日期
-    'updata':'"/Resources/UI/Updata.svg"', //更新
+    'updata':'"/Resources/UI/Updata2.svg"', //更新
     'tag':'"/Resources/UI/Tag.svg"', //標簽
     'uoguog':'"/Resources/UI/uoguog.svg"', //複選框: -
     'gougou':'"/Resources/UI/gougou.svg"', //複選框: v
     'nogougou':'"/Resources/UI/nogougou.svg"', //複選框: 空的
     'huaigougou':'"/Resources/UI/huaigougou.svg"', //複選框: x
   }
-  static ver = 'v0.0.5.0916';
+  static ver = 'v0.0.6.0916';
   static version = md.ver;
   static ESC = { //轉義字符
     '<':'&lt;',
@@ -1058,6 +1058,10 @@ class md{
     help.push('gougougou(data): 解析並輸出任務列表 | data: 傳遞資料');
     help.push('checkboxicon(style): 輸出複選框圖標 | style: 複選框類型, 可選 " " "-" "v" "x", 默認為 " "');
     help.push('footnote(data, footnotelist): 解析並輸出脚注或脚注列表 | data: 傳遞資料; footnotelist: 傳遞脚注清單');
+    help.push('getoffset(data): 給列表用的, 用於計算偏移值 | data: 傳遞資料; | 返回數組: 偏移值, 列表類型, 截取后資料');
+    help.push('charcom(data, key, end): 用於比較字符串 | data: 傳遞資料; key: 關鍵詞; end: 從尾開始, 默認爲 false; | 返回 布爾值');
+    help.push('uiicon(type, classlist): 輸出圖標 | type: 圖標類型; classlist: 附加 class 屬性');
+    help.push('doesc(data): 用於轉移字符串 | data: 傳遞資料');
     help.push('help(): 列印此幫助');
     console.log(help.join('\n'),'color: #0f5290');
   }
@@ -1149,3 +1153,6 @@ class md{
 
 //TODO:
 //幫助主題
+//數學公式的解析
+//CSharp 和 JS 的解析
+//流程圖的解析

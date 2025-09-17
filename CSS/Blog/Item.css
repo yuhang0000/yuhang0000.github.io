@@ -364,7 +364,7 @@ td img{
   color: #555;
 }
 .header .header_tag_sub{
-  padding-right: calc(var(--header_padding) / 2);
+  margin-right: calc(var(--header_padding) / 2);
   color: #640000;
 }
 .header .header_tag_sub:hover{
