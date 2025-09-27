@@ -30,7 +30,9 @@ class md{
     let output = []; //暫存輸出對象
     let footnotelist = []; //暫存脚注
     let offset_quote = 0; //暫存引用偏移量
-    datas = datas.trim().split('\n');
+    let offset_list = []; //暫存列表類型
+    let footer = []; //追加 html 到末尾
+    datas = datas.trimEnd().split('\n');
 
     //元數據
     /*let title; //標題
@@ -185,7 +187,7 @@ class md{
       //引用
       if(data_trim.length > 0 && data_trim[0] == '>'){
         let num = 0; //計數
-        let padding_left = data.length - data.trimStart().length;
+        let padding_left = data.length - data.trimStart().length; //檢查左側是否有空格
         let data_array = data_trim.split(' ');
         for(let t of data_array){
           if(t == '>'){
@@ -202,7 +204,7 @@ class md{
         if(num > offset_quote){ //升級
           for(let t = 0 ; t < num - offset_quote ; t++){
             if(padding_left > 0 && offset_quote == 0){ //向左位移
-              output.push('<div class="quote" style="margin-left: calc(' + Math.trunc(padding_left / 2) + ' * var(--list_margin_left))">');
+              output.push('<div class="quote" style="margin-left: calc(' + Math.trunc(padding_left / 2) + ' * var(--tab_margin_left))">');
             }
             else{
               output.push('<div class="quote">');
@@ -337,6 +339,7 @@ class md{
               subdata = subdata[0];
             }
             if(offset == offset_quote && subdata.length > 4 && subdata[0] == '|' && subdata[subdata.length - 1] == '|'){
+              lastindex = t;
               tablesub.push(readtable(subdata));
             }
             else{ //遍歷到非表哥就終止
@@ -346,7 +349,7 @@ class md{
           }
           //收尾
           i = lastindex;
-          if(output.length > 0){
+          if(output.length > 0 && tableheader.length > 0){
             output[output.length - 1] = html + tableheader + tablesub.join('') + '</table>';
           }
           else{
@@ -408,14 +411,14 @@ class md{
               outputtemp = md.title(data);
               break;
             case '*': //列表
-              outputtemp = dolist();
+              outputtemp = dolist(data);
               break;
             case '-': //还是列表
-              outputtemp = dolist();
+              outputtemp = dolist(data);
               break;
             default: //普通文本
-              if(data_trim.indexOf('.') != -1 && isNaN( data_trim.substring(0, data_trim.indexOf('.')) ) == false){ //有序列表
-                outputtemp = dolist();
+              if((data_array[0][data_array[0].length - 1] == '.' && isNaN(data_array[0]) == false) /*有序列表*/ || data[0] == ' ' /* 無 :before 的無序列表*/ ){ 
+                outputtemp = dolist(data);
               }
               else{ //段落
                 outputtemp = md.paragraph(data);
@@ -445,95 +448,59 @@ class md{
       }
 
       //列表
-      function dolist(){
-        let offset_list = []; //存儲標簽頭 (要麽 <ul> 要麽 <ol>)
-        //跳過非列表 (强迫症害死人)
-        let data1 = data_trim.indexOf(' ');
-        if(data1 != -1){
-          data1 = data_trim.substring(0,data_trim.indexOf(' '));
+      function dolist(data){
+        //跳過空行
+        if(data == null || data.length == 0){
+          return data;
         }
-        else{
-          data1 = data_trim;
-        }
-        if(data1 != '-' && data1 != '*' && (data1[data1.length - 1] != '.' || isNaN(data1) == true) ){ 
-          return md.paragraph(data);
-        }
-        
-        //向下遍歷
-        let html = [];
-        for(let t = i ; t < datas.length ; t++){
-          let data = datas[t];
-          if(data.trim().length == 0){ //跳過空行
-            continue;
-          }
-
-          //如果 offset_quote > 0
-          if(offset_quote > 0){
-            data = data.substring(offset_quote * 2);
-          }
-          
-          //查找偏移值
-          let offset = md.getoffset(data); //偏移量
-          let type = offset[1];
-          data = offset[2];
-          offset = offset[0];
-          
-          if(offset_list.length < offset){ //升級
-            let num = offset - offset_list.length;
-            for(let tt = 0 ; tt < num ; tt++){
-              if(tt + 1 != num){ //前面缺省為 <ul>
-                html.push('<ul>');
-                offset_list.push(null);
-              }
-              else{
-                if(type == null){
-                  html.push('<ul>');
-                }
-                else{
-                  html.push('<ol>');
-                }
-                offset_list.push(type);
-              }
+        let type = md.getoffset(data);
+        data = type[1];
+        type = type[0];
+        //非列表
+        if(type.length == 0){
+          if(offset_list.length > 0){ //直接封包
+            for(let t = footer.length - 1 ; t > -1 ; t--){
+              output.push(footer[t]);
+              offset_list = [];
+              footer = [];
             }
           }
-          if(offset_list.length > offset){ //降級
-            let num = offset_list.length - offset;
-            for(let tt = 0 ; tt < num ; tt++){
-              if(offset_list[offset_list.length - 1] == null){ //取最後一個 type, 然後封包
-                html.push('</ul>');
-                offset_list.splice(offset_list.length - 1, 1);
-              }
-              else{
-                html.push('</ol>');
-                offset_list.splice(offset_list.length - 1, 1);
-              }
-            }
-          }
-          if(offset == 0){ //偏移值為 0 時終止循環
-            //i = t - 1;
+          return data;
+        }
+        //繼續
+        let ins = 0; //插入點
+        for(let t of type){ //尋找插入點
+          if(ins > offset_list.length - 1){
             break;
           }
-          else{ //追加在這裏
-            //在追加之前, 先檢查該列表與上一個列表為同一類型
-            if(type != offset_list[offset_list.length - 1]){
-              if(offset_list[offset_list.length - 1] == null){
-                html.push('</ul>');
-                html.push('<ol>');
-                offset_list[offset_list.length - 1] = type;
-              }
-              else{
-                html.push('</ol>');
-                html.push('<ul>');
-                offset_list[offset_list.length - 1] = type;
-              }
-            }
-            i = t;
-            html.push( md.list( duilie(data, true), false, false, type ) );
+          if( (t + offset_list[ins] == 3) || (t + offset_list[ins] == 2) && (t * offset_list[ins] == 0) ){
+            break;
+          }
+          ins++;
+        }
+        //封包舊的
+        for( let t = 0 ; t < footer.length - ins ; t++){
+          output.push(footer[t]);
+        }
+        //更新 array
+        footer.splice(0, footer.length - ins);
+        type.splice(0, ins);
+        offset_list.splice(ins);
+        offset_list = offset_list.concat(type);
+        //追加列表頭
+        for(let t of type){
+          if(t < 2){
+            output.push('<ul>');
+            footer.unshift('</ul>');
+          }
+          else{
+            output.push('<ol>');
+            footer.unshift('</ol>');
           }
         }
-        
-        //執行到此處説明運行到底部
-        return html.join('');
+        //修飾Data
+        data = md.list(data,type[type.length - 1]);
+        return data;
       }
       
       //整合
@@ -570,6 +537,9 @@ class md{
     header.push('</div></div>');
     if(header.length > 3){ //合并文檔頭
       output.unshift(header.join(''));
+    }
+    if(footer.length > 0){
+      output = output.concat(footer);
     }
     
     //輸出 HTML
@@ -650,7 +620,15 @@ class md{
 
   //普通文本
   static paragraph(data){
-    return "<p>" + data + "</p>";
+    /*if(data.length > 0 && data[0] == ' '){
+      let data_trim = data.trimStart();
+      let offset = data.length - data_trim.length;
+      offset = (offset / 2).toFixed();
+      return '<p style="padding-left: calc(' + offset + ' * var(--tab_margin_left));">' + data_trim + "</p>";
+    }
+    else{*/
+      return "<p>" + data + "</p>";
+    //}
   }
 
   //分割綫
@@ -663,11 +641,12 @@ class md{
     link = link.split('/');
     let docurl = document.location.href.split('/');
     switch (link[0]){
-      case '.':
+      case '.': //當前
         link.splice(0,1);
+        docurl[docurl.length - 1] = docurl[docurl.length - 1].substring(0,docurl[docurl.length - 1].indexOf('?')); //去除末尾的問號
         return docurl.join('/') + '/' + link.join('/');
         break;
-      case '..':
+      case '..': //上一級
         //link.splice(0,1);
         let num = 0;
         for(let t of link){
@@ -688,7 +667,7 @@ class md{
         }
         return docurl.join('/') + '/' + link.join('/');
         break;
-      case '':
+      case '': //根目錄
         docurl.splice(3);
         return docurl.join('/') + link.join('/');
         break;
@@ -700,34 +679,12 @@ class md{
   }
 
   //創建列表
-  static list(data, top = false , bottom = false , type = null){ //傳遞資料, 附加頭 <ul>, 附加尾 </ul>, 有序列表的類型, 儅值為 null 時, 為無序列表, 默認值應當為1
-    let ulorol;
-    if(type == null){ //無序列表
-      ulorol = ['<ul>','</ul>'];
-    }
-    else{ //有序列表
-      type = String(type);
-      if(['A','a','I','i'].indexOf(type) == -1){
-        type = '';
-      }
-      else{
-        type = ' type="' + type + '"';
-      }
-      ulorol = ['<ol' + type + '>','</ol>'];
-    }
-
+  static list(data, type = 1){ //傳遞資料, 有序列表的類型, 儅值為 null 時, 為無序列表, 默認值應當為1
     let html = '<li>';
-    if(top == true){ //追加頭部
-      html = ulorol[0] + '<li>';
+    if(type == 0){ //沒有:before的無需列表
+      html = '<li class="no_before">'
     }
-    // html = html + data.trim().substring(2) + '</li>';
-    //data = data.trim().split(' ');
-    //data.splice(0,1);
-    //html = html + md.gougougou(data.join(' ')) + '</li>';
     html = html + md.gougougou(data.trim()) + '</li>';
-    if(bottom == true){ //追加尾部
-      html = html + ulorol[1];
-    }
     return html;
   }
 
@@ -1068,36 +1025,35 @@ class md{
 
   //給列表計算偏移值的
   static getoffset(data){
+    if(data == null || data.length < 1){
+      return [ [], data ]
+    }
     data = data.split(' ');
-    let num = 0;
-    let type = 'none'; //列表類型
+    let num = 0; //用來給 "無序列表並無 :before" 計數的
+    let type = []; //列表類型
     let howlong = 0; //向前裁切多少數組
     for(let t of data){
-      if(t == ''){
+      if(t == ''){ //無序列表並無 :before
         num++;
       }
-      else if(t == '-' || t == '*'){
-        num = num + 2;
-        type = null;
+      else if(t == '-' || t == '*'){ //無序列表
+        type.push(1);
       }
-      else if(t[t.length - 1] == '.' && isNaN(t) == false){
-        num = num + 2;
-        type = 1;
+      else if(t.length > 1 && t[t.length - 1] == '.' && isNaN(t) == false){ //有序列表
+        type.push(2);
       }
-      else{ //截至
+      else{
         break;
       }
       howlong++;
     }
-    if(type == 'none'){ //沒有返回任何類型, 為非列表
-      num = 0;
+    data.splice(0,howlong);
+    data = data.join(' ');
+    //追加 "無序列表並無 :before"
+    for(let t = 0 ; t < Math.round(num / 2) ; t++){
+      type.unshift(0);
     }
-    data.splice(0, howlong);
-    // num = num / 2;
-    // if(num.indexOf('.') != -1){ //去除小數點
-    //   num = num.substring(0, num.indexOf('.'));
-    // }
-    return [ Math.trunc(num / 2), type, data.join(' ')]; //偏移值, 列表類型, 截取后數據
+    return [ type, data ];
   }
 
   //比較字符

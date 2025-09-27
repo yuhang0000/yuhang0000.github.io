@@ -50,7 +50,7 @@ a.link:hover{ /* 選擇器不用白不用 */
 /* 公共屬性 */
 :root{
   --blog_item_paddingLR: 32px; /* 部落格的父容器兩側的内邊距 */
-  --list_margin_left: 20px; /* 列表左邊距 */
+  --tab_margin_left: 20px; /* 制表符默認左邊距 */
   --header_padding: 12px; /* 文檔頭的邊距 */
   --R: 4px; /* 倒角 */
 }
@@ -84,7 +84,7 @@ a.link:hover{ /* 選擇器不用白不用 */
 .blog_item.Markdown p{
   white-space: pre-wrap;
   padding: 0px 0px;
-  margin: 2px 0px;
+  margin: 8px 0px;
 }
 /* 分割綫 */
 .line{
@@ -251,13 +251,13 @@ code.block{
 }
 /* 列表 */
 .blog_item>ul, .blog_item>ol{
-  padding-left: var(--list_margin_left);
+  padding-left: var(--tab_margin_left);
   padding-top: 8px;
   padding-bottom: 8px;
   margin: 0px;
 }
 ul, ol{
-  padding-left: var(--list_margin_left);
+  padding-left: var(--tab_margin_left);
 }
 li:not(.footnotesub){
   padding: 2px 0px;
@@ -266,9 +266,14 @@ li:not(.footnotesub){
 }
 ul>li:not(.footnotesub):before{
   content: "●";
-  color: #aaa;
   padding: 0px 8px 1px 0px;
   font-size: 0.9rem;
+}
+ul>li.no_before:before{
+  color: #00000000;
+}
+ul>li:not(.footnotesub):not(.no_before):before{
+  color: #aaa;
 }
 .blog_item ol{
   counter-reset: No;
@@ -286,6 +291,9 @@ li{
   white-space: pre-wrap;
 }
 /* 引用 */
+.blog_item>div.quote{
+  margin: 8px 0px;
+}
 div.quote{
   border-left: 3px solid #aaa;
   padding-left: 16px;
