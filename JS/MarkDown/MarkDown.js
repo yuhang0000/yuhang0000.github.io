@@ -421,6 +421,7 @@ class md{
                 outputtemp = dolist(data);
               }
               else{ //段落
+                dolist(null); //傳遞 null 以調用 clear();
                 outputtemp = md.paragraph(data);
               }
               break;
@@ -449,31 +450,39 @@ class md{
 
       //列表
       function dolist(data){
-        //跳過空行
-        if(data == null || data.length == 0){
-          return data;
-        }
-        let type = md.getoffset(data);
-        data = type[1];
-        type = type[0];
-        //非列表
-        if(type.length == 0){
-          if(offset_list.length > 0){ //直接封包
+        //直接封包, 重置暫存
+        function dolist_clear(){
+          if(offset_list.length > 0){ 
             for(let t = footer.length - 1 ; t > -1 ; t--){
               output.push(footer[t]);
-              offset_list = [];
-              footer = [];
             }
+            offset_list = [];
+            footer = [];
           }
+        }
+        
+        //跳過空行
+        if(data == null || data.length == 0){
+          dolist_clear();
           return data;
         }
+        let type = md.getoffset(data); //返回 type 列表和已修剪 data
+        //非列表
+        if(type[0].length == 0 || (offset_list.length == 0 && Math.max(...type[0]) == 0) ){
+          dolist_clear();
+          return md.paragraph(data);
+        }
         //繼續
+        data = type[1];
+        type = type[0];
+        //修飾Data
+        data = md.list(data,type[type.length - 1]);
         let ins = 0; //插入點
         for(let t of type){ //尋找插入點
           if(ins > offset_list.length - 1){
             break;
           }
-          if( (t + offset_list[ins] == 3) || (t + offset_list[ins] == 2) && (t * offset_list[ins] == 0) ){
+          if(t + offset_list[ins] == 3){
             break;
           }
           ins++;
@@ -498,8 +507,7 @@ class md{
             footer.unshift('</ol>');
           }
         }
-        //修飾Data
-        data = md.list(data,type[type.length - 1]);
+        //輸出
         return data;
       }
       
