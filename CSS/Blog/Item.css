@@ -264,21 +264,21 @@ li:not(.footnotesub){
   display: flex;
   align-items: center;
 }
-ul>li:not(.footnotesub):before{
+ul>*:not(.footnotesub):before{
   content: "●";
   padding: 0px 8px 1px 0px;
   font-size: 0.9rem;
 }
-ul>li.no_before:before{
+ul>*.no_before:before{
   color: #00000000;
 }
-ul>li:not(.footnotesub):not(.no_before):before{
+ul>*:not(.footnotesub):not(.no_before):before{
   color: #aaa;
 }
-.blog_item ol{
+.blog_item ol>*:first-child{
   counter-reset: No;
 }
-ol>li:not(.footnotesub):before{
+ol>*:not(.footnotesub):not(.no_before):before{
   color: #aaa;
   font-weight: normal;
   padding: 0px 6px 0px 0px;
@@ -289,6 +289,22 @@ ol>li:not(.footnotesub):before{
 }
 li{
   white-space: pre-wrap;
+}
+/* 列表套娃 */
+ul>*:not(li), ol>*:not(li){
+  position: relative;
+  left: var(--tab_margin_left);
+  padding-left: 0px;
+}
+ul>*:not(li):before{
+  position: absolute;
+  left: calc(-1* var(--tab_margin_left));
+  top: 2px;
+}
+ol>*:not(li):before{
+  position: absolute;
+  left: calc(-1* var(--tab_margin_left));
+  top: 3px;
 }
 /* 引用 */
 .blog_item>div.quote{
