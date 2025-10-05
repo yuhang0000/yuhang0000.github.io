@@ -224,7 +224,7 @@ async function readbloglist(){
 }
 
 //主程式
-async function main(){
+async function pagebar_main(){
 	await readbloglist();
 	let url = new URL(window.location.href);
 	pagebar_top.addEventListener('click', () => { //最新
@@ -251,4 +251,4 @@ async function main(){
 	
 }
 
-main();
+// main();

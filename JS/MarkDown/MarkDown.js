@@ -458,8 +458,7 @@ class md{
     }
 
     //追加文檔尾
-    footer.push(dolist.footer);
-    
+    footer.concat(dolist.footer.join(''));
     if(footnote.footnotelist.length > 0){ //追加脚注
       footer.push('<ol class="footnotelist">' + footnote.footnotelist.join('') + '</ol>');
       //output.push(footnotehtml);

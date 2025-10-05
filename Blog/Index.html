@@ -40,6 +40,27 @@
 <script type="text/javascript" src="/JS/Blog/Interaction.js"></script>
 <script type="text/javascript" src="/JS/MarkDown/MarkDown.js"></script>
 <script type="text/javascript" src="/JS/Blog/Pagebar.js"></script>
+<script defer>
+function loadjs2fail(url){
+	let html = '<div class="blog_item" style="display: inline-block; padding: 8px; white-space: pre-wrap; container-type: normal;">' + '<div style="padding-bottom: 8px;">Oops!</div>' + 
+	'必要的脚本程式沒能載入完畢, 該頁面無法正常使用.' + '<br>' + '也許您可以試試<a class="link" style="cursor: pointer; color: blue;" onclick="window.location.reload();">重新載入</a>? 説不定就好了!' +
+	'<div style="padding-top: 8px;">請求連接: <a class="link" href="' + url + '" target="_blank">' + url + '</a></div></div>';
+	let blog_body = document.querySelector('.blog_body');
+	blog_body.innerHTML = html;
+}
+if(typeof(md) == 'undefined'){ //js載入失效
+	loadjs2fail('/JS/MarkDown/MarkDown.js')
+}
+else if(typeof(pagebar_main) == 'undefined'){ //js載入失效
+	loadjs2fail('/JS/Blog/Pagebar.js')
+}
+else if(typeof(readmorebtn) == 'undefined'){ //js載入失效
+	loadjs2fail('/JS/Blog/Interaction.js')
+}
+else{ //載入完成
+	pagebar_main();
+}
+</script>
 
 </body>
 </html>
