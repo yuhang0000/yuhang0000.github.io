@@ -251,7 +251,8 @@ code.block{
 }
 /* 列表 */
 .blog_item>ul, .blog_item>ol{
-  padding-left: var(--tab_margin_left);
+  /* padding-left: var(--tab_margin_left); */
+  padding-left: 0px;
   padding-top: 8px;
   padding-bottom: 8px;
   margin: 0px;

@@ -30,9 +30,12 @@ class md{
     let output = []; //暫存輸出對象
     let footnotelist = []; //暫存脚注
     let offset_quote = 0; //暫存引用偏移量
-    let offset_list = []; //暫存列表類型
     let footer = []; //追加 html 到末尾
     datas = datas.trimEnd().split('\n');
+
+    //創建實例
+    let dolist = new md.dolist();
+    let footnote = new md.footnote();
 
     //元數據
     /*let title; //標題
@@ -396,7 +399,7 @@ class md{
             }
             //輸出
             if(num > 2){
-              dolist(null); //傳遞 null 以調用 clear();
+              dolist.clear(output); //傳遞 null 以調用 clear();
               if(settitle > 0 && output.length > 0 && datas[i - 1].trim().length != 0){ //設置標題
                 output[output.length - 1] = md.title(output[output.length - 1], settitle);
                 return '';
@@ -409,21 +412,21 @@ class md{
           
           switch (firstcham){
             case '#': //標題
-              dolist(null); //傳遞 null 以調用 clear();
+              dolist.clear(output); //傳遞 null 以調用 clear();
               outputtemp = md.title(data);
               break;
             case '*': //列表
-              outputtemp = dolist(data);
+              outputtemp = dolist.read(data,output);
               break;
             case '-': //还是列表
-              outputtemp = dolist(data);
+              outputtemp = dolist.read(data,output);
               break;
             default: //普通文本
               if((data_array[0][data_array[0].length - 1] == '.' && isNaN(data_array[0]) == false) /*有序列表*/ || data[0] == ' ' /* 無 :before 的無序列表*/ ){ 
-                outputtemp = dolist(data);
+                outputtemp = dolist.read(data,output);
               }
               else{ //段落
-                dolist(null); //傳遞 null 以調用 clear();
+                dolist.clear(output); //傳遞 null 以調用 clear();
                 outputtemp = md.paragraph(data);
               }
               break;
@@ -445,94 +448,21 @@ class md{
         outputtemp = md.imgorlink(false, outputtemp);
 
         //脚注
-        outputtemp = md.footnote(outputtemp, footnotelist);
+        outputtemp = footnote.read(outputtemp);
 
         return outputtemp;
-      }
-
-      //列表
-      function dolist(data){
-        //直接封包, 重置暫存
-        function dolist_clear(){
-          if(offset_list.length > 0){ 
-            for(let t = footer.length - 1 ; t > -1 ; t--){
-              output.push(footer[t]);
-            }
-            offset_list = [];
-            footer = [];
-          }
-        }
-        
-        //跳過空行
-        if(data == null || data.length == 0){
-          dolist_clear();
-          return data;
-        }
-        let type = md.getoffset(data); //返回 type 列表和已修剪 data
-        //非列表
-        if(type[0].length == 0 || (offset_list.length == 0 && Math.max(...type[0]) == 0) ){
-          dolist_clear();
-          return md.paragraph(data);
-        }
-        //繼續
-        data = type[1];
-        type = type[0];
-        //修飾Data
-        data = md.list(data,type[type.length - 1]);
-        let ins = 0; //插入點
-        for(let t of type){ //尋找插入點
-          if(ins > offset_list.length - 1){
-            break;
-          }
-          if(t + offset_list[ins] == 3){
-            break;
-          }
-          ins++;
-        }
-        //封包舊的
-        for( let t = 0 ; t < footer.length - ins ; t++){
-          output.push(footer[t]);
-        }
-        //更新 array
-        footer.splice(0, footer.length - ins);
-        //type.splice(0, ins);
-        offset_list.splice(ins);
-        //offset_list = offset_list.concat(type);
-        for(let t = ins ; t < type.length ; t++){
-          offset_list.push(type[t]);
-        }
-        //追加列表頭
-        for(let t = ins ; t < type.length ; t++){
-          if(type[t] < 2){
-            if(t > 0 && type[t - 1] == 0){ //列表嵌套時, 應該要隱藏 :before
-              output.push('<ul class="no_before">');
-            }
-            else{
-              output.push('<ul>');
-            }
-            footer.unshift('</ul>');
-          }
-          else{
-            if(t > 0 && type[t - 1] == 0){
-              output.push('<ol class="no_before">');
-            }
-            else{
-              output.push('<ol>');
-            }
-            footer.unshift('</ol>');
-          }
-        }
-        //輸出
-        return data;
       }
       
       //整合
       output.push(duilie(data));
     }
 
-    if(footnotelist.length > 0){ //追加脚注
-      let footnotehtml = '<ol class="footnotelist">' + footnotelist.join('') + '</ol>';
-      output.push(footnotehtml);
+    //追加文檔尾
+    footer.push(dolist.footer);
+    
+    if(footnote.footnotelist.length > 0){ //追加脚注
+      footer.push('<ol class="footnotelist">' + footnote.footnotelist.join('') + '</ol>');
+      //output.push(footnotehtml);
     }
     
     let header = ['<div class="header">']; //文檔頭
@@ -561,7 +491,7 @@ class md{
     if(header.length > 3){ //合并文檔頭
       output.unshift(header.join(''));
     }
-    if(footer.length > 0){
+    if(footer.length > 0){ //合并文檔尾
       output = output.concat(footer);
     }
     
@@ -932,87 +862,81 @@ class md{
   }
 
   //脚注
-  static footnote(data, footnotelist){
-    let foot = [];
-    let data_trim = data.trim();
-
-    //先判斷是不是 [^]:
-    /*if(data_trim.length > 0 && data_trim[0] == '[' && data_trim[1] == '^'){
-      let lastindex = -1;
-      for(let i = 0 ; i < data_trim.length ; i++){
-        if(i + 1 < data_trim.length && data_trim[i] == ']' && data_trim[i + 1] == ':'){
-          let note = data_trim.substring(2, i); //截取關鍵詞
-          footnotelist.push('<p class="footnotesub" name="' + note + '">' + data_trim.substring(i + 2) + '</p>');
-          return '';
-        }
-      }
-    }*/
-
-    let tempdump = []; //暫存索引
-    let tempdump2 = []; //暫存符號
-    if(data_trim.length > 0){
-      //先便利
-      for(let i = 0 ; i < data_trim.length ; i++){
-        switch(data_trim[i]){
-          case '[':
-            if(i + 1 < data_trim.length && data_trim[i + 1] == '^'){
-              tempdump.push(i);
-              tempdump2.push('[^');
-              i++;
-            }
-            break;
-          case ']':
-            if(i + 1 < data_trim.length && data_trim[i + 1] == ':'){ //脚注頭
-              tempdump.push(i);
-              tempdump2.push(']:');
-              i++;
-            }
-            else{
-              tempdump.push(i);
-              tempdump2.push(']');
-            }
-            break;
-        }
-      }
-      //篩選
-      let tempkey = ']';
-      for(let i = 0 ; i < tempdump.length ; i++){
-        switch(tempdump2[i]){
-          case '[^':
-            if(tempkey == ']'){
-              tempkey = '[^';
-            }
-            else{
-              tempdump.splice(i,1);
-            }
-            break;
-          case ']':
-            if(tempkey == '[^'){
-              tempkey = ']';
-            }
-            else{
-              tempdump.splice(i,1);
-            }
-            break;
-          case ']:': //脚注頭
-            if(tempkey == '[^'){
-              let note = data_trim.substring(tempdump[i - 1] + 2, tempdump[i]); //截取關鍵詞
-              footnotelist.push('<li class="footnotesub" id="' + note + '"><b>' + note + '</b>: ' + data_trim.substring(tempdump[i] + 2, data_trim.lastIndexOf('</p>')).trim() + '</li>');
-              return ''; //暫存到脚注列表, 直接返回空字符
-            }
-        }
-      }
-      tempdump.splice(tempdump.length - tempdump.length % 2, tempdump.length % 2);
-      tempdump2.splice(tempdump2.length - tempdump2.length % 2, tempdump2.length % 2);
-      //開始
-      for(let i = tempdump.length - 1 ; i > -1 ; i--){
-        let note = data_trim.substring(tempdump[i - 1] + 2, tempdump[i]); //截取關鍵詞
-        data = data_trim.substring(0,tempdump[i - 1]) + '<a class="footnote" href="#' + note + '">' + note + '</a>' + data_trim.substring(tempdump[i] + 1);
-        i--;
-      }
+  static footnote = class{
+    constructor(){
+      this.footnotelist = [];
     }
+    //讀取
+    read(data){
+      let foot = [];
+      let data_trim = data.trim();
+      
+      let tempdump = []; //暫存索引
+      let tempdump2 = []; //暫存符號
+      if(data_trim.length > 0){
+        //先便利
+        for(let i = 0 ; i < data_trim.length ; i++){
+          switch(data_trim[i]){
+            case '[':
+              if(i + 1 < data_trim.length && data_trim[i + 1] == '^'){
+                tempdump.push(i);
+                tempdump2.push('[^');
+                i++;
+              }
+              break;
+            case ']':
+              if(i + 1 < data_trim.length && data_trim[i + 1] == ':'){ //脚注頭
+                tempdump.push(i);
+                tempdump2.push(']:');
+                i++;
+              }
+              else{
+                tempdump.push(i);
+                tempdump2.push(']');
+              }
+              break;
+          }
+        }
+        //篩選
+        let tempkey = ']';
+        for(let i = 0 ; i < tempdump.length ; i++){
+          switch(tempdump2[i]){
+            case '[^':
+              if(tempkey == ']'){
+                tempkey = '[^';
+              }
+              else{
+                tempdump.splice(i,1);
+              }
+              break;
+            case ']':
+              if(tempkey == '[^'){
+                tempkey = ']';
+              }
+              else{
+                tempdump.splice(i,1);
+              }
+              break;
+            case ']:': //脚注頭
+              if(tempkey == '[^'){
+                let note = data_trim.substring(tempdump[i - 1] + 2, tempdump[i]); //截取關鍵詞
+                this.footnotelist.push('<li class="footnotesub" id="' + note + '"><b>' + note + '</b>: ' + data_trim.substring(tempdump[i] + 2, data_trim.lastIndexOf('</p>')).trim() + '</li>');
+                return ''; //暫存到脚注列表, 直接返回空字符
+              }
+          }
+        }
+        tempdump.splice(tempdump.length - tempdump.length % 2, tempdump.length % 2);
+        tempdump2.splice(tempdump2.length - tempdump2.length % 2, tempdump2.length % 2);
+        //開始
+        for(let i = tempdump.length - 1 ; i > -1 ; i--){
+          let note = data_trim.substring(tempdump[i - 1] + 2, tempdump[i]); //截取關鍵詞
+          data = data_trim.substring(0,tempdump[i - 1]) + '<a class="footnote" href="#' + note + '">' + note + '</a>' + data_trim.substring(tempdump[i] + 1);
+          i--;
+        }
+      }
         
-    return data
+      return data
+    }
   }
 
   //HELP!!!
@@ -1127,6 +1051,92 @@ class md{
     }
     return data;
   }
+
+  //讀取列表
+  static dolist = class {
+    //屬性
+    constructor() {
+      this.list_type = []; //暫存列表類型
+      this.footer = []; //追加 html 到末尾
+    }
+    
+    //直接封包, 重置暫存
+    clear(output){
+      if(this.list_type.length > 0){ 
+        for(let t = this.footer.length - 1 ; t > -1 ; t--){
+          output.push(this.footer[t]);
+        }
+        this.list_type = [];
+        this.footer = [];
+      }
+    }
+
+    //讀取
+    read(data,output){        
+      //跳過空行
+      if(data == null || data.length == 0){
+        clear();
+        return data;
+      }
+      let type = md.getoffset(data); //返回 type 列表和已修剪 data
+      //非列表
+      if(type[0].length == 0 || (this.list_type.length == 0 && Math.max(...type[0]) == 0) ){
+        clear();
+        return md.paragraph(data);
+      }
+      //繼續
+      data = type[1];
+      type = type[0];
+      //修飾Data
+      data = md.list(data,type[type.length - 1]);
+      let ins = 0; //插入點
+      for(let t of type){ //尋找插入點
+        if(ins > this.list_type.length - 1){
+          break;
+        }
+        if(t + this.list_type[ins] == 3){
+          break;
+        }
+        ins++;
+      }
+      //封包舊的
+      for( let t = 0 ; t < this.footer.length - ins ; t++){
+        output.push(this.footer[t]);
+      }
+      //更新 array
+      this.footer.splice(0, this.footer.length - ins);
+      //type.splice(0, ins);
+      this.list_type.splice(ins);
+      //offset_list = offset_list.concat(type);
+      for(let t = ins ; t < type.length ; t++){
+        this.list_type.push(type[t]);
+      }
+      //追加列表頭
+      for(let t = ins ; t < type.length ; t++){
+        if(type[t] < 2){
+          if(t > 0 && type[t - 1] == 0){ //列表嵌套時, 應該要隱藏 :before
+            output.push('<ul class="no_before">');
+          }
+          else{
+            output.push('<ul>');
+          }
+          this.footer.unshift('</ul>');
+        }
+        else{
+          if(t > 0 && type[t - 1] == 0){ //列表嵌套時, 應該要隱藏 :before
+            output.push('<ol class="no_before">');
+          }
+          else{
+            output.push('<ol>');
+          }
+          this.footer.unshift('</ol>');
+        }
+      }
+      //輸出
+      return data;
+    }
+    
+  };
   
 }
 
