@@ -14,7 +14,7 @@ class md{
     'nogougou':'"/Resources/UI/nogougou.svg"', //複選框: 空的
     'huaigougou':'"/Resources/UI/huaigougou.svg"', //複選框: x
   }
-  static ver = 'v0.0.7.1002';
+  static ver = 'v0.0.8.1008';
   static version = md.ver;
   static ESC = { //轉義字符
     '<':'&lt;',
@@ -28,7 +28,6 @@ class md{
   //解析主循環
   static read(datas){
     let output = []; //暫存輸出對象
-    let footnotelist = []; //暫存脚注
     let offset_quote = 0; //暫存引用偏移量
     let footer = []; //追加 html 到末尾
     datas = datas.trimEnd().split('\n');
@@ -36,6 +35,7 @@ class md{
     //創建實例
     let dolist = new md.dolist();
     let footnote = new md.footnote();
+    let quote = new md.quote();
 
     //元數據
     /*let title; //標題
@@ -188,45 +188,8 @@ class md{
       }
 
       //引用
-      if(data_trim.length > 0 && data_trim[0] == '>'){
-        let num = 0; //計數
-        let padding_left = data.length - data.trimStart().length; //檢查左側是否有空格
-        let data_array = data_trim.split(' ');
-        for(let t of data_array){
-          if(t == '>'){
-            num++;
-          }
-          else{
-            break;
-          }
-        }
-        //裁剪前面
-        data_array.splice(0,num);
-        data = data_trim = data_array.join(' ');
-        
-        if(num > offset_quote){ //升級
-          for(let t = 0 ; t < num - offset_quote ; t++){
-            if(padding_left > 0 && offset_quote == 0){ //向左位移
-              output.push('<div class="quote" style="margin-left: calc(' + Math.trunc(padding_left / 2) + ' * var(--tab_margin_left))">');
-            }
-            else{
-              output.push('<div class="quote">');
-            }
-          }
-        }
-        else if(num < offset_quote){ //降級
-          for(let t = 0 ; t < offset_quote - num ; t++){
-            output.push('</div>');
-          }
-        }
-        offset_quote = num;
-      }
-      else if(offset_quote > 0){ //對引用塊封包
-        for(let t = 0 ; t < offset_quote ; t++){
-            output.push('</div>');
-        }
-        offset_quote = 0;
-      }
+      data = quote.read(data,output);
+      data_trim = data.trim();
 
       //表哥
       if(data_trim.length > 4 && data_trim[0] == '|' && data_trim[data_trim.length - 1] == '|'){
@@ -458,9 +421,10 @@ class md{
     }
 
     //追加文檔尾
-    footer.concat(dolist.footer.join(''));
-    if(footnote.footnotelist.length > 0){ //追加脚注
-      footer.push('<ol class="footnotelist">' + footnote.footnotelist.join('') + '</ol>');
+    footer = footer.concat(dolist.list_list.join(''));
+    footer = footer.concat(quote.quote_list.join(''));
+    if(footnote.footnote_list.length > 0){ //追加脚注
+      footer.push('<ol class="footnotelist">' + footnote.footnote_list.join('') + '</ol>');
       //output.push(footnotehtml);
     }
     
@@ -863,7 +827,7 @@ class md{
   //脚注
   static footnote = class{
     constructor(){
-      this.footnotelist = [];
+      this.footnote_list = [];
     }
     //讀取
     read(data){
@@ -919,7 +883,7 @@ class md{
             case ']:': //脚注頭
               if(tempkey == '[^'){
                 let note = data_trim.substring(tempdump[i - 1] + 2, tempdump[i]); //截取關鍵詞
-                this.footnotelist.push('<li class="footnotesub" id="' + note + '"><b>' + note + '</b>: ' + data_trim.substring(tempdump[i] + 2, data_trim.lastIndexOf('</p>')).trim() + '</li>');
+                this.footnote_list.push('<li class="footnotesub" id="' + note + '"><b>' + note + '</b>: ' + data_trim.substring(tempdump[i] + 2, data_trim.lastIndexOf('</p>')).trim() + '</li>');
                 return ''; //暫存到脚注列表, 直接返回空字符
               }
           }
@@ -1056,17 +1020,17 @@ class md{
     //屬性
     constructor() {
       this.list_type = []; //暫存列表類型
-      this.footer = []; //追加 html 到末尾
+      this.list_list = []; //追加 html 到末尾
     }
     
     //直接封包, 重置暫存
     clear(output){
       if(this.list_type.length > 0){ 
-        for(let t = this.footer.length - 1 ; t > -1 ; t--){
-          output.push(this.footer[t]);
+        for(let t = this.list_list.length - 1 ; t > -1 ; t--){
+          output.push(this.list_list[t]);
         }
         this.list_type = [];
-        this.footer = [];
+        this.list_list = [];
       }
     }
 
@@ -1074,13 +1038,13 @@ class md{
     read(data,output){        
       //跳過空行
       if(data == null || data.length == 0){
-        clear();
+        this.clear(output);
         return data;
       }
       let type = md.getoffset(data); //返回 type 列表和已修剪 data
       //非列表
       if(type[0].length == 0 || (this.list_type.length == 0 && Math.max(...type[0]) == 0) ){
-        clear();
+        this.clear(output);
         return md.paragraph(data);
       }
       //繼續
@@ -1099,11 +1063,11 @@ class md{
         ins++;
       }
       //封包舊的
-      for( let t = 0 ; t < this.footer.length - ins ; t++){
-        output.push(this.footer[t]);
+      for( let t = 0 ; t < this.list_list.length - ins ; t++){
+        output.push(this.list_list[t]);
       }
       //更新 array
-      this.footer.splice(0, this.footer.length - ins);
+      this.list_list.splice(0, this.list_list.length - ins);
       //type.splice(0, ins);
       this.list_type.splice(ins);
       //offset_list = offset_list.concat(type);
@@ -1119,7 +1083,7 @@ class md{
           else{
             output.push('<ul>');
           }
-          this.footer.unshift('</ul>');
+          this.list_list.unshift('</ul>');
         }
         else{
           if(t > 0 && type[t - 1] == 0){ //列表嵌套時, 應該要隱藏 :before
@@ -1128,7 +1092,7 @@ class md{
           else{
             output.push('<ol>');
           }
-          this.footer.unshift('</ol>');
+          this.list_list.unshift('</ol>');
         }
       }
       //輸出
@@ -1136,7 +1100,67 @@ class md{
     }
     
   };
-  
+
+  //讀取引用
+  static quote = class{
+    //屬性
+    constructor() {
+      this.quote_list = [];
+    }
+    
+    //復位
+    clear(output){
+      for(let t of this.quote_list){
+        output.push(t);
+      }
+      this.quote_list = [];
+    }
+    
+    //讀取
+    read(data,output){
+      //跳過空行
+      if(data == null || data.trim().length == 0){
+        return data;
+      }
+      //檢查有多少個 '>'
+      let offset = 0;
+      let data_array = data.split(' ');
+      if(data_array.length < 2){ //分段不夠, 跳過
+        this.clear(output);
+        return data;
+      }
+      for(let t of data_array){
+        if(t == '>'){
+          offset++;
+        }
+        else{
+          break;
+        }
+      }
+      if(offset < 1){ //偏移量不夠, 跳過
+        this.clear(output);
+        return data;
+      }
+      data_array.splice(0, offset);
+      //升級
+      if(offset > this.quote_list.length){
+        for(let t = 0 ; t < offset - this.quote_list.length ; t++){
+          output.push('<div class="quote">');
+          this.quote_list.push('</div>');
+        }
+      }
+      //降級
+      else if(offset < this.quote_list.length){
+        /*for(let t = 0 ; t < quote_list.length - MathRoundOffset ; t++){
+          output.push(quote_list[t]);
+        }
+        quote_list.splice(0, quote_list.length - MathRoundOffset);*/
+        output.push(this.quote_list.splice(0, this.quote_list.length - offset).join(''));
+      }
+      //輸出
+      return data_array.join(' ');
+    }
+  }
 }
 
 //TODO:
