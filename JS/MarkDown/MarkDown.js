@@ -28,7 +28,6 @@ class md{
   //解析主循環
   static read(datas){
     let output = []; //暫存輸出對象
-    let offset_quote = 0; //暫存引用偏移量
     let footer = []; //追加 html 到末尾
     datas = datas.trimEnd().split('\n');
 
@@ -193,137 +192,7 @@ class md{
 
       //表哥
       if(data_trim.length > 4 && data_trim[0] == '|' && data_trim[data_trim.length - 1] == '|'){
-        let LCR = []; //暫存列對齊方式
-        let tablesplit = data_trim.split('|'); //拆分單元格
-        tablesplit.splice(0,1); //頭和尾為空的, 移除
-        tablesplit.splice(tablesplit.length - 1,1);
-        //解析對齊方式
-        for(let t of tablesplit){
-          t = t.trim();
-          let num = 0;
-          let ddd = ''; //暫存對其方位
-          for(let tt of t){ //逐字解析
-            if(num == 0 && tt == ':'){
-              ddd = 'l'; //左對其
-            }
-            else if(tt == ':'){
-              if(ddd == 'l'){
-                ddd = 'c'; //中對其
-              }
-              else{
-                ddd = 'r'; //右對其
-              }
-            }
-            else if(tt == '-'){
-              num++;
-            }
-            else{
-              num = -1;
-              break;
-            }
-          }
-          if(num < 3){ //這不是我表哥
-            LCR = [];
-            break;
-          }
-          else{
-            if(ddd == ''){
-              ddd = 'l'
-            }
-            LCR.push(ddd);
-          }
-        }
-        //開始解析
-        if(LCR.length > 0){
-          //debugger;
-          let html = '<table>'; //表哥容器
-          let tableheader = ''; //表哥頭兒
-          let tablesub = []; //表哥兄弟
-          //封裝
-          function readtable(data, head = false){ //傳遞資料, 是否為表頭
-            let html = ['<tr>'];
-            let key = ['<td class="','</td>'];
-            if(head == true){ //為表頭
-              key = ['<th class="','</th>'];
-              html = ['<tr class="header">'];
-            }
-            //if(data.length > 4 && data[0] == '|' && data[data.length - 1] == '|'){
-              data = data.split('|');
-              data.splice(0,1);
-              data.splice(data.length - 1,1);
-              for(let t = 0 ; t < data.length ; t++){
-                if(t > LCR.length - 1){ //超過列數就終止
-                  break;
-                }
-                html.push(key[0] + LCR[t] + '">' + duilie(data[t], true) + key[1]);
-              }
-              if(data.length < LCR.length){ //列數不夠就往後補
-                for(let t = 0 ; t < LCR.length - data.length ; t++){
-                  html.push(key[0] + 'l">' + key[1]);
-                }
-              }
-            //}
-            html.push('</tr>');
-            return html.join('');
-          }
-          //唉... 用來截取 '>' 之後字符的
-          function quote(data){
-            let num = 0;
-            data = data.split(' ');
-            for(let t of data){
-              if(t == '>'){
-                num++;
-              }
-              else{
-                break;
-              }
-            }
-            data.splice(0,num);
-            return [data.join(' '), num];
-          }
-          //檢查表頭
-          if(output.length > 0){
-            let offset = 0;
-            let header = datas[i - 1].trim();
-            if(offset_quote > 0){ //儅存在引用塊偏移值時
-              header = quote(header);
-              offset = header[1];
-              header = header[0];
-            }
-            if(offset == offset_quote && header.length > 4 && header[0] == '|' && header[header.length - 1] == '|'){
-              tableheader = readtable((header), true);
-            }
-          }
-          //向下遍歷
-          let lastindex = i + 1;
-          for(let t = i + 1 ; t < datas.length ; t++){
-            let offset = 0;
-            let subdata = datas[t].trim();
-            if(offset_quote > 0){ //儅存在引用塊偏移值時
-              subdata = quote(subdata);
-              offset = subdata[1];
-              subdata = subdata[0];
-            }
-            if(offset == offset_quote && subdata.length > 4 && subdata[0] == '|' && subdata[subdata.length - 1] == '|'){
-              lastindex = t;
-              tablesub.push(readtable(subdata));
-            }
-            else{ //遍歷到非表哥就終止
-              lastindex = t - 1;
-              break;
-            }
-          }
-          //收尾
-          i = lastindex;
-          if(output.length > 0 && tableheader.length > 0){
-            output[output.length - 1] = html + tableheader + tablesub.join('') + '</table>';
-          }
-          else{
-            output.push(html + tableheader + tablesub.join('') + '</table>');
-          }
-          //debugger;
-          continue;
-        }
+        
       }
       
       //解析隊列
@@ -1160,6 +1029,60 @@ class md{
       //輸出
       return data_array.join(' ');
     }
+  }
+
+  //读取表格
+  static dotable = class{
+    //屬性
+    constructor() {
+      this.table_list = []; //暫存每列對其方向, 也可以代指縂列數
+    }
+
+    //檢查是不是表格頭 |---|
+    check(data){
+      let list = [];
+      data = data.trim();
+      if(data[0] != '|' || data[data.length - 1] != '|'){ //每行前後必須是 '|'
+        return [];
+      }
+      let data_array = data.split('|');
+      // data_array.splice(0,1); //去頭
+      // data_array.splice(data_array.length - 1,1); //去尾
+      data_array.shift(); //去頭
+      data_array.pop(); //去尾
+      //遍歷
+      for(let t of data_array){
+        if(t.length < 3){ //最小也得是 '---'
+          return [];
+        }
+        //對其方向
+        let fangxiang = 'l'; //默認左對齊
+        if(t[0] == ':'){ //頭
+          fangxiang = 'l';
+          if(t[t.length - 1] == ':'){ //頭&尾
+            fangxiang = 'c';
+          }
+        }
+        else if(t[t.length - 1] == ':'){ //尾
+          fangxiang = 'r';
+        }
+        list.push(fangxiang);
+        let num = 0; //計算有多少個 '---'
+        for(let tt of t){
+          if(tt == '-'){
+            num++
+          }
+          else if(tt != ':'){ //既不是 '-' 也不是 ':'
+            return [];
+          }
+        }
+        if(num < 3){ // '-' 的數量不超過3
+          return [];
+        }
+      }
+      return list; //返回每列對其方向, 儅 length 為 0 時, 説明不是表格1
+    }
+    
   }
 }
 
