@@ -223,55 +223,28 @@ class md{
         //遍歷
         if(data_trim.length > 0 && skip == false){
           let data_array = data_trim.split(' ');
-          let firstcham = data_trim[0]; //取首個字符
           
           //分割綫
-          if(firstcham == '=' || firstcham == '-' || firstcham == '*' || firstcham == '_'){
-            let num = 0;
-            let settitle = 0; //标题等級
-            let data_nospace = data_array.join('');
-            if(data_nospace.length > 2){
-              switch (firstcham){ //設置標題等級
-                case '=':
-                  settitle = 1;
-                  break
-                case '-':
-                  settitle = 2;
-                  break
-              }
-              for(let t of data_array.join('')){ //直接合并空格, 畢竟 * * * 這類也算分割綫
-                if(t == firstcham){
-                  num++;
-                }
-                else{
-                  num = 0;
-                  break;
-                }
-              }
-            }
-            //輸出
-            if(num > 2){
-              if(settitle > 0 && output.length > 0 && datas[i - 1].trim().length != 0){ //設置標題
-                output[output.length - 1] = md.title(output[output.length - 1], settitle);
-                return '';
-              }
-              else{
-                return md.line();
-              }
-            }
+          let doline = md.doline(data_trim);
+          if(doline[1] > 0 && output.length > 0 && datas[i - 1].trim().length != 0){ //設置標題
+            output[output.length - 1] = md.title(output[output.length - 1], settitle);
+            return '';
+          }
+          else if(doline[1] == 0){
+            return doline
           }
           
-          switch (firstcham){
+          switch (data_trim[0]){
             case '#': //標題
               outputtemp = md.title(data);
               break;
             default: //普通文本
               //段落
-              if(table.table_list.length == 0 && dolist.list_list.length == 0){ //表格, 列表尚未封包時, 先禁用
+              if(table.table_list.length == 0 && dolist.list_list.length == 0 && quote.quote_list.length == 0){ //表格, 列表, 引用尚未封包時, 先禁用
                 outputtemp = md.paragraph(data);
               }
               else{
-                outputtemp = data;
+                outputtemp = data_trim;
               }
               break;
           }
@@ -284,7 +257,7 @@ class md{
           return '';
         }
 
-        if(table.table_list.length == 0){ //表格尚未封包時, 先禁用
+        if(table.table_list.length == 0 && dolist.list_list.length == 0 && quote.quote_list.length == 0){ //表格, 列表, 引用尚未封包時, 先禁用
           //内斂格式
           outputtemp = md.inlineformat(outputtemp);
           //處理圖像和超鏈接
@@ -311,6 +284,10 @@ class md{
       footer.push('<ol class="footnotelist">' + footnote.footnote_list.join('') + '</ol>');
       //output.push(footnotehtml);
     }
+    table.table_list = []
+    dolist.list_list = []
+    quote.quote_list = []
+    footnote.footnote_list = []
     
     let header = ['<div class="header">']; //文檔頭
     if(meta['title'].length > 0){ //追加大標題
@@ -344,11 +321,32 @@ class md{
     
     //輸出 HTML
     output = output.join('');
-
-    //後處理: 交互
     let html = document.createElement('div');
     html.classList.add('Markdown');
     html.innerHTML = output;
+
+    //二次解析 (列表, 引用)
+    // datas = html.querySelectorAll('ol:not(:has(ol, ul)), ul:not(:has(ol, ul)), div.quote:not(:has(div.quote))');
+    let list_list = [ html.querySelectorAll('.Markdown>ol') ];
+    list_list.push( html.querySelectorAll('.Markdown>ul') );
+    let list_quote = [ html.querySelectorAll('.Markdown>div.quote') ];
+    function duilie2(data){ //解析隊列
+      data = data.trim();
+      data = md.doline(data)[0];
+      //内斂格式
+      data = md.inlineformat(data);
+      //處理圖像和超鏈接
+      data = md.imgorlink(true, data);
+      data = md.imgorlink(false, data);
+      //脚注
+      data = footnote.read(data);
+      return data;
+    }
+    for(let t of list_list){ //列表
+      console.log(t);
+    }
+
+    //後處理: 交互
     //標題描點
     let titlelist = html.querySelectorAll('div.title');
     for(let title of titlelist){
@@ -899,6 +897,45 @@ class md{
     return data;
   }
 
+  //分割线
+  static doline(data){
+    let firstcham = data.trim()[0];
+    if(firstcham == '=' || firstcham == '-' || firstcham == '*' || firstcham == '_'){
+      let num = 0;
+      let settitle = 0; //标题等級
+      let data_nospace = data_array.join('');
+      if(data_nospace.length > 2){
+        switch (firstcham){ //設置標題等級
+          case '=':
+            settitle = 1;
+            break
+          case '-':
+            settitle = 2;
+            break
+        }
+        for(let t of data_array.join('')){ //直接合并空格, 畢竟 * * * 這類也算分割綫
+          if(t == firstcham){
+            num++;
+          }
+          else{
+            num = 0;
+            break;
+          }
+        }
+      }
+      //輸出
+      if(num > 2){
+        return [md.line(), settitle];
+      }
+      else{
+        return [data, -1]; //-1: 不是綫 | 0: 就是綫 | 1: 不僅是綫, 還是一級標題 | 2: 不僅是綫, 居然還是二級標題
+      }
+    }
+    else{
+      return [data, -1];
+    }
+  }
+
   //讀取列表
   static dolist = class {
     //屬性
@@ -1027,7 +1064,17 @@ class md{
         this.clear(output);
         return data;
       }
-      data_array.splice(0, offset);
+      
+      //截取後面的文本, 並設置爲 P 段落
+      // data_array.splice(0, offset);
+      data = data_array.splice(offset).join(' ');
+      if(data.length == 0){ //如果截取后長度為 0, 就不要了
+        data_array = [''];
+      }
+      else{
+        data_array = ['<p>' + data + '</p>'];
+      }
+      
       //升級
       if(offset > this.quote_list.length){
         for(let t = 0 ; t < offset - this.quote_list.length ; t++){
@@ -1042,7 +1089,7 @@ class md{
         data_array.unshift(this.quote_list.splice(0, this.quote_list.length - offset).join(''));
       }
       //輸出
-      return data_array.join(' ');
+      return data_array.join('');
     }
   }
 

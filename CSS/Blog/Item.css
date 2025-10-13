@@ -314,7 +314,11 @@ ol>*:not(li):before{
 div.quote{
   border-left: 3px solid #aaa;
   padding-left: 16px;
-  display: inline-block;
+  display: inline-flex;
+  flex-direction: column;
+}
+div.quote div.quote:not(:first-child):not(:last-child){
+  margin: 4px 0px;
 }
 /* 勾勾 */
 img.gougou{
