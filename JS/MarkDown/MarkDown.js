@@ -35,6 +35,7 @@ class md{
     let dolist = new md.dolist();
     let footnote = new md.footnote();
     let quote = new md.quote();
+    let table = new md. dotable();
 
     //元數據
     /*let title; //標題
@@ -138,8 +139,8 @@ class md{
         }
       }
 
-      //數學公式或代碼塊
       let data_trim = data.trim();
+      //數學公式
       if(data_trim.length == 2 && data_trim == '$$'){
         let lastindex = -1;
         let mathdiv = ['<div class="math">'];
@@ -162,7 +163,8 @@ class md{
           continue;
         }
       }
-      else if(data_trim.length > 2 && md.charcom(data_trim, '\`\`\`') == true){ //CODE
+      //代碼塊
+      else if(data_trim.length > 2 && md.charcom(data_trim, '\`\`\`') == true){
         let lastindex = -1;
         let lang = data_trim.substring(data_trim.lastIndexOf('\`') + 1).trim();
         let codediv = ['<div class="code_block"><div><span>' + lang + '</span>' + md.uiicon('copy',['copy']) + '</div><code class="block" lang="' + lang + '">']
@@ -185,15 +187,33 @@ class md{
           continue;
         }
       }
+      //未建立的表哥
+      else if(dolist.list_list == 0 && table.table_list.length == 0 && data_trim.length > 1 && data_trim[0] == '|' && data_trim[data_trim.length - 1] == '|'){
+        let table_list = table.check(data_trim); //檢查是否為表格頭
+        if(table_list.length == 0 && i + 1 < datas.length){ //如果不是, 可能是表格標題, 再向下一位查詢
+          table_list = table.check(datas[i + 1]);
+          if(table_list.length > 0){
+            output.push('<table>');
+            table.table_list = table_list;
+            data = table.read(data,output,true);
+          }
+        }
+        else if(table_list.length > 0){
+          output.push('<table>');
+          table.table_list = table_list;
+          data = '';
+        }
+      }
+      //已建立的表哥
+      else if(table.table_list.length > 0){
+        data = table.read(data,output);
+      }
 
       //引用
       data = quote.read(data,output);
       data_trim = data.trim();
-
-      //表哥
-      if(data_trim.length > 4 && data_trim[0] == '|' && data_trim[data_trim.length - 1] == '|'){
-        
-      }
+      //列表
+      data = dolist.read(data,output);
       
       //解析隊列
       function duilie(data, skip = false){ //skip: 跳過遍歷步驟
@@ -231,7 +251,6 @@ class md{
             }
             //輸出
             if(num > 2){
-              dolist.clear(output); //傳遞 null 以調用 clear();
               if(settitle > 0 && output.length > 0 && datas[i - 1].trim().length != 0){ //設置標題
                 output[output.length - 1] = md.title(output[output.length - 1], settitle);
                 return '';
@@ -244,22 +263,15 @@ class md{
           
           switch (firstcham){
             case '#': //標題
-              dolist.clear(output); //傳遞 null 以調用 clear();
               outputtemp = md.title(data);
               break;
-            case '*': //列表
-              outputtemp = dolist.read(data,output);
-              break;
-            case '-': //还是列表
-              outputtemp = dolist.read(data,output);
-              break;
             default: //普通文本
-              if((data_array[0][data_array[0].length - 1] == '.' && isNaN(data_array[0]) == false) /*有序列表*/ || data[0] == ' ' /* 無 :before 的無序列表*/ ){ 
-                outputtemp = dolist.read(data,output);
-              }
-              else{ //段落
-                dolist.clear(output); //傳遞 null 以調用 clear();
+              //段落
+              if(table.table_list.length == 0 && dolist.list_list.length == 0){ //表格, 列表尚未封包時, 先禁用
                 outputtemp = md.paragraph(data);
+              }
+              else{
+                outputtemp = data;
               }
               break;
           }
@@ -271,16 +283,16 @@ class md{
         else{ //甚麽都木有
           return '';
         }
-        
-        //内斂格式
-        outputtemp = md.inlineformat(outputtemp);
-  
-        //處理圖像和超鏈接
-        outputtemp = md.imgorlink(true, outputtemp);
-        outputtemp = md.imgorlink(false, outputtemp);
 
-        //脚注
-        outputtemp = footnote.read(outputtemp);
+        if(table.table_list.length == 0){ //表格尚未封包時, 先禁用
+          //内斂格式
+          outputtemp = md.inlineformat(outputtemp);
+          //處理圖像和超鏈接
+          outputtemp = md.imgorlink(true, outputtemp);
+          outputtemp = md.imgorlink(false, outputtemp);
+          //脚注
+          outputtemp = footnote.read(outputtemp);
+        }
 
         return outputtemp;
       }
@@ -290,6 +302,9 @@ class md{
     }
 
     //追加文檔尾
+    if(table.table_list.length > 0){
+      footer.push('</table>');
+    }
     footer = footer.concat(dolist.list_list.join(''));
     footer = footer.concat(quote.quote_list.join(''));
     if(footnote.footnote_list.length > 0){ //追加脚注
@@ -904,23 +919,24 @@ class md{
     }
 
     //讀取
-    read(data,output){        
+    read(data,output){
       //跳過空行
-      if(data == null || data.length == 0){
-        this.clear(output);
+      if(data == null || data.trim().length == 0){
+        // this.clear(output);
         return data;
       }
       let type = md.getoffset(data); //返回 type 列表和已修剪 data
       //非列表
       if(type[0].length == 0 || (this.list_type.length == 0 && Math.max(...type[0]) == 0) ){
         this.clear(output);
-        return md.paragraph(data);
+        return data;
       }
       //繼續
       data = type[1];
       type = type[0];
       //修飾Data
       data = md.list(data,type[type.length - 1]);
+      let html = []; //暫存容器
       let ins = 0; //插入點
       for(let t of type){ //尋找插入點
         if(ins > this.list_type.length - 1){
@@ -933,7 +949,7 @@ class md{
       }
       //封包舊的
       for( let t = 0 ; t < this.list_list.length - ins ; t++){
-        output.push(this.list_list[t]);
+        html.push(this.list_list[t]);
       }
       //更新 array
       this.list_list.splice(0, this.list_list.length - ins);
@@ -947,25 +963,26 @@ class md{
       for(let t = ins ; t < type.length ; t++){
         if(type[t] < 2){
           if(t > 0 && type[t - 1] == 0){ //列表嵌套時, 應該要隱藏 :before
-            output.push('<ul class="no_before">');
+            html.push('<ul class="no_before">');
           }
           else{
-            output.push('<ul>');
+            html.push('<ul>');
           }
           this.list_list.unshift('</ul>');
         }
         else{
           if(t > 0 && type[t - 1] == 0){ //列表嵌套時, 應該要隱藏 :before
-            output.push('<ol class="no_before">');
+            html.push('<ol class="no_before">');
           }
           else{
-            output.push('<ol>');
+            html.push('<ol>');
           }
           this.list_list.unshift('</ol>');
         }
       }
       //輸出
-      return data;
+      html.push(data);
+      return html.join('');
     }
     
   };
@@ -1014,17 +1031,15 @@ class md{
       //升級
       if(offset > this.quote_list.length){
         for(let t = 0 ; t < offset - this.quote_list.length ; t++){
-          output.push('<div class="quote">');
+          // output.push('<div class="quote">');
+          data_array.unshift('<div class="quote">');
           this.quote_list.push('</div>');
         }
       }
       //降級
       else if(offset < this.quote_list.length){
-        /*for(let t = 0 ; t < quote_list.length - MathRoundOffset ; t++){
-          output.push(quote_list[t]);
-        }
-        quote_list.splice(0, quote_list.length - MathRoundOffset);*/
-        output.push(this.quote_list.splice(0, this.quote_list.length - offset).join(''));
+        // output.push(this.quote_list.splice(0, this.quote_list.length - offset).join(''));
+        data_array.unshift(this.quote_list.splice(0, this.quote_list.length - offset).join(''));
       }
       //輸出
       return data_array.join(' ');
@@ -1036,6 +1051,12 @@ class md{
     //屬性
     constructor() {
       this.table_list = []; //暫存每列對其方向, 也可以代指縂列數
+    }
+
+    //清理, 復位
+    clear(output){
+      this.table_list = [];
+      output.push('</table>');
     }
 
     //檢查是不是表格頭 |---|
@@ -1051,7 +1072,8 @@ class md{
       data_array.shift(); //去頭
       data_array.pop(); //去尾
       //遍歷
-      for(let t of data_array){
+      for(let t of data_array){ //拆項
+        t = t.trim();
         if(t.length < 3){ //最小也得是 '---'
           return [];
         }
@@ -1068,7 +1090,7 @@ class md{
         }
         list.push(fangxiang);
         let num = 0; //計算有多少個 '---'
-        for(let tt of t){
+        for(let tt of t){ //拆字
           if(tt == '-'){
             num++
           }
@@ -1082,7 +1104,49 @@ class md{
       }
       return list; //返回每列對其方向, 儅 length 為 0 時, 説明不是表格1
     }
-    
+
+    //解析
+    read(data,output,type){
+      let data_trim = data.trim();
+      let table_list = this.check(data);
+      if(table_list.length > 0){ //判斷 data 是否為表格頭
+        if(this.table_list.length == 0){ //如果 this.table_list 為空, 就補上
+          this.table_list.length = table_list;
+          output.push('<table>');
+        }
+        return '';
+      }
+      else if(this.table_list.length == 0 || data_trim.length < 1 || (data_trim[0] != '|' || data_trim[data_trim.length - 1] != '|') ){ //非表格
+        this.clear(output);
+        return data;
+      }
+      
+      let subhtml = ['<th class="','">','</th>']; //標題
+      if(type != true){
+        subhtml = ['<td class="','">','</td>']; //項目
+      }
+      
+      let html = ['<tr>']; //暫存容器
+      let data_array = data_trim.split('|'); //行拆項
+      data_array.shift();
+      data_array.pop();
+      if(this.table_list.length > data_array.length){ //儅子項比列表頭少時, 填充空白
+        for(let t = 0 ; t < this.table_list.length - data_array.length ; t++){
+          data_array.push('');
+        }
+      }
+      for(let t = 0 ; t < this.table_list.length ; t++){ //this.table_list.length 比 data_array.length 好, 儅子項比列表頭多時, 直接截斷
+        let tt = data_array[t].trim();
+        this.addsub(tt,this.table_list[t],html,subhtml); //追加項
+      }
+      html.push('</tr>');
+      return html.join('');
+    }
+
+    //添加項
+    addsub(data,dir,html,subhtml){ //文本, 方向, 容器, 子項封裝頭和尾
+      html.push(subhtml[0] + dir + subhtml[1] + data + subhtml[2]);
+    }
   }
 }
 

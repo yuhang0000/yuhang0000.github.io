@@ -355,7 +355,7 @@ th, td{
   border: 1px solid #bbb;
   padding: 4px 8px;
 }
-tr.header{
+tr>th{
   background: #ddd;
 }
 td.r{
