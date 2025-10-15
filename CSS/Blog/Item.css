@@ -257,6 +257,10 @@ code.block{
   padding-bottom: 8px;
   margin: 0px;
 }
+.quote>ul, .quote>ol{
+  padding-left: 0px;
+  margin: 0px;
+}
 ul, ol{
   padding-left: var(--tab_margin_left);
 }
@@ -307,6 +311,12 @@ ol>*:not(li):before{
   left: calc(-1* var(--tab_margin_left));
   top: 3px;
 }
+ul>.quote:before{
+  top: 8px;
+}
+ol>.quote:before{
+  top: 9px;
+}
 /* 引用 */
 .blog_item>div.quote{
   margin: 8px 0px;
@@ -317,8 +327,8 @@ div.quote{
   display: inline-flex;
   flex-direction: column;
 }
-/* div.quote div.quote:not(:first-of-type){ */
-div.quote div.quote{
+div.quote div.quote:not(:first-of-type){
+/* div.quote div.quote{ */
   margin-top: 4px;
 }
 /* 勾勾 */

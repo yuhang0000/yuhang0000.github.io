@@ -128,8 +128,8 @@ class md{
       }
 
       //引用
-      data = quote.read(data,output);
-      data_trim = data.trim();
+      // data = quote.read(data,output);
+      // data_trim = data.trim();
       //列表
       data = dolist.read(data,output);
       
@@ -382,6 +382,8 @@ class md{
         for(let i = 0 ; i < datas.length ; i++){
           let data = datas[i].innerText.trim();
           // console.log(data);
+          
+        }
       }
     }
     parseDOM2(list_li_array);
@@ -864,7 +866,7 @@ class md{
     if(data == null || data.length < 1){
       return [ [], data ]
     }
-    data = data.split(' ');
+    data = data.trimEnd().split(' ');
     let num = 0; //用來給 "無序列表並無 :before" 計數的
     let type = []; //列表類型
     let howlong = 0; //向前裁切多少數組
@@ -877,6 +879,9 @@ class md{
       }
       else if(t.length > 1 && t[t.length - 1] == '.' && isNaN(t) == false){ //有序列表
         type.push(2);
+      }
+      else if(t == '>'){
+        type.push(3);
       }
       else{
         break;
@@ -1015,15 +1020,14 @@ class md{
       //繼續
       data = type[1];
       type = type[0];
-      //修飾Data
-      data = md.list(data,type[type.length - 1]);
       let html = []; //暫存容器
       let ins = 0; //插入點
       for(let t of type){ //尋找插入點
         if(ins > this.list_type.length - 1){
           break;
         }
-        if(t + this.list_type[ins] == 3){
+        // if(t + this.list_type[ins] == 3){
+        if(t != this.list_type[ins] && !(t ** 2 < 2 && this.list_type[ins] ** 2 < 2) ){ //冪函數居然不是 ^, 用上 ! 來表否定
           break;
         }
         ins++;
@@ -1034,31 +1038,47 @@ class md{
       }
       //更新 array
       this.list_list.splice(0, this.list_list.length - ins);
-      //type.splice(0, ins);
       this.list_type.splice(ins);
-      //offset_list = offset_list.concat(type);
       for(let t = ins ; t < type.length ; t++){
         this.list_type.push(type[t]);
       }
-      //追加列表頭
-      for(let t = ins ; t < type.length ; t++){
-        if(type[t] < 2){
-          if(t > 0 && type[t - 1] == 0){ //列表嵌套時, 應該要隱藏 :before
-            html.push('<ul class="no_before">');
-          }
-          else{
-            html.push('<ul>');
-          }
-          this.list_list.unshift('</ul>');
+      //修飾文本
+      if(type.length > 0 && type[type.length - 1] == 3){ //對於引用
+        if(data.length == 0){ //如果截取后長度為 0, 就不要了
+          data = ''
         }
         else{
-          if(t > 0 && type[t - 1] == 0){ //列表嵌套時, 應該要隱藏 :before
-            html.push('<ol class="no_before">');
-          }
-          else{
-            html.push('<ol>');
-          }
-          this.list_list.unshift('</ol>');
+          data = md.paragraph(data);
+        }
+      }
+      else{ //對於列表
+        data = md.list(data,type[type.length - 1]);
+      }
+      //追加列表頭
+      for(let t = ins ; t < type.length ; t++){
+        switch (type[t]){
+          case 2: //有序列表
+            if(t > 0 && type[t - 1] == 0){ //列表嵌套時, 應該要隱藏 :before
+              html.push('<ol class="no_before">');
+            }
+            else{
+              html.push('<ol>');
+            }
+            this.list_list.unshift('</ol>');
+            break;
+          case 3: //引用
+            html.push('<div class="quote">');
+            this.list_list.unshift('</div>');
+            break;
+          default: //無序列表
+            if(t > 0 && type[t - 1] == 0){ //列表嵌套時, 應該要隱藏 :before
+              html.push('<ul class="no_before">');
+            }
+            else{
+              html.push('<ul>');
+            }
+            this.list_list.unshift('</ul>');
+            break;
         }
       }
       //輸出
