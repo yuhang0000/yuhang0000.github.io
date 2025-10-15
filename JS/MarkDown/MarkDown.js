@@ -14,7 +14,7 @@ class md{
     'nogougou':'"/Resources/UI/nogougou.svg"', //複選框: 空的
     'huaigougou':'"/Resources/UI/huaigougou.svg"', //複選框: x
   }
-  static ver = 'v0.0.8.1008';
+  static ver = 'v0.0.9.1014';
   static version = md.ver;
   static ESC = { //轉義字符
     '<':'&lt;',
@@ -27,6 +27,7 @@ class md{
 
   //解析主循環
   static read(datas){
+    let starttime = new Date().valueOf(); //開始時間
     let output = []; //暫存輸出對象
     let footer = []; //追加 html 到末尾
     datas = datas.trimEnd().split('\n');
@@ -51,12 +52,151 @@ class md{
     'titlelist':[], //標題列表
     }
     
-    //console.log(datas);
+    //通用解析管綫
+    function parseDOM1(data,level,datas,i,output){
+    //data: 傳遞資訊 | level: 第幾次解析 | datas: 資訊所在的數組 | i: 資訊所在的數組的索引位置 | output: 最終輸出的容器
+    //return {data,type,index}; //data: 返回資訊 | type: 返回狀態 | index: 返回新的索引位置
+      let data_trim = data.trim();
+      //數學公式
+      if(data_trim.length == 2 && data_trim == '$$'){
+        let lastindex = -1;
+        let mathdiv = ['<div class="math">'];
+        for(let t = i + 1 ; t < datas.length ; t++){
+          let tt = datas[t];
+          let ttt = tt.trim();
+          if(ttt.length == 2 && ttt == '$$'){ //收尾
+            lastindex = t++;
+            mathdiv.push('</div>');
+            break;
+          }
+          else{ //追加
+            mathdiv.push( md.doesc(tt) );
+          }
+        }
+        if(lastindex != -1){ //輸出
+          i = lastindex;
+          output.push(mathdiv.join(''));
+          // continue;
+          return {data:null,type:'continue',index:i};
+        }
+      }
+      //代碼塊
+      else if(data_trim.length > 2 && md.charcom(data_trim, '\`\`\`') == true){
+        let lastindex = -1;
+        let lang = data_trim.substring(data_trim.lastIndexOf('\`') + 1).trim();
+        let codediv = ['<div class="code_block"><div><span>' + lang + '</span>' + md.uiicon('copy',['copy']) + '</div><code class="block" lang="' + lang + '">']
+        for(let t = i + 1 ; t < datas.length ; t++){
+          let tt = datas[t];
+          let ttt = tt.trim();
+          if(ttt.length == 3 && ttt == '\`\`\`'){ //收尾
+            lastindex = t++;
+            codediv.push('</code></div>');
+            break;
+          }
+          else{ //追加
+            codediv.push(md.doesc(tt) + '\n');
+          }
+        }
+        if(lastindex != -1){ //輸出
+          i = lastindex;
+          //output = output + codediv;
+          output.push(codediv.join(''));
+          // continue;
+          return {data:null,type:'continue',index:i};
+        }
+      }
+      //未建立的表哥
+      else if(dolist.list_list == 0 && table.table_list.length == 0 && data_trim.length > 1 && data_trim[0] == '|' && data_trim[data_trim.length - 1] == '|'){
+        let table_list = table.check(data_trim); //檢查是否為表格頭
+        if(table_list.length == 0 && i + 1 < datas.length){ //如果不是, 可能是表格標題, 再向下一位查詢
+          table_list = table.check(datas[i + 1]);
+          if(table_list.length > 0){
+            output.push('<table>');
+            table.table_list = table_list;
+            data = table.read(data,output,true);
+          }
+        }
+        else if(table_list.length > 0){
+          output.push('<table>');
+          table.table_list = table_list;
+          data = '';
+        }
+      }
+      //已建立的表哥
+      else if(table.table_list.length > 0){
+        data = table.read(data,output);
+      }
+
+      //引用
+      data = quote.read(data,output);
+      data_trim = data.trim();
+      //列表
+      data = dolist.read(data,output);
+      
+      //解析隊列
+      function duilie(data, skip = false){ //skip: 跳過遍歷步驟
+        let data_trim = data.trim();
+        let outputtemp = '';
+        
+        //遍歷
+        if(data_trim.length > 0 && skip == false){
+          let data_array = data_trim.split(' ');
+          
+          //分割綫
+          let doline = md.doline(data_trim);
+          if(doline[1] > 0){
+            if(i - 1 < 0 && datas[i - 1].trim().length != 0){ //設置標題
+              output[output.length - 1] = md.title(output[output.length - 1], settitle);
+              return '';
+            }
+            else{ //或者僅設置綫段
+              return doline[0];
+            }
+          }
+          
+          switch (data_trim[0]){
+            case '#': //標題
+              outputtemp = md.title(data);
+              break;
+            default: //普通文本
+              //段落
+              if(table.table_list.length == 0 && dolist.list_list.length == 0 && quote.quote_list.length == 0){ //表格, 列表, 引用尚未封包時, 先禁用
+                outputtemp = md.paragraph(data);
+              }
+              else{
+                outputtemp = data_trim;
+              }
+              break;
+          }
+          
+        }
+        else if(data_trim.length > 0){ //跳過遍歷步驟之後給 outputtemp 賦值
+          outputtemp = data_trim;
+        }
+        else{ //甚麽都木有
+          return '';
+        }
+
+        if(table.table_list.length == 0 && dolist.list_list.length == 0 && quote.quote_list.length == 0){ //表格, 列表, 引用尚未封包時, 先禁用
+          //内斂格式
+          outputtemp = md.inlineformat(outputtemp);
+          //處理圖像和超鏈接
+          outputtemp = md.imgorlink(true, outputtemp);
+          outputtemp = md.imgorlink(false, outputtemp);
+          //脚注
+          outputtemp = footnote.read(outputtemp);
+        }
+
+        return outputtemp;
+      }
+      
+      //整合
+      return {data:duilie(data)};
+    }
+
+    //一次解析主循環
     for(let i = 0; i < datas.length ; i++){ //每行遍历
       let data = datas[i];
-      //let outputtemp = ''
-      //console.log(data);
-
       
       //檢查元數據
       if(i == 0 && data == "---"){
@@ -139,139 +279,17 @@ class md{
         }
       }
 
-      let data_trim = data.trim();
-      //數學公式
-      if(data_trim.length == 2 && data_trim == '$$'){
-        let lastindex = -1;
-        let mathdiv = ['<div class="math">'];
-        for(let t = i + 1 ; t < datas.length ; t++){
-          let tt = datas[t];
-          let ttt = tt.trim();
-          if(ttt.length == 2 && ttt == '$$'){ //收尾
-            lastindex = t++;
-            mathdiv.push('</div>');
-            break;
-          }
-          else{ //追加
-            mathdiv.push( md.doesc(tt) );
-          }
-        }
-        if(lastindex != -1){ //輸出
-          i = lastindex;
-          //output = output + mathdiv;
-          output.push(mathdiv.join(''));
-          continue;
-        }
+      let parse = parseDOM1(data,1,datas,i,output)
+      if(parse.index != null){
+        i = parse.index;
       }
-      //代碼塊
-      else if(data_trim.length > 2 && md.charcom(data_trim, '\`\`\`') == true){
-        let lastindex = -1;
-        let lang = data_trim.substring(data_trim.lastIndexOf('\`') + 1).trim();
-        let codediv = ['<div class="code_block"><div><span>' + lang + '</span>' + md.uiicon('copy',['copy']) + '</div><code class="block" lang="' + lang + '">']
-        for(let t = i + 1 ; t < datas.length ; t++){
-          let tt = datas[t];
-          let ttt = tt.trim();
-          if(ttt.length == 3 && ttt == '\`\`\`'){ //收尾
-            lastindex = t++;
-            codediv.push('</code></div>');
-            break;
-          }
-          else{ //追加
-            codediv.push(md.doesc(tt) + '\n');
-          }
-        }
-        if(lastindex != -1){ //輸出
-          i = lastindex;
-          //output = output + codediv;
-          output.push(codediv.join(''));
-          continue;
-        }
+      if(parse.type == 'continue'){ //妥協了, 外部函數不能直接操縱内循環
+        continue;
       }
-      //未建立的表哥
-      else if(dolist.list_list == 0 && table.table_list.length == 0 && data_trim.length > 1 && data_trim[0] == '|' && data_trim[data_trim.length - 1] == '|'){
-        let table_list = table.check(data_trim); //檢查是否為表格頭
-        if(table_list.length == 0 && i + 1 < datas.length){ //如果不是, 可能是表格標題, 再向下一位查詢
-          table_list = table.check(datas[i + 1]);
-          if(table_list.length > 0){
-            output.push('<table>');
-            table.table_list = table_list;
-            data = table.read(data,output,true);
-          }
-        }
-        else if(table_list.length > 0){
-          output.push('<table>');
-          table.table_list = table_list;
-          data = '';
-        }
+      else if(parse.type == 'break'){
+        break;
       }
-      //已建立的表哥
-      else if(table.table_list.length > 0){
-        data = table.read(data,output);
-      }
-
-      //引用
-      data = quote.read(data,output);
-      data_trim = data.trim();
-      //列表
-      data = dolist.read(data,output);
-      
-      //解析隊列
-      function duilie(data, skip = false){ //skip: 跳過遍歷步驟
-        let data_trim = data.trim();
-        let outputtemp = '';
-        
-        //遍歷
-        if(data_trim.length > 0 && skip == false){
-          let data_array = data_trim.split(' ');
-          
-          //分割綫
-          let doline = md.doline(data_trim);
-          if(doline[1] > 0 && output.length > 0 && datas[i - 1].trim().length != 0){ //設置標題
-            output[output.length - 1] = md.title(output[output.length - 1], settitle);
-            return '';
-          }
-          else if(doline[1] == 0){
-            return doline
-          }
-          
-          switch (data_trim[0]){
-            case '#': //標題
-              outputtemp = md.title(data);
-              break;
-            default: //普通文本
-              //段落
-              if(table.table_list.length == 0 && dolist.list_list.length == 0 && quote.quote_list.length == 0){ //表格, 列表, 引用尚未封包時, 先禁用
-                outputtemp = md.paragraph(data);
-              }
-              else{
-                outputtemp = data_trim;
-              }
-              break;
-          }
-          
-        }
-        else if(data_trim.length > 0){ //跳過遍歷步驟之後給 outputtemp 賦值
-          outputtemp = data_trim;
-        }
-        else{ //甚麽都木有
-          return '';
-        }
-
-        if(table.table_list.length == 0 && dolist.list_list.length == 0 && quote.quote_list.length == 0){ //表格, 列表, 引用尚未封包時, 先禁用
-          //内斂格式
-          outputtemp = md.inlineformat(outputtemp);
-          //處理圖像和超鏈接
-          outputtemp = md.imgorlink(true, outputtemp);
-          outputtemp = md.imgorlink(false, outputtemp);
-          //脚注
-          outputtemp = footnote.read(outputtemp);
-        }
-
-        return outputtemp;
-      }
-      
-      //整合
-      output.push(duilie(data));
+      output.push(parse.data);
     }
 
     //追加文檔尾
@@ -326,25 +344,47 @@ class md{
     html.innerHTML = output;
 
     //二次解析 (列表, 引用)
-    // datas = html.querySelectorAll('ol:not(:has(ol, ul)), ul:not(:has(ol, ul)), div.quote:not(:has(div.quote))');
-    let list_list = [ html.querySelectorAll('.Markdown>ol') ];
-    list_list.push( html.querySelectorAll('.Markdown>ul') );
-    let list_quote = [ html.querySelectorAll('.Markdown>div.quote') ];
-    function duilie2(data){ //解析隊列
-      data = data.trim();
-      data = md.doline(data)[0];
-      //内斂格式
-      data = md.inlineformat(data);
-      //處理圖像和超鏈接
-      data = md.imgorlink(true, data);
-      data = md.imgorlink(false, data);
-      //脚注
-      data = footnote.read(data);
-      return data;
+    let list_li_array = []; //<li> 集合
+    function dolist_list(DOM_lists){ //循環查找嵌套列表, 並返回所有 <li>
+      if(DOM_lists == null){
+        return;
+      }
+      let list_li = [];
+      for(let t of DOM_lists){
+        //判斷該節點是 <li> 還是 <ul><ol>
+        if(t.nodeName == 'UL' || t.nodeName == 'OL' || (t.nodeName == 'DIV' && t.classList.contains("quote") == true) ){ //大寫的
+          dolist_list(t.children); //嵌套
+          if(list_li.length > 0){ //將 <li> 集合返回給 list_lis
+            list_li_array.push(list_li);
+          }
+          list_li = [];
+          continue;
+        }
+        else{
+          list_li.push(t);
+        }
+      }
+      if(list_li.length > 0){ //將 <li> 集合返回給 list_lis
+        list_li_array.push(list_li);
+      }
     }
-    for(let t of list_list){ //列表
-      console.log(t);
+    dolist_list(html.querySelectorAll('.Markdown>ol'));
+    dolist_list(html.querySelectorAll('.Markdown>ul'));
+    dolist_list(html.querySelectorAll('.Markdown>div.quote'));
+    // debugger;
+    // console.table(list_li_array);
+    //二次解析主函數
+    function parseDOM2(DOM_lists){
+      //大循環
+      for(let datas of DOM_lists){
+        //小循環
+        let output = [];
+        for(let i = 0 ; i < datas.length ; i++){
+          let data = datas[i].innerText.trim();
+          // console.log(data);
+      }
     }
+    parseDOM2(list_li_array);
 
     //後處理: 交互
     //標題描點
@@ -376,7 +416,11 @@ class md{
     }
     
     //console.table(meta);
-    return [html, meta];
+    let endtime = new Date().valueOf();
+    if(window.debug == true){
+      console.log( '解析花費了: ' + ((endtime - starttime) / 1000 ) + ' 秒.');
+    }
+    return {html:html, meta:meta};
   }
   
   //標題
@@ -903,7 +947,7 @@ class md{
     if(firstcham == '=' || firstcham == '-' || firstcham == '*' || firstcham == '_'){
       let num = 0;
       let settitle = 0; //标题等級
-      let data_nospace = data_array.join('');
+      let data_nospace = data.split(' ').join('');
       if(data_nospace.length > 2){
         switch (firstcham){ //設置標題等級
           case '=':
@@ -913,7 +957,7 @@ class md{
             settitle = 2;
             break
         }
-        for(let t of data_array.join('')){ //直接合并空格, 畢竟 * * * 這類也算分割綫
+        for(let t of data_nospace){ //直接合并空格, 畢竟 * * * 這類也算分割綫
           if(t == firstcham){
             num++;
           }
@@ -1195,6 +1239,7 @@ class md{
       html.push(subhtml[0] + dir + subhtml[1] + data + subhtml[2]);
     }
   }
+
 }
 
 //TODO:

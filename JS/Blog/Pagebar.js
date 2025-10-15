@@ -115,11 +115,10 @@ async function readblog(page = 1){
 			.then(data => {
 				if(data != null){
 				  if(url.trim().indexOf('.md') != -1){ //Markdown 文檔
-				    //blog_body.innerHTML = blog_body.innerHTML + '<div class="blog_item Markdown" href="' + url.trim() + '">' + md.read(data) + '</div>'; //MarkDown
 				    let markdown = md.read(data);
-				    markdown[0].setAttribute('href', url.trim());
-				    markdown[0].classList.add('blog_item');
-				    blog_body.appendChild(markdown[0]);
+				    markdown.html.setAttribute('href', url.trim());
+				    markdown.html.classList.add('blog_item');
+				    blog_body.appendChild(markdown.html);
 				  }
 				  else{ //HTML 文檔
 				    blog_body.innerHTML = blog_body.innerHTML + '<div class="blog_item HTML" href="' + url.trim() + '">' + data + '</div>'; //HTML

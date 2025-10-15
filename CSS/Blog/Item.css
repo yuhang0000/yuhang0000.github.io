@@ -317,8 +317,9 @@ div.quote{
   display: inline-flex;
   flex-direction: column;
 }
-div.quote div.quote:not(:first-child):not(:last-child){
-  margin: 4px 0px;
+/* div.quote div.quote:not(:first-of-type){ */
+div.quote div.quote{
+  margin-top: 4px;
 }
 /* 勾勾 */
 img.gougou{
