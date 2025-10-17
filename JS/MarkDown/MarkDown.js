@@ -35,7 +35,7 @@ class md{
     //創建實例
     let dolist = new md.dolist();
     let footnote = new md.footnote();
-    let quote = new md.quote();
+    // let quote = new md.quote();
     let table = new md. dotable();
 
     //元數據
@@ -127,11 +127,10 @@ class md{
         data = table.read(data,output);
       }
 
-      //引用
-      // data = quote.read(data,output);
-      // data_trim = data.trim();
       //列表
-      data = dolist.read(data,output);
+      if(level == 1){
+        data = dolist.read(data,output);
+      }
       
       //解析隊列
       function duilie(data, skip = false){ //skip: 跳過遍歷步驟
@@ -145,7 +144,7 @@ class md{
           //分割綫
           let doline = md.doline(data_trim);
           if(doline[1] > 0){
-            if(i - 1 < 0 && datas[i - 1].trim().length != 0){ //設置標題
+            if(i - 1 > -1 && datas[i - 1].trim().length != 0){ //設置標題
               output[output.length - 1] = md.title(output[output.length - 1], settitle);
               return '';
             }
@@ -160,8 +159,15 @@ class md{
               break;
             default: //普通文本
               //段落
-              if(table.table_list.length == 0 && dolist.list_list.length == 0 && quote.quote_list.length == 0){ //表格, 列表, 引用尚未封包時, 先禁用
-                outputtemp = md.paragraph(data);
+              if(table.table_list.length == 0 && dolist.list_list.length == 0){ //表格, 列表尚未封包時, 先禁用
+                switch (level){
+                  case 2:
+                    outputtemp = md.list(data);
+                    break;
+                  default:
+                    outputtemp = md.paragraph(data);
+                    break;
+                }
               }
               else{
                 outputtemp = data_trim;
@@ -177,7 +183,7 @@ class md{
           return '';
         }
 
-        if(table.table_list.length == 0 && dolist.list_list.length == 0 && quote.quote_list.length == 0){ //表格, 列表, 引用尚未封包時, 先禁用
+        if(table.table_list.length == 0 && dolist.list_list.length == 0){ //表格, 列表尚未封包時, 先禁用
           //内斂格式
           outputtemp = md.inlineformat(outputtemp);
           //處理圖像和超鏈接
@@ -293,18 +299,11 @@ class md{
     }
 
     //追加文檔尾
-    if(table.table_list.length > 0){
-      footer.push('</table>');
-    }
-    footer = footer.concat(dolist.list_list.join(''));
-    footer = footer.concat(quote.quote_list.join(''));
+    table.clear(footer);
+    dolist.clear(footer);
     if(footnote.footnote_list.length > 0){ //追加脚注
       footer.push('<ol class="footnotelist">' + footnote.footnote_list.join('') + '</ol>');
-      //output.push(footnotehtml);
     }
-    table.table_list = []
-    dolist.list_list = []
-    quote.quote_list = []
     footnote.footnote_list = []
     
     let header = ['<div class="header">']; //文檔頭
@@ -375,15 +374,39 @@ class md{
     // console.table(list_li_array);
     //二次解析主函數
     function parseDOM2(DOM_lists){
-      //大循環
-      for(let datas of DOM_lists){
-        //小循環
-        let output = [];
-        for(let i = 0 ; i < datas.length ; i++){
-          let data = datas[i].innerText.trim();
-          // console.log(data);
-          
+      //大循環 [[li,li,li],[p,p,p]]
+      for(let DOM_list of DOM_lists){
+        //小循環 [li,li,li]
+        let DOMtype = DOM_list[0].nodeName; //插入節點類型
+        let output = []; //暫存容器
+        let datas = []; //提取的文本
+        for(let t = 0 ; t < DOM_list.length ; t++){
+          datas.push(DOM_list[t].innerText);
+          if(t > 0){ //移除舊DOM, 僅保留第一個作爲插入點
+            DOM_list[t].remove();
+          }
         }
+        //解析在這裏
+        for(let i = 0 ; i < datas.length ; i++){ 
+          let data = datas[i].trim();
+          console.log(data);
+          let parse = parseDOM1(data,2,datas,i,output)
+          if(parse.index != null){
+            i = parse.index;
+          }
+          if(parse.type == 'continue'){ //妥協了, 外部函數不能直接操縱内循環
+            continue;
+          }
+          else if(parse.type == 'break'){
+            break;
+          }
+          output.push(parse.data);
+        }
+        //追加至尾部
+        table.clear(output);
+        dolist.clear(output);
+        //插入
+        DOM_list[0].replaceWith(...document.createRange().createContextualFragment(output.join('')).children);
       }
     }
     parseDOM2(list_li_array);
@@ -1088,7 +1111,7 @@ class md{
     
   };
 
-  //讀取引用
+  //讀取引用 (棄用)
   static quote = class{
     //屬性
     constructor() {
