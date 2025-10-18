@@ -14,7 +14,7 @@ class md{
     'nogougou':'"/Resources/UI/nogougou.svg"', //複選框: 空的
     'huaigougou':'"/Resources/UI/huaigougou.svg"', //複選框: x
   }
-  static ver = 'v0.0.9.1014';
+  static ver = 'v1.0.0.1018';
   static version = md.ver;
   static ESC = { //轉義字符
     '<':'&lt;',
@@ -35,28 +35,33 @@ class md{
     //創建實例
     let dolist = new md.dolist();
     let footnote = new md.footnote();
-    // let quote = new md.quote();
     let table = new md. dotable();
 
     //元數據
-    /*let title; //標題
-    let data; //寫作日期
-    let updata; //最後更新日期
-    let tag; //標簽
-    let guest = true; //是否公開*/
-    let meta = { 'title':'', //標題
-    'date':'', //寫作日期
-    'updata':'', //最後更新日期
-    'tag':[], //標簽
-    'guest':true, //是否公開
-    'titlelist':[], //標題列表
+    let meta = {
+      'title':'',     //標題
+      'date':'',      //寫作日期
+      'updata':'',    //最後更新日期
+      'tag':[],       //標簽
+      'guest':true,   //是否公開
+      'titlelist':[], //標題列表
     }
     
     //通用解析管綫
-    function parseDOM1(data,level,datas,i,output){
-    //data: 傳遞資訊 | level: 第幾次解析 | datas: 資訊所在的數組 | i: 資訊所在的數組的索引位置 | output: 最終輸出的容器
+    function parseDOM1(comm){
     //return {data,type,index}; //data: 返回資訊 | type: 返回狀態 | index: 返回新的索引位置
+      let data = comm.data;       //data: 傳遞資訊
+      let level = comm.level;     //level: 第幾次解析
+      let datas = comm.datas;     //datas: 資訊所在的數組
+      let i = comm.index;         //index: 資訊所在的數組的索引位置
+      let output = comm.output;   //output: 最終輸出的容器
+      let encap_type = comm.type; //type: 容器封裝默認類型
+      
       let data_trim = data.trim();
+      if(level == 3){
+        return {data:duilie(data,true)};
+      }
+      
       //數學公式
       if(data_trim.length == 2 && data_trim == '$$'){
         let lastindex = -1;
@@ -160,8 +165,8 @@ class md{
             default: //普通文本
               //段落
               if(table.table_list.length == 0 && dolist.list_list.length == 0){ //表格, 列表尚未封包時, 先禁用
-                switch (level){
-                  case 2:
+                switch (encap_type){
+                  case 'LI':
                     outputtemp = md.list(data);
                     break;
                   default:
@@ -285,7 +290,7 @@ class md{
         }
       }
 
-      let parse = parseDOM1(data,1,datas,i,output)
+      let parse = parseDOM1({data:data,level:1,datas:datas,index:i,output:output});
       if(parse.index != null){
         i = parse.index;
       }
@@ -301,10 +306,6 @@ class md{
     //追加文檔尾
     table.clear(footer);
     dolist.clear(footer);
-    if(footnote.footnote_list.length > 0){ //追加脚注
-      footer.push('<ol class="footnotelist">' + footnote.footnote_list.join('') + '</ol>');
-    }
-    footnote.footnote_list = []
     
     let header = ['<div class="header">']; //文檔頭
     if(meta['title'].length > 0){ //追加大標題
@@ -389,8 +390,8 @@ class md{
         //解析在這裏
         for(let i = 0 ; i < datas.length ; i++){ 
           let data = datas[i].trim();
-          console.log(data);
-          let parse = parseDOM1(data,2,datas,i,output)
+          // console.log(data);
+          let parse = parseDOM1({data:data,level:2,datas:datas,index:i,output:output,type:DOMtype});
           if(parse.index != null){
             i = parse.index;
           }
@@ -410,7 +411,16 @@ class md{
       }
     }
     parseDOM2(list_li_array);
-
+    //三次解析主函數 (表格)
+    for(let t of html.querySelectorAll('th, td')){
+      let data = t.innerText;
+      data = parseDOM1({data:data,level:3});
+      t.innerHTML = data.data;
+    }
+    
+    //最後加脚注
+    html.appendChild(footnote.clear());
+    
     //後處理: 交互
     //標題描點
     let titlelist = html.querySelectorAll('div.title');
@@ -780,6 +790,14 @@ class md{
     constructor(){
       this.footnote_list = [];
     }
+    //重置
+    clear(){
+      let dom = document.createElement('ol');
+      dom.classList.add('footnotelist');
+      dom.innerHTML = this.footnote_list.join('');
+      this.footnote_list = [];
+      return dom;
+    }
     //讀取
     read(data){
       let foot = [];
@@ -1050,7 +1068,8 @@ class md{
           break;
         }
         // if(t + this.list_type[ins] == 3){
-        if(t != this.list_type[ins] && !(t ** 2 < 2 && this.list_type[ins] ** 2 < 2) ){ //冪函數居然不是 ^, 用上 ! 來表否定
+        // if(t != this.list_type[ins] && !(t ** 2 < 2 && this.list_type[ins] ** 2 < 2) ){ //冪函數居然不是 ^, 用上 ! 來表否定
+        if(!(t == 0 || this.list_type[ins] == 0 || t == this.list_type[ins])){
           break;
         }
         ins++;
@@ -1290,3 +1309,4 @@ class md{
 //數學公式的解析
 //CSharp 和 JS 的解析
 //流程圖的解析
+//代碼塊的摺叠與展開
