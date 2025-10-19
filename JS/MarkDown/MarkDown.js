@@ -462,7 +462,8 @@ class md{
       let btn_readmore = t.querySelector('div.readmore');
       let btn_readmore_text = btn_readmore.querySelector('span')
       btn_readmore_text.addEventListener('click', () => {
-        if(code_block.style.maxHeight != max_code_length){ //收起動作
+        if(code_block.classList.contains('open') == true){ //收起動作
+          code_block.classList.remove('open');
           code_block.style.maxHeight = max_code_length;
           btn_readmore_text.innerText = '展開更多';
           //btn_copy.scrollIntoView({behavior: 'smooth'});
@@ -471,6 +472,7 @@ class md{
         }
         else{ //展開動作
           //code_block.style.maxHeight = 'none'; //這裏不設為 none 因爲不能使過度動畫生效;
+          code_block.classList.add('open');
           code_block.style.maxHeight = code_block.scrollHeight + 'px';
           btn_readmore_text.innerText = '收起';
         }

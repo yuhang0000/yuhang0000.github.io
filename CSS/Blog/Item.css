@@ -234,14 +234,20 @@ div.code_block div img{
 div.code_block div img:hover{
   background: #00000022;
 }
-code.block{
+div.code_block code.block{
   white-space: pre;
   height: auto;
   width: auto;
-  transition: max-height var(--speed);
+  transition: max-height var(--speed), margin var(--speed);
   padding: 8px 0px;
   margin: 4px 12px;
   overflow: auto;
+}
+div.code_block code.block.open{
+  margin-bottom: 28px;
+}
+div.code_block:has(.open) div.readmore{
+  padding-top: 0px;
 }
 div.code_block div.readmore{
   position: absolute;
