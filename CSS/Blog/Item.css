@@ -271,7 +271,8 @@ li:not(.footnotesub){
 }
 ul>*:not(.footnotesub):before{
   content: "●";
-  padding: 0px 8px 1px 0px;
+  min-width: calc(var(--tab_margin_left) - 2px);
+  padding: 0px 2px 1px 0px;
   font-size: 0.9rem;
 }
 ul>*.no_before:before{
@@ -286,11 +287,12 @@ ul>*:not(.footnotesub):not(.no_before):before{
 ol>*:not(.footnotesub):not(.no_before):before{
   color: #aaa;
   font-weight: normal;
-  padding: 0px 6px 0px 0px;
+  min-width: calc(var(--tab_margin_left) - 2px);
+  padding: 0px 2px 0px 0px;
   font-size: 0.9rem;
   content: counter(No) ".";
   counter-increment: No;
-  text-align: right;
+  text-align: left;
 }
 li{
   white-space: pre-wrap;

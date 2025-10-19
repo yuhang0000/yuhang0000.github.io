@@ -1109,7 +1109,12 @@ class md{
             this.list_list.unshift('</ol>');
             break;
           case 3: //引用
-            html.push('<div class="quote">');
+            if(t > 0 && type[t - 1] == 0){ //列表嵌套時, 應該要隱藏 :before
+              html.push('<div class="quote no_before">');
+            }
+            else{
+              html.push('<div class="quote">');
+            }
             this.list_list.unshift('</div>');
             break;
           default: //無序列表
