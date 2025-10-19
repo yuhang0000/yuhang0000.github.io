@@ -112,10 +112,11 @@ async function readblog(page = 1){
 					return null;
 				}
 			})
+			//讀取文檔在這裏
 			.then(data => {
 				if(data != null){
 				  if(url.trim().indexOf('.md') != -1){ //Markdown 文檔
-				    let markdown = md.read(data);
+				    let markdown = md.read({data:data});
 				    markdown.html.setAttribute('href', url.trim());
 				    markdown.html.classList.add('blog_item');
 				    blog_body.appendChild(markdown.html);
@@ -141,7 +142,9 @@ async function readblog(page = 1){
 	}
 	
 	//展開按鈕
-	readmorebtn();
+	// readmorebtn();
+	//后處理
+	md.postproc();
 
 	pagebar.classList.remove('disable');
 }

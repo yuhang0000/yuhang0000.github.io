@@ -14,7 +14,7 @@ class md{
     'nogougou':'"/Resources/UI/nogougou.svg"', //複選框: 空的
     'huaigougou':'"/Resources/UI/huaigougou.svg"', //複選框: x
   }
-  static ver = 'v1.0.0.1018';
+  static ver = 'v1.0.2.1020';
   static version = md.ver;
   static ESC = { //轉義字符
     '<':'&lt;',
@@ -26,11 +26,17 @@ class md{
   }
 
   //解析主循環
-  static read(datas){
+  //comm: data:傳遞資料 | max_code_length: 最大代碼塊摺叠長度
+  static read(comm){
+    //前置參數
     let starttime = new Date().valueOf(); //開始時間
     let output = []; //暫存輸出對象
     let footer = []; //追加 html 到末尾
-    datas = datas.trimEnd().split('\n');
+    let datas = comm.data.trimEnd().split('\n'); //待解析的文本
+    let max_code_length = '400px'; //最大代碼塊摺叠長度
+    if(comm.max_code_length != null){
+      max_code_length = comm.max_code_length;
+    }
 
     //創建實例
     let dolist = new md.dolist();
@@ -89,13 +95,13 @@ class md{
       else if(data_trim.length > 2 && md.charcom(data_trim, '\`\`\`') == true){
         let lastindex = -1;
         let lang = data_trim.substring(data_trim.lastIndexOf('\`') + 1).trim();
-        let codediv = ['<div class="code_block"><div><span>' + lang + '</span>' + md.uiicon('copy',['copy']) + '</div><code class="block" lang="' + lang + '">']
+        let codediv = ['<div class="code_block"><div class="header"><span>' + lang + '</span>' + md.uiicon('copy',['copy']) + '</div><div class="body"><code class="block" lang="' + lang + '">']
         for(let t = i + 1 ; t < datas.length ; t++){
           let tt = datas[t];
           let ttt = tt.trim();
           if(ttt.length == 3 && ttt == '\`\`\`'){ //收尾
             lastindex = t++;
-            codediv.push('</code></div>');
+            codediv.push('</code><div class="readmore disable"><span>展開更多</span></div></div></div>');
             break;
           }
           else{ //追加
@@ -432,11 +438,15 @@ class md{
       a.setAttribute('href', '#' + text);
       meta['titlelist'].push([level,text]); //追加標題列表
     }
-    //代碼塊的複製按鈕
+    //代碼塊 - 複製按鈕&展開按鈕&摺叠高度
     let code_block = html.querySelectorAll('div.code_block');
     for(let t of code_block){
-      let btn = t.querySelector('img.copy');
-      btn.addEventListener('click', () => {
+      //摺叠高度
+      let code_block = t.querySelector('code.block');
+      code_block.style.maxHeight = max_code_length;
+      //複製按鈕
+      let btn_copy = t.querySelector('img.copy');
+      btn_copy.addEventListener('click', () => {
         let code = t.querySelector('code');
         //code.select();
         //document.execCommand('copy');
@@ -448,6 +458,23 @@ class md{
           console.log(code.innerText);
         }
       });
+      //展開按鈕
+      let btn_readmore = t.querySelector('div.readmore');
+      let btn_readmore_text = btn_readmore.querySelector('span')
+      btn_readmore_text.addEventListener('click', () => {
+        if(code_block.style.maxHeight != max_code_length){ //收起動作
+          code_block.style.maxHeight = max_code_length;
+          btn_readmore_text.innerText = '展開更多';
+          //btn_copy.scrollIntoView({behavior: 'smooth'});
+          let style = getComputedStyle(t); //不能直接讀取 css 選擇器上的屬性的話, 就用這個
+          window.scrollTo({ top: window.scrollY + t.getBoundingClientRect().top - parseInt(style.marginTop) - parseInt(style.marginBottom)/2, behavior: 'smooth' });
+        }
+        else{ //展開動作
+          //code_block.style.maxHeight = 'none'; //這裏不設為 none 因爲不能使過度動畫生效;
+          code_block.style.maxHeight = code_block.scrollHeight + 'px';
+          btn_readmore_text.innerText = '收起';
+        }
+      });
     }
     
     //console.table(meta);
@@ -456,6 +483,20 @@ class md{
       console.log( '解析花費了: ' + ((endtime - starttime) / 1000 ) + ' 秒.');
     }
     return {html:html, meta:meta};
+  }
+
+  //在完成 Markdown 解析之後的后處理
+  static postproc(){
+    //代碼塊
+    let codes = document.querySelectorAll('div.code_block');
+    for(let t of codes){
+      let code_block = t.querySelector('code.block');
+      //是否顯示 "展開更多" btn
+      if(code_block.scrollHeight > code_block.offsetHeight){
+        let btn_readmore = t.querySelector('div.readmore');
+        btn_readmore.classList.remove('disable');
+      }
+    }
   }
   
   //標題
@@ -795,6 +836,9 @@ class md{
       let dom = document.createElement('ol');
       dom.classList.add('footnotelist');
       dom.innerHTML = this.footnote_list.join('');
+      if(this.footnote_list.length == 0){ //如果沒有脚注的話, 就把容器給隱藏了
+        dom.style.display = 'none';
+      }
       this.footnote_list = [];
       return dom;
     }
@@ -1309,9 +1353,11 @@ class md{
 
 }
 
+//嘗試兼容 web.archive.org, 因爲在該網站拍攝的快照, 其保存的每份js脚本均會二次封裝一層 if 函數, 導致 class 轉成局部變數.
+window.md = md;
+
 //TODO:
 //幫助主題
 //數學公式的解析
 //CSharp 和 JS 的解析
 //流程圖的解析
-//代碼塊的摺叠與展開

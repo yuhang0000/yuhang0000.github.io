@@ -27,14 +27,6 @@ a.link:hover{ /* 選擇器不用白不用 */
 	font-size: 0.75em;
 	text-align: center;
 }
-.readmore{
-	color:#8757ad;
-	padding:5px;
-	user-select:none;
-}
-.readmore:hover{
-	color: #47285e;
-}
 .picwithnote{
 	width: 320px;
 	display: flex;
@@ -53,6 +45,7 @@ a.link:hover{ /* 選擇器不用白不用 */
   --tab_margin_left: 20px; /* 制表符默認左邊距 */
   --header_padding: 12px; /* 文檔頭的邊距 */
   --R: 4px; /* 倒角 */
+  --speed: 0.5s; /* 動畫速度 */
 }
 /* 用來裝部落格的容器 */
 .blog_item{
@@ -68,7 +61,7 @@ a.link:hover{ /* 選擇器不用白不用 */
   padding: 16px var(--blog_item_paddingLR);
 	background: #f6f6f6;
 	margin-bottom: 8px;
-	transition: border 0.5s, background 0.5s;
+	transition: border var(--speed), background var(--speed);
 	container-type: inline-size;
 	color: #333;
 }
@@ -205,10 +198,12 @@ div.code_block{
   display: inline-flex;
   flex-direction: column;
   width: fit-content;
+  max-width: 100%;
   border-radius: var(--R);
   background: #eee;
+  margin: 4px 0px;
 }
-div.code_block div{
+div.code_block div.header{
   font-size: 0.8em;
   display: flex;
   flex-direction: row;
@@ -217,6 +212,11 @@ div.code_block div{
   background: #ddd;
   border-bottom: 1px solid #ccc;
   border-radius: var(--R) var(--R) 0px 0px;
+}
+div.code_block div.body{
+  display: flex;
+  flex-direction: column-reverse;
+  position: relative;
 }
 div.code_block div span{
   flex: 1;
@@ -229,17 +229,41 @@ div.code_block div img{
   padding: 4px;
   border-radius: calc(var(--R) / 2);
   background: #00000000;
-  transition: background 0.5s;
+  transition: background var(--speed);
 }
 div.code_block div img:hover{
   background: #00000022;
 }
 code.block{
-  white-space: pre-wrap;
+  white-space: pre;
   height: auto;
-  width: fit-content;
-  padding: 8px 12px;
-  margin: 4px 0px;
+  width: auto;
+  transition: max-height var(--speed);
+  padding: 8px 0px;
+  margin: 4px 12px;
+  overflow: auto;
+}
+div.code_block div.readmore{
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  background: linear-gradient(0deg, #eeeeeeee 50%, #eeeeee00);
+  padding-top: 16px;
+  padding-bottom: 8px;
+  font-size: 0.9em;
+  border-radius: 0px 0px var(--R) var(--R);
+}
+div.code_block div.readmore.disable{
+  display: none;
+}
+div.code_block div.readmore span{
+	color:#8757ad;
+	padding:5px;
+	user-select:none;
+	transition: color var(--speed);
+}
+div.code_block div.readmore span:hover{
+	color: #47285e;
 }
 /* 數學公式 */
 .math{
