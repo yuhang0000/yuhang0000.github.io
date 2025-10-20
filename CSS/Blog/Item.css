@@ -218,11 +218,11 @@ div.code_block div.body{
   flex-direction: column-reverse;
   position: relative;
 }
-div.code_block div span{
+div.code_block div.header span{
   flex: 1;
   padding: 2px 8px;
 }
-div.code_block div img{
+div.code_block div.header img{
   opacity: 0.7;
   width: 1.2em;
   height: 1.2em;
@@ -231,7 +231,7 @@ div.code_block div img{
   background: #00000000;
   transition: background var(--speed);
 }
-div.code_block div img:hover{
+div.code_block div.header img:hover{
   background: #00000022;
 }
 div.code_block code.block{
@@ -249,6 +249,14 @@ div.code_block code.block.open{
 div.code_block:has(.open) div.readmore{
   padding-top: 0px;
 }
+div.code_block:has(.open) div.readmore span:before{
+  transform: translateY(0rem);
+  opacity: 1;
+}
+div.code_block:has(.open) div.readmore span:after{
+  transform: translateY(0rem);
+  opacity: 0;
+}
 div.code_block div.readmore{
   position: absolute;
   width: 100%;
@@ -258,18 +266,47 @@ div.code_block div.readmore{
   padding-bottom: 8px;
   font-size: 0.9em;
   border-radius: 0px 0px var(--R) var(--R);
+  transition: padding var(--speed);
 }
 div.code_block div.readmore.disable{
   display: none;
 }
 div.code_block div.readmore span{
-	color:#8757ad;
-	padding:5px;
-	user-select:none;
-	transition: color var(--speed);
+	color: #00000000;
+	padding: 5px;
+	user-select: none;
+	opacity: 0.6;
+	transition: opacity var(--speed);
+  display: inline-flex;
+  flex-direction: column;
+  height: 1rem;
+  overflow: hidden;
+  font-size: 0px;
+}
+div.code_block div.readmore span:after{
+	content: "展開更多";
+  background-position: 64px -20px;
+  margin-top: 5px;
+  opacity: 1;
+}
+div.code_block div.readmore span:before{
+	content: "收起";
+  background-position: 49px 2.5px;
+  opacity: 0;
+}
+div.code_block div.readmore span:before, div.code_block div.readmore span:after{
+  color: #777;
+  background-image: url(/Resources/UI/Readmore.svg);
+  background-repeat: no-repeat;
+  background-size: 0.9em;
+  padding-right: 2em;
+  height: 1em;
+  font-size: 0.9rem;
+  transform: translateY( calc(-1rem - 5px) );
+  transition: transform var(--speed), opacity var(--speed);
 }
 div.code_block div.readmore span:hover{
-	color: #47285e;
+	opacity: 1;
 }
 /* 數學公式 */
 .math{
