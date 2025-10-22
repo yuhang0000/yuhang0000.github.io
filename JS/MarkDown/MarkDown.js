@@ -955,7 +955,7 @@ class md{
       text: 'color: #0f5290;',
       title: 'color: #0f5290; font-weight: bold;',
       code_header: 'font-size: 0.8em; padding: 4px; background: #ddd; border-bottom: 1px solid #ccc; border-radius: 4px 4px 0px 0px;',
-      code_body: 
+      code_body: '',
     }
     
     function lite(){
