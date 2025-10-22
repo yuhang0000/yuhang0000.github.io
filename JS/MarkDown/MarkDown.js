@@ -918,7 +918,7 @@ class md{
   }
 
   //HELP!!!
-  static help(){
+  static help_old(key){
     let help = [];
     help.push('%c適用於 Web 環境的 Markdown 解析器 ' + md.ver);
     help.push('By: yuhang0000');
@@ -946,6 +946,47 @@ class md{
     help.push('doesc(data): 用於轉移字符串 | data: 傳遞資料');
     help.push('help(): 列印此幫助');
     console.log(help.join('\n'),'color: #0f5290');
+  }
+
+  //HELP!!!
+  static help(key){
+    //存放文本樣式
+    let style = {
+      text: 'color: #0f5290;',
+      title: 'color: #0f5290; font-weight: bold;',
+      code_header: 'font-size: 0.8em; padding: 4px; background: #ddd; border-bottom: 1px solid #ccc; border-radius: 4px 4px 0px 0px;',
+      code_body: 
+    }
+    
+    function lite(){
+      console.log('%c適用於 Web 環境的 Markdown 解析器 ' + md.ver + '\n' +
+`By: yuhang0000
+
+%c快速上手:
+%cmd.read({` + "data:'Text'" + `});
+
+%c説明:
+%c傳遞 Markdown 資訊, 並轉化爲可讀的 HTML 文檔.
+
+%c使用案例:
+%cjs
+%clet text = '**Hello World!!!**';
+let result = md.read(data:text);
+let HTML = result.html;
+document.body.appendChild(a);
+md.postproc();`
+      ,style.text,style.title,style.text,style.title,style.text,style.title,style.text);
+    }
+
+    //調用  
+    if(key == null){ //默認文檔
+      lite();
+      return '';
+    }
+    else{ //詳細文檔
+      
+    }
+    
   }
 
   //給列表計算偏移值的

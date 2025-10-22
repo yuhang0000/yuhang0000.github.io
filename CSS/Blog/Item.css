@@ -285,13 +285,13 @@ div.code_block div.readmore span{
 }
 div.code_block div.readmore span:after{
 	content: "展開更多";
-  background-position: 64px -20px;
+  background-position: 64px -19.5px;
   margin-top: 5px;
   opacity: 1;
 }
 div.code_block div.readmore span:before{
 	content: "收起";
-  background-position: 49px 2.5px;
+  background-position: 49px 3px;
   opacity: 0;
 }
 div.code_block div.readmore span:before, div.code_block div.readmore span:after{
