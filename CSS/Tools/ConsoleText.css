@@ -1,0 +1,63 @@
+/* 公共屬性 */
+:root{
+  
+}
+/* 標題 */
+h1{
+  color: #444;
+  margin: 0px;
+  font-size: 1.6em;
+  font-family: Comfortaa;
+  font-weight: bold;
+}
+h2{
+  color: #555;
+  margin: 0px;
+  font-size: 1.2em;
+  font-family: Comfortaa;
+}
+/* 主容器 */
+.editor_body{
+  padding: 8px 16px;
+  background: #eee;
+}
+/* 編輯區域 */
+.editor{
+  padding: 8px 0px;
+  border-bottom: 1px solid #aaa;
+}
+/* 編輯區域 - 文本樣式 */
+.text{
+  padding-top: 8px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.text>*{
+  
+}
+.text span{
+  color: #333;
+}
+div.color{
+  display: flex;
+  align-items: center;
+}
+div.color_select{
+  display: inline-block;
+  width: 32px;
+  height: 32px;
+  overflow: hidden;
+}
+input[type="color"]{
+  padding: 0;
+  margin: 0;
+  border: 0;
+  padding-block: 0;
+  padding-inline: 0;
+  transform: scale(1.5);
+  block-size: 32px;
+  inline-size: 32px;
+  cursor: pointer;
+  appearance: none;
+}
