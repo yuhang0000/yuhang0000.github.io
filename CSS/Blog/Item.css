@@ -296,7 +296,7 @@ div.code_block div.readmore span:before{
 }
 div.code_block div.readmore span:before, div.code_block div.readmore span:after{
   color: #777;
-  background-image: url(/Resources/UI/Readmore.svg);
+  background-image: url(/Resources/UI/Blog/Readmore.svg);
   background-repeat: no-repeat;
   background-size: 0.9em;
   padding-right: 2em;

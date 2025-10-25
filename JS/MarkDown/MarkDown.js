@@ -3,16 +3,16 @@ class md{
 
   //公共變數
   static imglist = { //圖像合集
-    '404':'"/Resources/UI/404.png"', //缺省的圖像連接
-    'link':'"/Resources/UI/Link2.svg"', //連接
-    'copy':'"/Resources/UI/Copy.svg"', //複製
-    'date':'"/Resources/UI/Date2.svg"', //日期
-    'updata':'"/Resources/UI/Updata2.svg"', //更新
-    'tag':'"/Resources/UI/Tag.svg"', //標簽
-    'uoguog':'"/Resources/UI/uoguog.svg"', //複選框: -
-    'gougou':'"/Resources/UI/gougou.svg"', //複選框: v
-    'nogougou':'"/Resources/UI/nogougou.svg"', //複選框: 空的
-    'huaigougou':'"/Resources/UI/huaigougou.svg"', //複選框: x
+    '404':'"/Resources/UI/Blog/404.png"', //缺省的圖像連接
+    'link':'"/Resources/UI/Blog/Link2.svg"', //連接
+    'copy':'"/Resources/UI/Blog/Copy.svg"', //複製
+    'date':'"/Resources/UI/Blog/Date2.svg"', //日期
+    'updata':'"/Resources/UI/Blog/Updata2.svg"', //更新
+    'tag':'"/Resources/UI/Blog/Tag.svg"', //標簽
+    'uoguog':'"/Resources/UI/Blog/uoguog.svg"', //複選框: -
+    'gougou':'"/Resources/UI/Blog/gougou.svg"', //複選框: v
+    'nogougou':'"/Resources/UI/Blog/nogougou.svg"', //複選框: 空的
+    'huaigougou':'"/Resources/UI/Blog/huaigougou.svg"', //複選框: x
   }
   static ver = 'v1.0.2.1020';
   static version = md.ver;
