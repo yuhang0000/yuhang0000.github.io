@@ -1,10 +1,51 @@
 /* 公共屬性 */
 :root{
-  
+  --speed: 0.2s;
+  --border: 2px;
+  --padding: 16px;
+  --gray0: #fff;
+  --gray1: #eee;
+  --gray2: #ddd;
+  --gray3: #ccc;
+  --gray4: #bbb;
+  --gray5: #aaa;
+  --gray6: #999;
+  --gray7: #888;
+  --gray8: #777;
+  --gray9: #666;
+  --graya: #555;
+  --grayb: #444;
+  --grayc: #333;
+  --grayd: #222;
+  --graye: #111;
+  --grayf: #000;
+  --btn-size: 32px;
+  --btn-background: var(--gray3);
+  --btn-background-hover: var(--gray4);
+  --btn-background-active: var(--gray5);
+  --btn-border: var(--border) solid var(--btn-border-color);
+  --btn-border-color: var(--gray5);
+  --btn-border-color-hover: var(--gray7);
+  --btn-border-color-active: var(--gray9);
+  --btn-radius: 6px;
+  --text-input-color: var(--gray9);
+  --text-input-color-hover: var(--graya);
+  --text-input-background: var(--gray0);
+  --text-input-background-hover: var(--gray1);
+}
+body{
+  margin: 0px;
+}
+input{
+  appearance: none;
+}
+img{
+  user-select: none;
+  -webkit-user-drag: none;
 }
 /* 標題 */
 h1{
-  color: #444;
+  color: var(--gray9);
   margin: 0px;
   font-size: 1.6em;
   font-family: Comfortaa;
@@ -18,46 +59,220 @@ h2{
 }
 /* 主容器 */
 .editor_body{
-  padding: 8px 16px;
-  background: #eee;
-}
-/* 編輯區域 */
-.editor{
-  padding: 8px 0px;
-  border-bottom: 1px solid #aaa;
-}
-/* 編輯區域 - 文本樣式 */
-.text{
-  padding-top: 8px;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-}
-.text>*{
   
 }
-.text span{
-  color: #333;
+/* 標題欄 */
+.titlebar{
+  display: block;
+  padding: var(--padding);
+  background: var(--gray3);
 }
-div.color{
+/* 工具欄 */
+.toolbar{
+  display: flex;
+  padding: var(--padding);
+  background: var(--gray2);
+  flex-direction: row;
+}
+.toolbar .btn{
+  display: block;
+  width: var(--btn-size);
+  height: var(--btn-size);
+  margin-left: var(--padding);
+}
+/* 字體選擇 */
+.toolbar .select *{
+  transition: border-color var(--speed), background var(--speed), color var(--speed);
+}
+.toolbar .select:not(:active):hover span{
+  border-color: var(--btn-border-color-hover);
+  color: var(--text-input-color-hover);
+  background: var(--text-input-background-hover);
+}
+.toolbar .select:not(:active):hover .fold{
+  border-color: var(--btn-border-color-hover);
+  background: var(--btn-background-hover);
+}
+.toolbar .select:active span{
+  border-color: var(--btn-border-color-active);
+  color: var(--text-input-color-hover);
+  background: var(--text-input-background-hover);
+}
+.toolbar .select:active .fold{
+  border-color: var(--btn-border-color-active);
+  background: var(--btn-background-active);
+}
+.toolbar .select{
+  display: inline-flex;
+  height: var(--btn-size);
+}
+.toolbar .select span{
+  width: 128px;
+  height: 100%;
+  box-sizing: border-box;
+  background: var(--text-input-background);
   display: flex;
   align-items: center;
+  padding-left: 8px;
+  color: var(--text-input-color);
+  font-family: Comfortaa;
+  border: var(--btn-border);
+  border-right-width: 0px;
+  border-radius: var(--btn-radius) 0px 0px  var(--btn-radius);
 }
-div.color_select{
-  display: inline-block;
-  width: 32px;
-  height: 32px;
-  overflow: hidden;
+.toolbar .select .fold{
+  width: var(--btn-size);
+  height: 100%;
+  box-sizing: border-box;
+  background: var(--gray3);
+  border: var(--btn-border);
+  border-radius: 0px var(--btn-radius) var(--btn-radius) 0px;
 }
-input[type="color"]{
-  padding: 0;
-  margin: 0;
-  border: 0;
-  padding-block: 0;
-  padding-inline: 0;
-  transform: scale(1.5);
-  block-size: 32px;
-  inline-size: 32px;
-  cursor: pointer;
-  appearance: none;
+.toolbar .select .fold img{
+  width: 100%;
+  height: 100%;
 }
+/* 字體大小 */
+.toolbar .number{
+  display: inline-flex;
+  margin-left: var(--padding);
+}
+.toolbar .number *{
+  transition: border-color var(--speed), background var(--speed), color var(--speed);
+}
+.toolbar .number input{
+  height: 100%;
+  width: var(--btn-size);
+  box-sizing: border-box;
+  background: var(--text-input-background);
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: var(--text-input-color);
+  font-family: Comfortaa;
+  border: var(--btn-border);
+  border-right-width: 0px;
+  border-radius: var(--btn-radius) 0px 0px  var(--btn-radius);
+}
+.toolbar .number input:focus{
+  outline: 0;
+  border-color: var(--btn-border-color-active);
+}
+.toolbar .number:has(input:focus) .lines .line, /* 這裏用通配符沒效果 */
+.toolbar .number:has(input:focus) .lines .up.down{
+  border-color: var(--btn-border-color-active);
+  background: var(--btn-border-color-active);
+}
+.toolbar .number input:hover{
+  background: var(--text-input-background-hover);
+  color: var(--text-input-color-hover);
+}
+.toolbar .number input:not(:focus):hover{
+  border-color: var(--btn-border-color-hover);
+}
+.toolbar .number:has(input:not(:focus):hover) .lines *{
+  border-color: var(--btn-border-color-hover);
+  background: var(--btn-border-color-hover);
+}
+.toolbar .number .lines{
+  display: flex;
+  flex-direction: column;
+}
+.toolbar .number .lines .line:not(.center){
+  flex: 1;
+  height: 100%;
+  border: var(--btn-border);
+  box-sizing: border-box;
+  border-left-width: 0px;
+}
+.toolbar .number .lines .center{
+  width: var(--border);
+  height: var(--border);
+  background: var(--btn-border-color);
+}
+.toolbar .number .up_down{
+  width: calc( var(--btn-size) - var(--border) );
+  height: var(--btn-size);
+  display: flex;
+  flex-direction: column;
+}
+.toolbar .number .up_down img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.toolbar .number .up_down .up{
+  flex: 1;
+  width: 100%;
+  height: auto;
+  box-sizing: border-box;
+  background: var(--gray3);
+  border: var(--btn-border);
+  border-radius: 0px var(--btn-radius) 0px 0px;
+  border-bottom-width: 0px;
+  border-left-width: 0px;
+  contain: size;
+}
+.toolbar .number .up_down .line{
+  width: 100%;
+  border: var(--btn-border);
+  box-sizing: border-box;
+  border-bottom-width: 0px;
+}
+.toolbar .number .up_down .down{
+  flex: 1;
+  width: 100%;
+  height: auto;
+  box-sizing: border-box;
+  background: var(--gray3);
+  border: var(--btn-border);
+  border-radius: 0px 0px var(--btn-radius) 0px;
+  border-top-width: 0px;
+  border-left-width: 0px;
+  contain: size;
+}
+
+.toolbar .number .up_down .up:not(:active):hover{
+  background: var(--gray4);
+  border-color: var(--btn-border-color-hover);
+}
+.toolbar .number:not(:has(input:focus)):has(.up_down .up:not(:active):hover) .lines .up{
+  border-color: var(--btn-border-color-hover);
+}
+.toolbar .number .up_down .down:not(:active):hover{
+  background: var(--gray4);
+  border-color: var(--btn-border-color-hover);
+}
+.toolbar .number:not(:has(input:focus)):has(.up_down .down:not(:active):hover) .lines .down{
+  border-color: var(--btn-border-color-hover);
+}
+.toolbar .number:not(:has(input:focus)):not(:has(.up_down .up:active, .up_down .down:active)):has(.up_down .up:hover, .up_down .down:hover) .lines .center{
+  background: var(--btn-border-color-hover);
+}
+/* .toolbar .number .up_down:has(.up:not(:active):hover, .down:not(:active):hover) .line{ */
+/* 在 .up_down 裏面, 不能同時包括 .up 和 .down 這兩個人的點擊事件, 并且兩者之一處於 :hover 事件 (我的天好繞) */
+.toolbar .number .up_down:not(:has(.up:active, .down:active)):has(.up:hover, .down:hover) .line {
+  border-color: var(--btn-border-color-hover);
+}
+
+.toolbar .number .up_down .up:active{
+  background: var(--gray5);
+  border-color: var(--btn-border-color-active);
+}
+.toolbar .number:has(.up_down .up:active) .lines .up{
+  border-color: var(--btn-border-color-active);
+}
+.toolbar .number .up_down .down:active{
+  background: var(--gray5);
+  border-color: var(--btn-border-color-active);
+}
+.toolbar .number:has(.up_down .down:active) .lines .down{
+  border-color: var(--btn-border-color-active);
+}
+.toolbar .number:has(.up_down .up:active, .up_down .down:active) .lines .center{
+  background: var(--btn-border-color-active);
+}
+.toolbar .number .up_down:has(.up:active, .down:active) .line{
+  border-color: var(--btn-border-color-active);
+}
+
