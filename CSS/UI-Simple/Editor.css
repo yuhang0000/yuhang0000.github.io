@@ -47,6 +47,15 @@
   --text-input-border-color: var(--gray4);
   --text-input-border-color-hover: var(--gray6);
   --text-input-border-color-active: var(--gray8);
+  /* 摺叠控件 */
+  --accordion-background: var(--gray1);
+  --accordion-background-hover: var(--gray2);
+  --accordion-background-active: var(--gray3);
+  --accordion-btn-icon-background-hover: var(--gray2);
+  --accordion-btn-icon-background-active: var(--gray3);
+  --accordion-btn-icon-border-color-hover: var(--gray4);
+  --accordion-btn-icon-border-color-active: var(--gray5);
+
 }
 input{
   appearance: none;
@@ -319,18 +328,29 @@ h3{
   width: 100%;
   height: 100%;
 }
-/* 項目欄, 就是那個點擊標題就可以摺叠的組件 */
+/* 摺叠控件, 就是那個點擊標題就可以摺叠的組件 */
 .accordion{
-  padding: var(--padding);
   display: inline-flex;
   flex-direction: column;
+  border-radius: var(--btn-radius);
+  background: var(--accordion-background);
 }
-.accordion .title{
-    display: flex;
-    flex-direction: row;
-    align-items: center;
+.accordion>.title{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: calc(var(--padding) / 2);
+  border-radius: var(--btn-radius);
+  background: var(--accordion-background);
+  transition: background var(--speed);
 }
-.accordion .title span{
+.accordion>.title:has(span:hover){
+  background: var(--accordion-background-hover);
+}
+.accordion>.title:has(span:active){
+  background: var(--accordion-background-active);
+}
+.accordion>.title span{
   letter-spacing: 6px;
   height: 16px;
   user-select: none;
@@ -339,6 +359,22 @@ h3{
   font-family: Comfortaa;
   font-weight: bold;
 }
-.accordion .title *:last-child{
+.accordion>.title *:last-child{
   margin-left: auto;
+}
+.accordion>.title .icon_btn:not(:active):hover{
+  background: var(--accordion-btn-icon-background-hover);
+  border-color: var(--accordion-btn-icon-border-color-active);
+}
+.accordion>.title .icon_btn.checked{
+  background: var(--accordion-btn-icon-background-hover);
+}
+.accordion>.title .icon_btn:active{
+  background: var(--accordion-btn-icon-background-active);
+  border-color: var(--accordion-btn-icon-border-color-active);
+}
+.accordion>.content{
+  padding: calc(var(--padding) / 2);
+  display: inline-flex;
+  flex-direction: column;
 }

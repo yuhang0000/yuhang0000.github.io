@@ -50,45 +50,27 @@ h2{
   padding: calc( var(--padding) / 2 );
   box-sizing: border-box;
 }
+
 /* 側邊欄 - 項目 */
 .sidebar .accordion{
-  padding: calc( var(--padding) / 2 );
+  margin: 0;
 }
 /* 側邊欄 - 項目 - 標題 */
-.sidebar .accordion .title{
-  
-}
-.sidebar .accordion .title span{
-  
-}
-.sidebar .accordion .title .icon_btn{
-  
-}
+
 /* 側邊欄 - 項目 - 圖標按鈕 */
-.sidebar .icon_btn:not(:active):hover{
-  background: var(--gray2);
-  border-color: var(--gray4);
-}
-.sidebar .icon_btn.checked{
-  background: var(--gray2);
-}
-.sidebar .icon_btn:active{
-  background: var(--gray3);
-  border-color: var(--gray5);
-}
-/* 側邊欄 - 項目 - 内容 */
-.sidebar .accordion .content{
+
+/* 側邊欄 - 項目 - 行 */
+.sidebar .accordion .item{
   display: inline-flex;
+}
+.sidebar .accordion .item:not(:first-child){
   padding-top: var(--padding);
 }
-/* 側邊欄 - 項目 - 内容 - 項目 */
-.sidebar .accordion .item{
+/* 側邊欄 - 項目 - 行 - 列 */
+.sidebar .accordion .column{
   display: inline-flex;
   height: var(--btn-size);
 }
-.sidebar .accordion .item:not(:first-child){
+.sidebar .accordion .column:not(:first-child){
   padding-left: calc( var(--padding) * 2 );
-}
-.sidebar .accordion .item>*:not(:first-child){
-  padding-left: var(--padding);
 }
