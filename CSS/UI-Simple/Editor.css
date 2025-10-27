@@ -1,0 +1,344 @@
+/* 公共屬性 */
+:root{
+  --speed: 0.2s;
+  --border: 2px;
+  --padding: 16px;
+  --gray0: #fff;
+  --gray1: #eee;
+  --gray2: #ddd;
+  --gray3: #ccc;
+  --gray4: #bbb;
+  --gray5: #aaa;
+  --gray6: #999;
+  --gray7: #888;
+  --gray8: #777;
+  --gray9: #666;
+  --graya: #555;
+  --grayb: #444;
+  --grayc: #333;
+  --grayd: #222;
+  --graye: #111;
+  --grayf: #000;
+  --none-color: #00000000;
+  --btn-size: 32px;
+  /* 表單 */
+  --btn-input-background: var(--gray3);
+  --btn-input-background-hover: var(--gray5);
+  --btn-input-background-active: var(--gray7);
+  --btn-input-border: var(--border) solid var(--btn-input-border-color);
+  --btn-input-border-color: var(--gray5);
+  --btn-input-border-color-hover: var(--gray7);
+  --btn-input-border-color-active: var(--gray9);
+  /* 圖標按鈕 */
+  --btn-icon-background: var(--none-color);
+  --btn-icon-background-hover: var(--gray4);
+  --btn-icon-background-active: var(--gray5);
+  --btn-icon-border: var(--border) solid var(--btn-icon-border-color);
+  --btn-icon-border-color: var(--none-color);
+  --btn-icon-border-color-hover: var(--gray6);
+  --btn-icon-border-color-active: var(--gray7);
+  --btn-radius: 6px;
+  /* 文本框 */
+  --text-input-color: var(--gray9);
+  --text-input-color-hover: var(--graya);
+  --text-input-background: var(--gray0);
+  --text-input-background-hover: var(--gray1);
+  --text-input-border: var(--border) solid var(--text-input-border-color);
+  --text-input-border-color: var(--gray4);
+  --text-input-border-color-hover: var(--gray6);
+  --text-input-border-color-active: var(--gray8);
+}
+input{
+  appearance: none;
+  padding: 0;
+}
+img{
+  user-select: none;
+  -webkit-user-drag: none;
+}
+/* 標準字體 */
+.input input, .input span{
+  font-size: 1em;
+  font-family: Comfortaa;
+}
+::selection{
+  color: var(--gray2);
+  background: var(--gray6);
+}
+/* 標題 */
+h1{
+  color: var(--grayb);
+  margin: 0px;
+  font-size: 1.6em;
+  font-family: Comfortaa;
+  font-weight: bold;
+}
+h2{
+  color: var(--gray9);
+  margin: 0px;
+  font-size: 1.2em;
+  font-family: Comfortaa;
+}
+h3{
+  color: var(--gray7);
+  margin: 0px;
+  font-size: 1.1em;
+  font-family: Comfortaa;
+}
+/* 表單空間 */
+.input{
+  display: inline-flex;
+  height: var(--btn-size);
+}
+.input, .input *{
+  transition: border-color var(--speed), background var(--speed), color var(--speed);
+}
+
+/* 下拉框 */
+.input.select:not(:active):hover span{
+  border-color: var(--btn-input-border-color-hover);
+  color: var(--text-input-color-hover);
+  background: var(--text-input-background-hover);
+}
+.input.select:not(:active):hover .fold{
+  border-color: var(--btn-input-border-color-hover);
+  background: var(--btn-input-background-hover);
+}
+.input.select:active span{
+  border-color: var(--btn-input-border-color-active);
+  color: var(--text-input-color-hover);
+  background: var(--text-input-background-hover);
+}
+.input.select:active .fold{
+  border-color: var(--btn-input-border-color-active);
+  background: var(--btn-input-background-active);
+}
+.input.select{
+  
+}
+.input.select span{
+  width: 128px;
+  height: 100%;
+  box-sizing: border-box;
+  background: var(--text-input-background);
+  display: flex;
+  align-items: center;
+  padding-left: 8px;
+  color: var(--text-input-color);
+  border: var(--text-input-border);
+  border-right-width: 0px;
+  border-radius: var(--btn-radius) 0px 0px  var(--btn-radius);
+}
+.input.select .fold{
+  width: var(--btn-size);
+  height: 100%;
+  box-sizing: border-box;
+  background: var(--gray3);
+  border: var(--btn-input-border);
+  border-radius: 0px var(--btn-radius) var(--btn-radius) 0px;
+}
+.input.select .fold img{
+  width: 100%;
+  height: 100%;
+}
+
+/* 字體大小 */
+.input.number{
+  
+}
+.input.number input{
+  height: var(--btn-size);
+  width: var(--btn-size);
+  box-sizing: border-box;
+  background: var(--text-input-background);
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: var(--text-input-color);
+  border: var(--text-input-border);
+  border-right-width: 0px;
+  border-radius: var(--btn-radius) 0px 0px  var(--btn-radius);
+}
+.input.number input:focus{ /* 文本框選中 */
+  outline: 0;
+  border-color: var(--text-input-border-color-active);
+}
+.input.number:has(input:focus) .lines .line,
+.input.number:has(input:focus) .lines .up.down{
+  border-color: var(--text-input-border-color-active);
+  background: var(--text-input-border-color-active);
+}
+.input.number input:hover{ /* 文本框徘徊 */
+  background: var(--text-input-background-hover);
+  color: var(--text-input-color-hover);
+}
+.input.number input:not(:focus):hover{
+  border-color: var(--text-input-border-color-hover);
+}
+.input.number:has(input:not(:focus):hover) .lines *{
+  border-color: var(--text-input-border-color-hover);
+  background: var(--text-input-border-color-hover);
+}
+.input.number .lines{
+  height: var(--btn-size);
+  display: flex;
+  flex-direction: column;
+}
+.input.number .lines .line:not(.center){
+  flex: 1;
+  height: 100%;
+  border: var(--btn-input-border);
+  box-sizing: border-box;
+  border-left-width: 0px;
+}
+.input.number .lines .center{
+  aspect-ratio: 1 / 1; /* 等比例縮放就行了, flex 佈局會自動填充尺寸的 */
+  background: var(--btn-input-border-color);
+}
+.input.number .up_down{
+  width: calc( var(--btn-size) - var(--border) );
+  height: var(--btn-size);
+  display: flex;
+  flex-direction: column;
+}
+.input.number .up_down img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.input.number .up_down .up{
+  flex: 1;
+  width: 100%;
+  height: auto;
+  box-sizing: border-box;
+  background: var(--gray3);
+  border: var(--btn-input-border);
+  border-radius: 0px var(--btn-radius) 0px 0px;
+  border-bottom-width: 0px;
+  border-left-width: 0px;
+  contain: size;
+}
+.input.number .up_down .line{
+  width: 100%;
+  border: var(--btn-input-border);
+  box-sizing: border-box;
+  border-bottom-width: 0px;
+}
+.input.number .up_down .down{
+  flex: 1;
+  width: 100%;
+  height: auto;
+  box-sizing: border-box;
+  background: var(--gray3);
+  border: var(--btn-input-border);
+  border-radius: 0px 0px var(--btn-radius) 0px;
+  border-top-width: 0px;
+  border-left-width: 0px;
+  contain: size;
+}
+
+.input.number .up_down .up:not(:active):hover{
+  background: var(--btn-input-background-hover);
+  border-color: var(--btn-input-border-color-hover);
+}
+.input.number:not(:has(input:focus)):has(.up_down .up:not(:active):hover) .lines .up{
+  border-color: var(--btn-input-border-color-hover);
+}
+.input.number .up_down .down:not(:active):hover{
+  background: var(--btn-input-background-hover);
+  border-color: var(--btn-input-border-color-hover);
+}
+.input.number:not(:has(input:focus)):has(.up_down .down:not(:active):hover) .lines .down{
+  border-color: var(--btn-input-border-color-hover);
+}
+.input.number:not(:has(input:focus)):not(:has(.up_down .up:active, .up_down .down:active)):has(.up_down .up:hover, .up_down .down:hover) .lines .center{
+  background: var(--btn-input-border-color-hover);
+}
+/* .toolbar .number .up_down:has(.up:not(:active):hover, .down:not(:active):hover) .line{ */
+/* 在 .up_down 裏面, 不能同時包括 .up 和 .down 這兩個人的點擊事件, 并且兩者之一處於 :hover 事件 (我的天好繞) */
+.input.number .up_down:not(:has(.up:active, .down:active)):has(.up:hover, .down:hover) .line {
+  border-color: var(--btn-input-border-color-hover);
+}
+
+.input.number .up_down .up:active{
+  background: var(--btn-input-background-active);
+  border-color: var(--btn-input-border-color-active);
+}
+.input.number:has(.up_down .up:active) .lines .up{
+  border-color: var(--btn-input-border-color-active);
+}
+.input.number .up_down .down:active{
+  background: var(--btn-input-background-active);
+  border-color: var(--btn-input-border-color-active);
+}
+.input.number:has(.up_down .down:active) .lines .down{
+  border-color: var(--btn-input-border-color-active);
+}
+.input.number:has(.up_down .up:active, .up_down .down:active) .lines .center{
+  background: var(--btn-input-border-color-active);
+}
+.input.number .up_down:has(.up:active, .down:active) .line{
+  border-color: var(--btn-input-border-color-active);
+}
+/* 圖標 */
+.icon{
+  width: var(--btn-size);
+  height: var(--btn-size);
+}
+.icon img{
+  width: 100%;
+  height: 100%;
+}
+/* 圖標按鈕組 */
+.icon_btn_group{
+  display: flex;
+  flex-direction: row;
+}
+/* 圖標按鈕 */
+.icon_btn{
+  width: var(--btn-size);
+  height: var(--btn-size);
+  background: var(--btn-icon-background);
+  border: var(--btn-icon-border);
+  border-radius: var(--btn-radius);
+  box-sizing: border-box;
+  transition: border-color var(--speed), background var(--speed), color var(--speed);
+}
+.icon_btn:not(:active):hover{
+  background: var(--btn-icon-background-hover);
+  border-color: var(--btn-icon-border-color-hover);
+}
+.icon_btn.checked{
+  background: var(--btn-icon-background-hover);
+}
+.icon_btn:active{
+  background: var(--btn-icon-background-active);
+  border-color: var(--btn-icon-border-color-active);
+}
+.icon_btn img{
+  width: 100%;
+  height: 100%;
+}
+/* 項目欄, 就是那個點擊標題就可以摺叠的組件 */
+.accordion{
+  padding: var(--padding);
+  display: inline-flex;
+  flex-direction: column;
+}
+.accordion .title{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.accordion .title span{
+  letter-spacing: 6px;
+  height: 16px;
+  user-select: none;
+  font-size: 1em;
+  color: var(--gray7);
+  font-family: Comfortaa;
+  font-weight: bold;
+}
+.accordion .title *:last-child{
+  margin-left: auto;
+}
