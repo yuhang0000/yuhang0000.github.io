@@ -47,7 +47,7 @@
   --text-input-border-color: var(--gray4);
   --text-input-border-color-hover: var(--gray6);
   --text-input-border-color-active: var(--gray8);
-  /* 摺叠控件 */
+  /* 摺叠面板 */
   --accordion-background: var(--gray1);
   --accordion-background-hover: var(--gray2);
   --accordion-background-active: var(--gray3);
@@ -328,7 +328,7 @@ h3{
   width: 100%;
   height: 100%;
 }
-/* 摺叠控件, 就是那個點擊標題就可以摺叠的組件 */
+/* 摺叠面板, 就是那個點擊標題就可以摺叠的組件 */
 .accordion{
   display: inline-flex;
   flex-direction: column;
@@ -343,11 +343,12 @@ h3{
   border-radius: var(--btn-radius);
   background: var(--accordion-background);
   transition: background var(--speed);
+  overflow: hidden;
 }
-.accordion>.title:has(span:hover){
+.accordion>.title:has(span:hover), .accordion.fold>.title:hover{
   background: var(--accordion-background-hover);
 }
-.accordion>.title:has(span:active){
+.accordion>.title:has(span:active), .accordion.fold>.title:active{
   background: var(--accordion-background-active);
 }
 .accordion>.title span{
@@ -359,7 +360,7 @@ h3{
   font-family: Comfortaa;
   font-weight: bold;
 }
-.accordion>.title *:last-child{
+.accordion>.title>*:last-child{
   margin-left: auto;
 }
 .accordion>.title .icon_btn:not(:active):hover{
@@ -377,4 +378,13 @@ h3{
   padding: calc(var(--padding) / 2);
   display: inline-flex;
   flex-direction: column;
+  transition: padding var(--speed), height var(--speed), opacity var(--speed);
+  overflow: hidden;
+  opacity: 1;
+}
+.accordion.fold>.content{
+  padding-top: 0px;
+  padding-bottom: 0px;
+  height: 0px;
+  opacity: 1;
 }

@@ -3,16 +3,16 @@ class md{
 
   //公共變數
   static imglist = { //圖像合集
-    '404':'"/Resources/UI-Simple/Blog/404.png"', //缺省的圖像連接
-    'link':'"/Resources/UI-Simple/Blog/Link2.svg"', //連接
-    'copy':'"/Resources/UI-Simple/Blog/Copy.svg"', //複製
-    'date':'"/Resources/UI-Simple/Blog/Date2.svg"', //日期
-    'updata':'"/Resources/UI-Simple/Blog/Updata2.svg"', //更新
-    'tag':'"/Resources/UI-Simple/Blog/Tag.svg"', //標簽
-    'uoguog':'"/Resources/UI-Simple/Blog/uoguog.svg"', //複選框: -
-    'gougou':'"/Resources/UI-Simple/Blog/gougou.svg"', //複選框: v
-    'nogougou':'"/Resources/UI-Simple/Blog/nogougou.svg"', //複選框: 空的
-    'huaigougou':'"/Resources/UI-Simple/Blog/huaigougou.svg"', //複選框: x
+    '404':'"/Resources/UI-Stuple/Blog/404.png"', //缺省的圖像連接
+    'link':'"/Resources/UI-Stuple/Blog/Link2.svg"', //連接
+    'copy':'"/Resources/UI-Stuple/Blog/Copy.svg"', //複製
+    'date':'"/Resources/UI-Stuple/Blog/Date2.svg"', //日期
+    'updata':'"/Resources/UI-Stuple/Blog/Updata2.svg"', //更新
+    'tag':'"/Resources/UI-Stuple/Blog/Tag.svg"', //標簽
+    'uoguog':'"/Resources/UI-Stuple/Blog/uoguog.svg"', //複選框: -
+    'gougou':'"/Resources/UI-Stuple/Blog/gougou.svg"', //複選框: v
+    'nogougou':'"/Resources/UI-Stuple/Blog/nogougou.svg"', //複選框: 空的
+    'huaigougou':'"/Resources/UI-Stuple/Blog/huaigougou.svg"', //複選框: x
   }
   static ver = 'v1.0.2.1020';
   static version = md.ver;

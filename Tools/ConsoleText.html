@@ -3,7 +3,7 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <title>ConsoleText</title>
   <link rel="shortcut icon" href="/favicon.ico">
-  <link rel="stylesheet" href="/CSS/UI-Simple/Editor.css">
+  <link rel="stylesheet" href="/CSS/UI-Stuple/Editor.css">
   <link rel="stylesheet" href="/CSS/Tools/ConsoleText.css">
   <link rel="stylesheet" href="/CSS/Fonts/Comfortaa.css">
 </head>
@@ -13,7 +13,7 @@
   <div class="toolbar">
     <div class="input select font">
       <span>monoself</span>
-      <div class="fold"><img src="\Resources\UI-Simple\Editor\Down-Small.svg"></div>
+      <div class="fold"><img src="\Resources\UI-Stuple\Editor\Down-Small.svg"></div>
     </div>
     <div class="input number font">
       <input value="16">
@@ -23,39 +23,58 @@
       	<div class="line down"></div>
       </div>
       <div class="up_down">
-        <div class="up"><img src="\Resources\UI-Simple\Editor\Up-Small.svg"></div>
+        <div class="up"><img src="\Resources\UI-Stuple\Editor\Up-Small.svg"></div>
         <div class="line"></div>
-        <div class="down"><img src="\Resources\UI-Simple\Editor\Down-Small.svg"></div>
+        <div class="down"><img src="\Resources\UI-Stuple\Editor\Down-Small.svg"></div>
       </div>
     </div>
     <div class="icon_btn_group">
-      <div class="icon_btn text_color"><img src="\Resources\UI-Simple\Editor\Text_Color.svg"></div>
-      <div class="icon_btn text_background"><img src="\Resources\UI-Simple\Editor\Text_BackGround.svg"></div>
-      <div class="icon_btn text_bold"><img src="\Resources\UI-Simple\Editor\Text_Bold.svg"></div>
-      <div class="icon_btn text_italic"><img src="\Resources\UI-Simple\Editor\Text_Italic.svg"></div>
-      <div class="icon_btn text_underline"><img src="\Resources\UI-Simple\Editor\Text_UnderLine.svg"></div>
+      <div class="icon_btn text_color"><img src="\Resources\UI-Stuple\Editor\Text_Color.svg"></div>
+      <div class="icon_btn text_background"><img src="\Resources\UI-Stuple\Editor\Text_BackGround.svg"></div>
+      <div class="icon_btn text_bold"><img src="\Resources\UI-Stuple\Editor\Text_Bold.svg"></div>
+      <div class="icon_btn text_italic"><img src="\Resources\UI-Stuple\Editor\Text_Italic.svg"></div>
+      <div class="icon_btn text_underline"><img src="\Resources\UI-Stuple\Editor\Text_UnderLine.svg"></div>
     </div>
     <div class="icon_btn_group">
-      <div class="icon_btn align_left"><img src="\Resources\UI-Simple\Editor\Align-Left.svg"></div>
-      <div class="icon_btn align_center"><img src="\Resources\UI-Simple\Editor\Align-Center.svg"></div>
-      <div class="icon_btn align_right"><img src="\Resources\UI-Simple\Editor\Align-Right.svg"></div>
+      <div class="icon_btn align_left"><img src="\Resources\UI-Stuple\Editor\Align-Left.svg"></div>
+      <div class="icon_btn align_center"><img src="\Resources\UI-Stuple\Editor\Align-Center.svg"></div>
+      <div class="icon_btn align_right"><img src="\Resources\UI-Stuple\Editor\Align-Right.svg"></div>
     </div>
     <div class="icon_btn_group" style="margin-left: auto;">
-      <div class="icon_btn import"><img src="\Resources\UI-Simple\Editor\Import.svg"></div>
-      <div class="icon_btn export"><img src="\Resources\UI-Simple\Editor\Export.svg"></div>
-      <div class="icon_btn home" onclick="document.location.href = '/index.html'; "><img src="\Resources\UI-Simple\Editor\Home.svg"></div>
+      <div class="icon_btn import"><img src="\Resources\UI-Stuple\Editor\Import.svg"></div>
+      <div class="icon_btn export"><img src="\Resources\UI-Stuple\Editor\Export.svg"></div>
+      <div class="icon_btn home" onclick="document.location.href = '/index.html'; "><img src="\Resources\UI-Stuple\Editor\Home.svg"></div>
     </div>
   </div>
   <div class="content">
     <div class="sidebar">
-      <div class="accordion class">
+      <div class="accordion padding">
         <div class="title">
-          <span>PADDING</span><div class="icon_btn lock"><img src="\Resources\UI-Simple\Editor\Unlock.svg"></div>
+          <span>PADDING</span>
+          <div class="lock_fold">
+          	<div class="column">
+          	  <div class="icon_btn lock"><img src="\Resources\UI-Stuple\Editor\Unlock.svg"></div>
+          	  <div class="input number font">
+                <input value="4">
+                <div class="lines">
+                	<div class="line up"></div>
+                	<div class="line center"></div>
+                	<div class="line down"></div>
+                </div>
+                <div class="up_down">
+                  <div class="up"><img src="\Resources\UI-Stuple\Editor\Up-Small.svg"></div>
+                  <div class="line"></div>
+                  <div class="down"><img src="\Resources\UI-Stuple\Editor\Down-Small.svg"></div>
+                </div>
+              </div>
+          	</div>
+          	<div class="icon fold"><img src="\Resources\UI-Stuple\Editor\Unfold.svg"></div>
+          </div>
         </div>
         <div class="content">
           <div class="item">
             <div class="column">
-              <div class="icon"><img src="\Resources\UI-Simple\Editor\Padding-Left.svg"></div>
+              <div class="icon"><img src="\Resources\UI-Stuple\Editor\Padding-Left.svg"></div>
               <div class="input number padding_left">
                 <input value="4">
                 <div class="lines">
@@ -64,14 +83,14 @@
                 	<div class="line down"></div>
                 </div>
                 <div class="up_down">
-                  <div class="up"><img src="\Resources\UI-Simple\Editor\Up-Small.svg"></div>
+                  <div class="up"><img src="\Resources\UI-Stuple\Editor\Up-Small.svg"></div>
                   <div class="line"></div>
-                  <div class="down"><img src="\Resources\UI-Simple\Editor\Down-Small.svg"></div>
+                  <div class="down"><img src="\Resources\UI-Stuple\Editor\Down-Small.svg"></div>
                 </div>
               </div>
             </div>
             <div class="column">
-              <div class="icon"><img src="\Resources\UI-Simple\Editor\Padding-Right.svg"></div>
+              <div class="icon"><img src="\Resources\UI-Stuple\Editor\Padding-Right.svg"></div>
               <div class="input number padding_right">
                 <input value="4">
                 <div class="lines">
@@ -80,16 +99,16 @@
                 	<div class="line down"></div>
                 </div>
                 <div class="up_down">
-                  <div class="up"><img src="\Resources\UI-Simple\Editor\Up-Small.svg"></div>
+                  <div class="up"><img src="\Resources\UI-Stuple\Editor\Up-Small.svg"></div>
                   <div class="line"></div>
-                  <div class="down"><img src="\Resources\UI-Simple\Editor\Down-Small.svg"></div>
+                  <div class="down"><img src="\Resources\UI-Stuple\Editor\Down-Small.svg"></div>
                 </div>
               </div>
             </div>
           </div>
           <div class="item">
             <div class="column">
-              <div class="icon"><img src="\Resources\UI-Simple\Editor\Padding-Top.svg"></div>
+              <div class="icon"><img src="\Resources\UI-Stuple\Editor\Padding-Top.svg"></div>
               <div class="input number padding_top">
                 <input value="4">
                 <div class="lines">
@@ -98,14 +117,14 @@
                 	<div class="line down"></div>
                 </div>
                 <div class="up_down">
-                  <div class="up"><img src="\Resources\UI-Simple\Editor\Up-Small.svg"></div>
+                  <div class="up"><img src="\Resources\UI-Stuple\Editor\Up-Small.svg"></div>
                   <div class="line"></div>
-                  <div class="down"><img src="\Resources\UI-Simple\Editor\Down-Small.svg"></div>
+                  <div class="down"><img src="\Resources\UI-Stuple\Editor\Down-Small.svg"></div>
                 </div>
               </div>
             </div>
             <div class="column">
-              <div class="icon"><img src="\Resources\UI-Simple\Editor\Padding-Bottom.svg"></div>
+              <div class="icon"><img src="\Resources\UI-Stuple\Editor\Padding-Bottom.svg"></div>
               <div class="input number padding_bottom">
                 <input value="4">
                 <div class="lines">
@@ -114,9 +133,291 @@
                 	<div class="line down"></div>
                 </div>
                 <div class="up_down">
-                  <div class="up"><img src="\Resources\UI-Simple\Editor\Up-Small.svg"></div>
+                  <div class="up"><img src="\Resources\UI-Stuple\Editor\Up-Small.svg"></div>
                   <div class="line"></div>
-                  <div class="down"><img src="\Resources\UI-Simple\Editor\Down-Small.svg"></div>
+                  <div class="down"><img src="\Resources\UI-Stuple\Editor\Down-Small.svg"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="accordion margin">
+        <div class="title">
+          <span>MARGIN</span>
+          <div class="lock_fold">
+          	<div class="column">
+          	  <div class="icon_btn lock"><img src="\Resources\UI-Stuple\Editor\Unlock.svg"></div>
+          	  <div class="input number font">
+                <input value="4">
+                <div class="lines">
+                	<div class="line up"></div>
+                	<div class="line center"></div>
+                	<div class="line down"></div>
+                </div>
+                <div class="up_down">
+                  <div class="up"><img src="\Resources\UI-Stuple\Editor\Up-Small.svg"></div>
+                  <div class="line"></div>
+                  <div class="down"><img src="\Resources\UI-Stuple\Editor\Down-Small.svg"></div>
+                </div>
+              </div>
+          	</div>
+          	<div class="icon fold"><img src="\Resources\UI-Stuple\Editor\Unfold.svg"></div>
+          </div>
+        </div>
+        <div class="content">
+          <div class="item">
+            <div class="column">
+              <div class="icon"><img src="\Resources\UI-Stuple\Editor\Margin-Left.svg"></div>
+              <div class="input number margin_left">
+                <input value="4">
+                <div class="lines">
+                	<div class="line up"></div>
+                	<div class="line center"></div>
+                	<div class="line down"></div>
+                </div>
+                <div class="up_down">
+                  <div class="up"><img src="\Resources\UI-Stuple\Editor\Up-Small.svg"></div>
+                  <div class="line"></div>
+                  <div class="down"><img src="\Resources\UI-Stuple\Editor\Down-Small.svg"></div>
+                </div>
+              </div>
+            </div>
+            <div class="column">
+              <div class="icon"><img src="\Resources\UI-Stuple\Editor\Margin-Right.svg"></div>
+              <div class="input number margin_right">
+                <input value="4">
+                <div class="lines">
+                	<div class="line up"></div>
+                	<div class="line center"></div>
+                	<div class="line down"></div>
+                </div>
+                <div class="up_down">
+                  <div class="up"><img src="\Resources\UI-Stuple\Editor\Up-Small.svg"></div>
+                  <div class="line"></div>
+                  <div class="down"><img src="\Resources\UI-Stuple\Editor\Down-Small.svg"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="item">
+            <div class="column">
+              <div class="icon"><img src="\Resources\UI-Stuple\Editor\Margin-Top.svg"></div>
+              <div class="input number margin_top">
+                <input value="4">
+                <div class="lines">
+                	<div class="line up"></div>
+                	<div class="line center"></div>
+                	<div class="line down"></div>
+                </div>
+                <div class="up_down">
+                  <div class="up"><img src="\Resources\UI-Stuple\Editor\Up-Small.svg"></div>
+                  <div class="line"></div>
+                  <div class="down"><img src="\Resources\UI-Stuple\Editor\Down-Small.svg"></div>
+                </div>
+              </div>
+            </div>
+            <div class="column">
+              <div class="icon"><img src="\Resources\UI-Stuple\Editor\Margin-Bottom.svg"></div>
+              <div class="input number margin_bottom">
+                <input value="4">
+                <div class="lines">
+                	<div class="line up"></div>
+                	<div class="line center"></div>
+                	<div class="line down"></div>
+                </div>
+                <div class="up_down">
+                  <div class="up"><img src="\Resources\UI-Stuple\Editor\Up-Small.svg"></div>
+                  <div class="line"></div>
+                  <div class="down"><img src="\Resources\UI-Stuple\Editor\Down-Small.svg"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="accordion radius">
+        <div class="title">
+          <span>RADIUS</span>
+          <div class="lock_fold">
+          	<div class="column">
+          	  <div class="icon_btn lock"><img src="\Resources\UI-Stuple\Editor\Unlock.svg"></div>
+          	  <div class="input number font">
+                <input value="4">
+                <div class="lines">
+                	<div class="line up"></div>
+                	<div class="line center"></div>
+                	<div class="line down"></div>
+                </div>
+                <div class="up_down">
+                  <div class="up"><img src="\Resources\UI-Stuple\Editor\Up-Small.svg"></div>
+                  <div class="line"></div>
+                  <div class="down"><img src="\Resources\UI-Stuple\Editor\Down-Small.svg"></div>
+                </div>
+              </div>
+          	</div>
+          	<div class="icon fold"><img src="\Resources\UI-Stuple\Editor\Unfold.svg"></div>
+          </div>
+        </div>
+        <div class="content">
+          <div class="item">
+            <div class="column">
+              <div class="icon"><img src="\Resources\UI-Stuple\Editor\Radius-LT.svg"></div>
+              <div class="input number radius_lt">
+                <input value="4">
+                <div class="lines">
+                	<div class="line up"></div>
+                	<div class="line center"></div>
+                	<div class="line down"></div>
+                </div>
+                <div class="up_down">
+                  <div class="up"><img src="\Resources\UI-Stuple\Editor\Up-Small.svg"></div>
+                  <div class="line"></div>
+                  <div class="down"><img src="\Resources\UI-Stuple\Editor\Down-Small.svg"></div>
+                </div>
+              </div>
+            </div>
+            <div class="column">
+              <div class="icon"><img src="\Resources\UI-Stuple\Editor\Radius-RT.svg"></div>
+              <div class="input number radius_rt">
+                <input value="4">
+                <div class="lines">
+                	<div class="line up"></div>
+                	<div class="line center"></div>
+                	<div class="line down"></div>
+                </div>
+                <div class="up_down">
+                  <div class="up"><img src="\Resources\UI-Stuple\Editor\Up-Small.svg"></div>
+                  <div class="line"></div>
+                  <div class="down"><img src="\Resources\UI-Stuple\Editor\Down-Small.svg"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="item">
+            <div class="column">
+              <div class="icon"><img src="\Resources\UI-Stuple\Editor\Radius-LB.svg"></div>
+              <div class="input number radius_lb">
+                <input value="4">
+                <div class="lines">
+                	<div class="line up"></div>
+                	<div class="line center"></div>
+                	<div class="line down"></div>
+                </div>
+                <div class="up_down">
+                  <div class="up"><img src="\Resources\UI-Stuple\Editor\Up-Small.svg"></div>
+                  <div class="line"></div>
+                  <div class="down"><img src="\Resources\UI-Stuple\Editor\Down-Small.svg"></div>
+                </div>
+              </div>
+            </div>
+            <div class="column">
+              <div class="icon"><img src="\Resources\UI-Stuple\Editor\Radius-RB.svg"></div>
+              <div class="input number radius_rb">
+                <input value="4">
+                <div class="lines">
+                	<div class="line up"></div>
+                	<div class="line center"></div>
+                	<div class="line down"></div>
+                </div>
+                <div class="up_down">
+                  <div class="up"><img src="\Resources\UI-Stuple\Editor\Up-Small.svg"></div>
+                  <div class="line"></div>
+                  <div class="down"><img src="\Resources\UI-Stuple\Editor\Down-Small.svg"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="accordion border">
+        <div class="title">
+          <span>BORDER</span>
+          <div class="lock_fold">
+          	<div class="column">
+          	  <div class="icon_btn lock"><img src="\Resources\UI-Stuple\Editor\Unlock.svg"></div>
+          	  <div class="input number font">
+                <input value="4">
+                <div class="lines">
+                	<div class="line up"></div>
+                	<div class="line center"></div>
+                	<div class="line down"></div>
+                </div>
+                <div class="up_down">
+                  <div class="up"><img src="\Resources\UI-Stuple\Editor\Up-Small.svg"></div>
+                  <div class="line"></div>
+                  <div class="down"><img src="\Resources\UI-Stuple\Editor\Down-Small.svg"></div>
+                </div>
+              </div>
+          	</div>
+          	<div class="icon fold"><img src="\Resources\UI-Stuple\Editor\Unfold.svg"></div>
+          </div>
+        </div>
+        <div class="content">
+          <div class="item">
+            <div class="column">
+              <div class="icon"><img src="\Resources\UI-Stuple\Editor\Border-Left.svg"></div>
+              <div class="input number border_left">
+                <input value="4">
+                <div class="lines">
+                	<div class="line up"></div>
+                	<div class="line center"></div>
+                	<div class="line down"></div>
+                </div>
+                <div class="up_down">
+                  <div class="up"><img src="\Resources\UI-Stuple\Editor\Up-Small.svg"></div>
+                  <div class="line"></div>
+                  <div class="down"><img src="\Resources\UI-Stuple\Editor\Down-Small.svg"></div>
+                </div>
+              </div>
+            </div>
+            <div class="column">
+              <div class="icon"><img src="\Resources\UI-Stuple\Editor\Border-Right.svg"></div>
+              <div class="input number border_right">
+                <input value="4">
+                <div class="lines">
+                	<div class="line up"></div>
+                	<div class="line center"></div>
+                	<div class="line down"></div>
+                </div>
+                <div class="up_down">
+                  <div class="up"><img src="\Resources\UI-Stuple\Editor\Up-Small.svg"></div>
+                  <div class="line"></div>
+                  <div class="down"><img src="\Resources\UI-Stuple\Editor\Down-Small.svg"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="item">
+            <div class="column">
+              <div class="icon"><img src="\Resources\UI-Stuple\Editor\Border-Top.svg"></div>
+              <div class="input number border_top">
+                <input value="4">
+                <div class="lines">
+                	<div class="line up"></div>
+                	<div class="line center"></div>
+                	<div class="line down"></div>
+                </div>
+                <div class="up_down">
+                  <div class="up"><img src="\Resources\UI-Stuple\Editor\Up-Small.svg"></div>
+                  <div class="line"></div>
+                  <div class="down"><img src="\Resources\UI-Stuple\Editor\Down-Small.svg"></div>
+                </div>
+              </div>
+            </div>
+            <div class="column">
+              <div class="icon"><img src="\Resources\UI-Stuple\Editor\Border-Bottom.svg"></div>
+              <div class="input number border_bottom">
+                <input value="4">
+                <div class="lines">
+                	<div class="line up"></div>
+                	<div class="line center"></div>
+                	<div class="line down"></div>
+                </div>
+                <div class="up_down">
+                  <div class="up"><img src="\Resources\UI-Stuple\Editor\Up-Small.svg"></div>
+                  <div class="line"></div>
+                  <div class="down"><img src="\Resources\UI-Stuple\Editor\Down-Small.svg"></div>
                 </div>
               </div>
             </div>
