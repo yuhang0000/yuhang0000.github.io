@@ -94,7 +94,7 @@ h2{
 /* 側邊欄 - 摺叠面板 - 鎖定 */
 .sidebar .accordion .title .column:not(:has(.lock.checked)) .input{
   width: 0px;
-  padding-left: 0px;
+  margin-left: 0px;
   opacity: 0;
 }
 .sidebar .accordion:has( .title .column .lock.checked) .content{
@@ -126,8 +126,8 @@ h2{
   height: var(--btn-size);
 }
 .sidebar .accordion .column:not(:first-child){
-  padding-left: calc( var(--padding) * 2 );
+  margin-left: calc( var(--padding) * 2 );
 }
 .sidebar .accordion .column>*:not(:first-child){
-  padding-left: var(--padding);
+  margin-left: var(--padding);
 }
