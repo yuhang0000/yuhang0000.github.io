@@ -10,6 +10,8 @@
 
 * `Characters` 角色列表 (暫時棄用);
 
+* `Columns` 專欄;
+
 * `Config` 存放該站點的配置訊息;
 
 * `CSS` 層曡樣式集;
@@ -17,6 +19,8 @@
 * `Images` 圖像存放在這裏;
 
 * `JS` 顧名思義, JavaScript;
+
+* `Notes` 筆記; 
 
 * `Personal_Logs` 個人資訊;
 
