@@ -1,0 +1,67 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>Zip 测试</title>
+        <script type="text/javascript" src="/JS/Tools/Hex.js"></script>
+        <script type="text/javascript" src="/JS/Tools/Zip.js"></script>
+    </head>
+    <body>
+        <div style="display: flex; flex-direction: column; align-items: flex-start; width: 100%;">
+            <div><input type="file" id="file"/><button id="btnclear">清空输出</button></div>
+            <textarea id="output" style="margin: 8px 0 0 0; width: 100%; height: 32em;"></textarea>
+        </div>
+        <script defer>
+            window.Debug = true;
+
+            let outputdlg = document.querySelector("#output");
+            
+            //打印
+            function consolelog(text, sendconsole = true, sendoutput = true){
+                if(sendconsole == true){
+                    console.log(text);
+                }
+                if(sendoutput == true){
+                    outputdlg.append(text + "\n");
+                }
+            }
+
+            consolelog("Zip Version: v" + Zip.Version);
+
+            //添加监听器
+            let btnclear = document.querySelector("#btnclear");
+            btnclear.addEventListener("click", () => {
+                outputdlg.innerText = "";
+            })
+
+            let btninput = document.querySelector("#file");
+            btninput.addEventListener("change", () => {
+                console.log(btninput.files.length + " 个");
+                if(btninput.files.length > 0){
+                    let file = btninput.files[0];
+                    let reader = new FileReader();
+                    consolelog("Input File: " + file.name);
+                    //当 FileReader 读取时
+                    reader.onload = () => {
+                        //consolelog("载入文本如下: \n" + reader.result);
+                        let hex = window.Hex.StringToHex(reader.result);
+                        //console.log(hex);
+                        let zip = new window.Zip.Decode(hex);
+                        let array = ["当前磁盘编号: " + zip.ECDR.DiskNo,
+                        "中央目录开始位置的磁盘编号: " + zip.ECDR.DiskNoOnStart,
+                        "该磁盘上所记录的中央目录数量: " + zip.ECDR.CDRCountOnDisk,
+                        "中央目录结构总数: " + zip.ECDR.CDRCount,
+                        "中央目录的大小: " + zip.ECDR.CDRLength,
+                        "中央目录开始位置相对位移: " + zip.ECDR.CDROffset,
+                        "注释长度: " + zip.ECDR.NodeLength,
+                        "注释内容: " + zip.ECDR.Node,
+                        ]
+                        consolelog(array.join("\n"));
+                    }
+
+                    reader.readAsBinaryString(file);
+                }
+            })
+
+        </script>
+    </body>
+</html>
