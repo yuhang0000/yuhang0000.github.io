@@ -1,9 +1,10 @@
-class Zip{
+import Hex from "/JS/Tools/Hex.js";
 
+export default class Zip{
     //压缩包Zip格式详析: https://www.cnblogs.com/li-sx/p/17531186.html
 
     //属性
-    static ver = "0.0.1.0803";
+    static ver = "0.0.1.0804";
     static Version = this.ver;
 
     /** 解壓 
@@ -25,7 +26,7 @@ class Zip{
             for(let i = data.length - 8; i > -1; i = i - 2){
                 let magicnum = "";
                 //拼好魔数
-                magicnum = window.Hex.SubHex(data, i / 2, 4);
+                magicnum = Hex.SubHex(data, i / 2, 4);
                 if(magicnum == "504b0506"){
                     if(window.Debug == true){
                         debugger;
@@ -37,21 +38,21 @@ class Zip{
                         throw new Error("不是一个有效的压缩包文件");
                     }
                     i = i + 8;
-                    this.ECDR.DiskNo = window.Hex.ParseIntLo(window.Hex.SubHex(data, i / 2, 2));
+                    this.ECDR.DiskNo = Hex.ParseIntLo(Hex.SubHex(data, i / 2, 2));
                     i = i + 4;
-                    this.ECDR.DiskNoOnStart = window.Hex.ParseIntLo(window.Hex.SubHex(data, i / 2, 2));
+                    this.ECDR.DiskNoOnStart = Hex.ParseIntLo(Hex.SubHex(data, i / 2, 2));
                     i = i + 4;
-                    this.ECDR.CDRCountOnDisk = window.Hex.ParseIntLo(window.Hex.SubHex(data, i / 2, 2));
+                    this.ECDR.CDRCountOnDisk = Hex.ParseIntLo(Hex.SubHex(data, i / 2, 2));
                     i = i + 4;
-                    this.ECDR.CDRCount = window.Hex.ParseIntLo(window.Hex.SubHex(data, i / 2, 2));
+                    this.ECDR.CDRCount = Hex.ParseIntLo(Hex.SubHex(data, i / 2, 2));
                     i = i + 4;
-                    this.ECDR.CDRLength = window.Hex.ParseIntLo(window.Hex.SubHex(data, i / 2, 4));
+                    this.ECDR.CDRLength = Hex.ParseIntLo(Hex.SubHex(data, i / 2, 4));
                     i = i + 8;
-                    this.ECDR.CDROffset = window.Hex.ParseIntLo(window.Hex.SubHex(data, i / 2, 4));
+                    this.ECDR.CDROffset = Hex.ParseIntLo(Hex.SubHex(data, i / 2, 4));
                     i = i + 8;
-                    this.ECDR.NodeLength = window.Hex.ParseIntLo(window.Hex.SubHex(data, i / 2, 2));
+                    this.ECDR.NodeLength = Hex.ParseIntLo(Hex.SubHex(data, i / 2, 2));
                     i = i + 4;
-                    this.ECDR.Node = window.Hex.SubHex(data, i / 2, this.ECDR.NodeLength);
+                    this.ECDR.Node = Hex.SubHex(data, i / 2, this.ECDR.NodeLength);
                     i = i + this.ECDR.NodeLength;
                     this.IsZip = true;
                     break;
@@ -111,11 +112,4 @@ class Zip{
         /** 拓展区 */
         ExBlock;
     }
-}
-
-window.Zip = Zip;
-
-//前置文件
-if(window.Hex == null){
-    console.warn("缺少前置文件: Hex.js ");
 }
