@@ -2,16 +2,30 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         <title>Zip 测试</title>
-        <script type="text/javascript" src="/JS/Tools/Hex.js"></script>
-        <script type="text/javascript" src="/JS/Tools/Zip.js"></script>
+        <style>
+            #btninput:disabled{
+                opacity: 0.5;
+            }
+            #btninput{
+                opacity: 1;
+                transition: opacity 0.5s;
+            }
+        </style>
     </head>
     <body>
         <div style="display: flex; flex-direction: column; align-items: flex-start; width: 100%;">
-            <div><input type="file" id="file"/><button id="btnclear">清空输出</button></div>
-            <textarea id="output" style="margin: 8px 0 0 0; width: 100%; height: 32em;"></textarea>
+            <div><input type="file" id="btninput"/><button id="btnclear">清空输出</button></div>
+            <textarea id="output" Spellcheck=false style="margin: 8px 0 0 0; width: 100%; height: 32em;"></textarea>
         </div>
-        <script defer>
+        <script type="module">
             window.Debug = true;
+
+            import Zip from "/JS/Tools/Zip.js";
+            import Hex from "/JS/Tools/Hex.js";
+            import Command from "/JS/Commands/Command.js";
+            window.zip = Zip;
+            window.hex = Hex;
+            window.command = Command;
 
             let outputdlg = document.querySelector("#output");
             
@@ -25,7 +39,7 @@
                 }
             }
 
-            consolelog("Zip Version: v" + Zip.Version);
+            consolelog("Zip Version: v" + Zip.Version + "\n");
 
             //添加监听器
             let btnclear = document.querySelector("#btnclear");
@@ -33,33 +47,124 @@
                 outputdlg.innerText = "";
             })
 
-            let btninput = document.querySelector("#file");
+            let btninput = document.querySelector("#btninput");
             btninput.addEventListener("change", () => {
-                console.log(btninput.files.length + " 个");
+                btninput.setAttribute("disabled", "");
+                console.log("载入 " + btninput.files.length + " 个");
                 if(btninput.files.length > 0){
                     let file = btninput.files[0];
+                    consolelog("载入文件: " + file.name);
+                    let starttime = new Date();
+                    let lasttime = starttime.valueOf();
+                    let now;
+                    consolelog("开始于: " + starttime.toLocaleString() );
                     let reader = new FileReader();
-                    consolelog("Input File: " + file.name);
                     //当 FileReader 读取时
-                    reader.onload = () => {
+                    reader.onloadend = () => {
                         //consolelog("载入文本如下: \n" + reader.result);
-                        let hex = window.Hex.StringToHex(reader.result);
-                        //console.log(hex);
-                        let zip = new window.Zip.Decode(hex);
-                        let array = ["当前磁盘编号: " + zip.ECDR.DiskNo,
-                        "中央目录开始位置的磁盘编号: " + zip.ECDR.DiskNoOnStart,
-                        "该磁盘上所记录的中央目录数量: " + zip.ECDR.CDRCountOnDisk,
-                        "中央目录结构总数: " + zip.ECDR.CDRCount,
-                        "中央目录的大小: " + zip.ECDR.CDRLength,
-                        "中央目录开始位置相对位移: " + zip.ECDR.CDROffset,
-                        "注释长度: " + zip.ECDR.NodeLength,
-                        "注释内容: " + zip.ECDR.Node,
-                        ]
-                        consolelog(array.join("\n"));
+                        now = new Date();
+                        consolelog("文件加载耗时: " + ((now.valueOf() - lasttime) / 1000 ).toString() + "s");
+                        lasttime = now.valueOf();
+                        // let hex = Hex.StringToHex(reader.result);
+                        let hex = new Uint8Array(reader.result);
+                        now = new Date();
+                        consolelog("HEX 转换耗时: " + ((now.valueOf() - lasttime) / 1000 ).toString() + "s");
+                        lasttime = now.valueOf();
+                        // console.log(hex);
+                        let zip = new Zip.Decode(hex, "GBK");
+                        now = new Date();
+                        consolelog("ZIP 目录解析耗时: " + ((now.valueOf() - lasttime) / 1000 ).toString() + "s");
+                        lasttime = now.valueOf();
+                        
+                        //不是压缩包
+                        if(zip.IsZip == false){
+                            consolelog("不是压缩包文件. ");
+                        }
+                        else{
+                            let array = [
+                                "是否加密: " + zip.IsEnc.toString(),
+                                "\n========== 中央目录尾部区 ==========",
+                                "当前磁盘编号: " + zip.ECDR.DiskNo,
+                                "中央目录开始位置的磁盘编号: " + zip.ECDR.DiskNoOnStart,
+                                "该磁盘上所记录的中央目录数量: " + zip.ECDR.CDRCountOnDisk,
+                                "中央目录结构总数: " + zip.ECDR.CDRCount,
+                                "中央目录的大小: " + zip.ECDR.CDRLength,
+                                "中央目录开始位置相对位移: " + zip.ECDR.CDROffset,
+                                "注释长度: " + zip.ECDR.NodeLength,
+                                "注释内容: " + zip.ECDR.Node,
+                            ]
+                            let array2 = [];
+                            for(let i = 0; i < zip.CDRs.length; i++){
+                                let cdr = zip.CDRs[i];
+                                let fileattr = [];
+                                if(cdr.FileAttr.ReadOnly == true){
+                                    fileattr.push("只读");
+                                }
+                                if(cdr.FileAttr.Hildle == true){
+                                    fileattr.push("隐藏");
+                                }
+                                if(cdr.FileAttr.System == true){
+                                    fileattr.push("系统文件");
+                                }
+                                if(cdr.FileAttr.SymbLink == true){
+                                    fileattr.push("符号链接");
+                                }
+                                if(cdr.FileAttr.Directory == true){
+                                    fileattr.push("文件夹");
+                                }
+                                if(cdr.FileAttr.Archive == true){
+                                    fileattr.push("归档");
+                                }
+                                if(cdr.FileAttr.Device == true){
+                                    fileattr.push("设备");
+                                }
+                                if(cdr.FileAttr.Normal == true){
+                                    fileattr.push("正常");
+                                }
+                                if(fileattr.length == 0){
+                                    fileattr.push("无属性");
+                                }
+
+                                let array = [
+                                    "\n========== 中央目录记录区 No." + i.toString(),
+                                    "压缩所用版本: " + cdr.VersionFormComp / 10,
+                                    "解压所需版本: " + cdr.FuncVer / 10,
+                                    "通用位标记: " + cdr.Flags,
+                                    "压缩方法: " + cdr.ZipType,
+                                    "文件最后修改时间: " + command.Conversion.FixDateTime(command.Conversion.GetDateTimeFromMSDOS(cdr.LastEditDate, cdr.LastEditTime)),
+                                    "CRC-32校验码: " + cdr.CRC32,
+                                    "压缩后的大小: " + command.Conversion.FixFileSize(cdr.SizeAfter),
+                                    "未压缩的大小: " + command.Conversion.FixFileSize(cdr.SizeBefore),
+                                    "文件名长度: " + cdr.FileNameLength,
+                                    "扩展区长度: " + cdr.ExBlockLength,
+                                    "文件注释长度: " + cdr.NoteLength,
+                                    "文件开始位置的磁盘编号: " + cdr.FileFormDisk,
+                                    "内部文件属性: " + cdr.IntFileAttr,
+                                    "外部文件属性: " + fileattr.join(", "),
+                                    "本地文件头的相对位移: " + cdr.FileOffset,
+                                    "文件名: " + cdr.FileName,
+                                    "扩展区: " + cdr.ExBlock,
+                                    "文件注释: " + cdr.Node
+                                ];
+                                array2.push(array.join("\n"));
+                            }
+                            now = new Date();
+                            consolelog("讯息输出耗时: " + ((now.valueOf() - lasttime) / 1000 ).toString() + "s");
+                            consolelog("总耗时: " + ((now.valueOf() - starttime.valueOf()) / 1000 ).toString() + "s");
+                            consolelog(array.join("\n"));
+                            consolelog(array2.join("\n"));
+                        }
+                        
+                        btninput.removeAttribute("disabled", "");    
                     }
 
-                    reader.readAsBinaryString(file);
+                    // reader.readAsBinaryString(file);
+                    reader.readAsArrayBuffer(file);
                 }
+                else{
+                    btninput.removeAttribute("disabled", "");
+                }
+
             })
 
         </script>
