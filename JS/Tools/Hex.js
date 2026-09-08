@@ -81,13 +81,13 @@ export default class Hex{
     }
     
     //大端序从左到右, 小端序从右至左
-
-    /** 转换为 Uint, 大端序 
+    /** 转换为 Uint
      * @function
      * @param {Uint8Array} hex - HEX 对象
+     * @param {boolean} BE - 大端序模式
      * @returns {number} 返回 Int
      */
-    static ParseUintHo(hex){
+    static ParseUint(hex, BE = false){
         if(hex == null){
             return null;
         }
@@ -100,87 +100,8 @@ export default class Hex{
         if(hex.length > 4){
             throw new Error("位元组超出 int 上限。 ");
         }
-
-        let num = 0;
-
-        for(let i = hex.length - 1; i > -1; i--){
-            num = num + (hex[i] * Math.pow(16, i * 2));
-        }
-
-        return num;
-
-    }
-    
-    /** 转换为 Int, 大端序 
-     * @function
-     * @param {Uint8Array} hex - HEX 对象
-     * @returns {number} 返回 Int
-     */
-    static ParseIntHo(hex){
-        if(hex == null){
-            return null;
-        }
-        if(Variable.GetType(hex) != "uint8array"){
-            throw new Error("不是一个有效的位元数组. ");
-        }
-        if(hex.length == 0){
-            return 0;
-        }
-        if(hex.length > 4){
-            throw new Error("位元组超出 int 上限。 ");
-        }
-
-        let num = 0;
-
-        for(let i = hex.length - 1; i > -1; i--){
-            num = num + (hex[i] * Math.pow(16, i * 2));
-        }
-
-        if(num > 2147483647){
-            num = num - 4294967296;
-        }
-
-        return num;
-
-    }
-    
-    /** 转换为 Uint, 小端序 
-     * @function
-     * @param {Uint8Array} hex - HEX 对象
-     * @returns {number} 返回 Int
-     */
-    static ParseUintLo(hex){
-        // let length = hex.length;
-        // if(hex == null || length == 0){
-        //     return 0;
-        // }
-        // else if(length > 8){
-        //     return 2147483647
-        // }
-        // //长度不够补 0
-        // else if(length < 8){
-        //     for(let i = 0; i < 8 - length; i++){
-        //         hex = hex + "0";
-        //     }
-        // }
-
-        // let hex2 = ""
-        // for (let i = 6; i > -1; i = i - 2) {
-        //     hex2 = hex2 + hex[i] + hex[i + 1];
-        // }
-
-        // return parseInt(hex2, 16);
-        if(hex == null){
-            return null;
-        }
-        if(Variable.GetType(hex) != "uint8array"){
-            throw new Error("不是一个有效的位元数组. ");
-        }
-        if(hex.length == 0){
-            return 0;
-        }
-        if(hex.length > 4){
-            throw new Error("位元组超出 int 上限。 ");
+        if(BE == true){
+            hex.reverse();
         }
 
         let num = 0;
@@ -193,12 +114,13 @@ export default class Hex{
 
     }
     
-    /** 转换为 Int, 小端序 
+    /** 转换为 Int
      * @function
      * @param {Uint8Array} hex - HEX 对象
+     * @param {boolean} BE - 大端序模式
      * @returns {number} 返回 Int
      */
-    static ParseIntLo(hex){
+    static ParseInt(hex, BE = false){
         if(hex == null){
             return null;
         }
@@ -210,6 +132,9 @@ export default class Hex{
         }
         if(hex.length > 4){
             throw new Error("位元组超出 int 上限。 ");
+        }
+        if(BE == true){
+            hex.reverse();
         }
 
         let num = 0;
@@ -327,6 +252,42 @@ export default class Hex{
         }
         
         return new Uint8Array(arr);
+    }
+
+    /** 打印成 HEX 格式
+     * @function
+     * @param {Uint8Array} hex - HEX 对象
+     * @param {boolean} BE - 大端序模式
+     * @returns {Array} 返回 HEX 格式化字串符组
+     */
+    static Print(hex, BE = false){
+        if(hex == null){
+            return null;
+        }
+        if(Variable.GetType(hex) != "uint8array"){
+            throw new Error("不是一个有效的位元数组. ");
+        }
+        if(hex.length == 0){
+            return [""];
+        }
+        if(BE == true){
+            hex.reverse();
+        }
+
+        let array = [];
+        let chars = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F"];
+
+        for(let i = 0; i < hex.length; i++){
+            let text = "";
+            let tmp1 = hex[i];
+            for(let ii = 0; ii < 2; ii++){
+                text = chars[tmp1%16] + text;
+                tmp1 = Math.trunc(tmp1/16);
+            }
+            array.push(text);
+        }
+
+        return array;
     }
 
     /** 获取位掩码 

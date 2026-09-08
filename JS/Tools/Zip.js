@@ -4,7 +4,7 @@ export default class Zip{
     //压缩包Zip格式详析: https://www.cnblogs.com/li-sx/p/17531186.html
 
     //属性
-    static ver = "0.0.3.0820";
+    static ver = "0.0.3.0906";
     static Version = this.ver;
 
     /** 解壓 
@@ -21,6 +21,8 @@ export default class Zip{
         TextEncode;
         /** 中央目录记录区队列 */
         CDRs = [];
+        /** 文件目录 */
+        Directory = [];
 
         /** 解析压缩包, 构造函数 
          * @function
@@ -38,7 +40,7 @@ export default class Zip{
                 let magicnum;
                 //拼好魔数
                 magicnum = Hex.SubHex(data, i, 4);
-                if(Hex.ParseUintLo(magicnum) == 101010256){ //50 4B 05 06
+                if(Hex.ParseUint(magicnum) == 101010256){ //50 4B 05 06
                     if(window.Debug == true){
                         debugger;
                     }
@@ -49,19 +51,19 @@ export default class Zip{
                         throw new Error("不是一个有效的压缩包文件. ");
                     }
                     i = i + 4;
-                    this.ECDR.DiskNo = Hex.ParseUintLo(Hex.SubHex(data, i, 2));
+                    this.ECDR.DiskNo = Hex.ParseUint(Hex.SubHex(data, i, 2));
                     i = i + 2;
-                    this.ECDR.DiskNoOnStart = Hex.ParseUintLo(Hex.SubHex(data, i, 2));
+                    this.ECDR.DiskNoOnStart = Hex.ParseUint(Hex.SubHex(data, i, 2));
                     i = i + 2;
-                    this.ECDR.CDRCountOnDisk = Hex.ParseUintLo(Hex.SubHex(data, i, 2));
+                    this.ECDR.CDRCountOnDisk = Hex.ParseUint(Hex.SubHex(data, i, 2));
                     i = i + 2;
-                    this.ECDR.CDRCount = Hex.ParseUintLo(Hex.SubHex(data, i, 2));
+                    this.ECDR.CDRCount = Hex.ParseUint(Hex.SubHex(data, i, 2));
                     i = i + 2;
-                    this.ECDR.CDRLength = Hex.ParseUintLo(Hex.SubHex(data, i, 4));
+                    this.ECDR.CDRLength = Hex.ParseUint(Hex.SubHex(data, i, 4));
                     i = i + 4;
-                    this.ECDR.CDROffset = Hex.ParseUintLo(Hex.SubHex(data, i, 4));
+                    this.ECDR.CDROffset = Hex.ParseUint(Hex.SubHex(data, i, 4));
                     i = i + 4;
-                    this.ECDR.NodeLength = Hex.ParseUintLo(Hex.SubHex(data, i, 2));
+                    this.ECDR.NodeLength = Hex.ParseUint(Hex.SubHex(data, i, 2));
                     i = i + 2;
                     this.ECDR.Node = Hex.SubHex(data, i, this.ECDR.NodeLength);
                     i = i + this.ECDR.NodeLength;
@@ -81,15 +83,15 @@ export default class Zip{
                     let textencode2 = this.TextEncode;
                     //拼好魔数
                     magicnum = Hex.SubHex(data, i, 4);
-                    if(Hex.ParseUintLo(magicnum) == 33639248){ //50 4B 01 02
+                    if(Hex.ParseUint(magicnum) == 33639248){ //50 4B 01 02
                         let cdr = new Zip.CDR;
                         i = i + 4;
                         cdr.VersionFormComp = Hex.SubHex(data, i, 2);
-                        cdr.OS = Hex.ParseUintLo(new Uint8Array([cdr.VersionFormComp[1]]));
-                        cdr.VersionFormComp = Hex.ParseUintLo(new Uint8Array([cdr.VersionFormComp[0]]));
+                        cdr.OS = Hex.ParseUint(new Uint8Array([cdr.VersionFormComp[1]]));
+                        cdr.VersionFormComp = Hex.ParseUint(new Uint8Array([cdr.VersionFormComp[0]]));
                         i = i + 2;
-                        cdr.VersionFormDecomp = Hex.ToBin(Hex.SubHex(data, i, 2));
-                        cdr.FuncVer = Hex.ParseUintLo(new Uint8Array([cdr.VersionFormDecomp[0]]));
+                        cdr.VersionFormDecomp = Hex.SubHex(data, i, 2);
+                        cdr.FuncVer = Hex.ParseUint(new Uint8Array([cdr.VersionFormDecomp[0]]));
                         i = i + 2;
                         cdr.Flags = Hex.GetBitFlags(Hex.SubHex(data, i, 2));
 
@@ -104,25 +106,25 @@ export default class Zip{
                         }
 
                         i = i + 2;
-                        cdr.ZipType = Hex.ParseUintLo(Hex.SubHex(data, i, 2));
+                        cdr.ZipType = Hex.ParseUint(Hex.SubHex(data, i, 2));
                         i = i + 2;
                         cdr.LastEditTime = Hex.SubHex(data, i, 2);
                         i = i + 2;
                         cdr.LastEditDate = Hex.SubHex(data, i, 2);
                         i = i + 2;
-                        cdr.CRC32 = Hex.ParseUintLo(Hex.SubHex(data, i, 4));
+                        cdr.CRC32 = Hex.ParseUint(Hex.SubHex(data, i, 4));
                         i = i + 4;
-                        cdr.SizeAfter = Hex.ParseUintLo(Hex.SubHex(data, i, 4));
+                        cdr.SizeAfter = Hex.ParseUint(Hex.SubHex(data, i, 4));
                         i = i + 4;
-                        cdr.SizeBefore = Hex.ParseUintLo(Hex.SubHex(data, i, 4));
+                        cdr.SizeBefore = Hex.ParseUint(Hex.SubHex(data, i, 4));
                         i = i + 4;
-                        cdr.FileNameLength = Hex.ParseUintLo(Hex.SubHex(data, i, 2));
+                        cdr.FileNameLength = Hex.ParseUint(Hex.SubHex(data, i, 2));
                         i = i + 2;
-                        cdr.ExBlockLength = Hex.ParseUintLo(Hex.SubHex(data, i, 2));
+                        cdr.ExBlockLength = Hex.ParseUint(Hex.SubHex(data, i, 2));
                         i = i + 2;
-                        cdr.NoteLength = Hex.ParseUintLo(Hex.SubHex(data, i, 2));
+                        cdr.NoteLength = Hex.ParseUint(Hex.SubHex(data, i, 2));
                         i = i + 2;
-                        cdr.FileFormDisk = Hex.ParseUintLo(Hex.SubHex(data, i, 2));
+                        cdr.FileFormDisk = Hex.ParseUint(Hex.SubHex(data, i, 2));
                         i = i + 2;
                         cdr.IntFileAttr = Hex.GetBitFlags(Hex.SubHex(data, i, 2));
                         i = i + 2;
@@ -165,7 +167,7 @@ export default class Zip{
                         }
 
                         i = i + 4;
-                        cdr.FileOffset = Hex.ParseUintLo(Hex.SubHex(data, i, 4));
+                        cdr.FileOffset = Hex.ParseUint(Hex.SubHex(data, i, 4));
                         i = i + 4;
                         cdr.FileName = Hex.HexToStr(Hex.SubHex(data, i, cdr.FileNameLength), textencode2);
                         i = i + cdr.FileNameLength;
@@ -175,6 +177,7 @@ export default class Zip{
                         i = i + cdr.NoteLength;
 
                         this.CDRs.push(cdr);
+                        this.Directory.push(cdr.FileName);
                     }
                     else{
                         break;
@@ -319,7 +322,9 @@ export default class Zip{
         static OS_X = 19;
     }
 
-    /** 文件属性 */
+    /** 文件属性 
+     * @class
+     */
     static FileAttr = class{
         /** 默认文件属性 */
         static Normal = false;
@@ -337,6 +342,31 @@ export default class Zip{
         static SymbLink = false;
         /** 设备 */
         static Device = false;
+    }
+
+    /** 压缩方法 
+     *  @class
+     */
+    static CompType = class{
+        /** 仅存储 */
+        static stored = 0;
+        static Shrunk = 1;
+        static ReducedCompFactor1 = 2;
+        static ReducedCompFactor2 = 3;
+        static ReducedCompFactor3 = 4;
+        static ReducedCompFactor4 = 5;
+        static Imploded = 6;
+        static Deflated = 8;
+        static Deflated64 = 9;
+        static BZIP2 = 12;
+        static LZMA = 14;
+        static CMPSC = 16;
+        static zstd = 93;
+        static mp3 = 94;
+        static xz = 95;
+        static jpeg = 96;
+        static wavpack = 97;
+        static PPMdv1 = 98;
     }
 
 }

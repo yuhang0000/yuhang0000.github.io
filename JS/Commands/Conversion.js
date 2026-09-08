@@ -32,22 +32,22 @@ export default class Conversion{
             
             date = Hex.ToBin(date).join("");
             time = Hex.ToBin(time).join("");
-            day = Hex.ParseUintHo(Hex.BinToHex(date.substring(11,16)));
-            month = Hex.ParseUintHo(Hex.BinToHex(date.substring(7,11)));
-            year = Hex.ParseUintHo(Hex.BinToHex(date.substring(0,7)));
-            sec = Hex.ParseUintHo(Hex.BinToHex(time.substring(11,16)));
-            min = Hex.ParseUintHo(Hex.BinToHex(time.substring(5,11)));
-            hour = Hex.ParseUintHo(Hex.BinToHex(time.substring(0,5)));
+            day = Hex.ParseUint(Hex.BinToHex(date.substring(11,16)), true);
+            month = Hex.ParseUint(Hex.BinToHex(date.substring(7,11)), true);
+            year = Hex.ParseUint(Hex.BinToHex(date.substring(0,7)), true);
+            sec = Hex.ParseUint(Hex.BinToHex(time.substring(11,16)), true);
+            min = Hex.ParseUint(Hex.BinToHex(time.substring(5,11)), true);
+            hour = Hex.ParseUint(Hex.BinToHex(time.substring(0,5)), true);
         }
         //日期时间在同一个 Uint8Array
         else if(date.length == 4){
             date = Hex.ToBin(date, false).join("");
-            day = Hex.ParseUintHo(Hex.BinToHex(date.substring(11,16)));
-            month = Hex.ParseUintHo(Hex.BinToHex(date.substring(7,11)));
-            year = Hex.ParseUintHo(Hex.BinToHex(date.substring(0,7)));
-            sec = Hex.ParseUintHo(Hex.BinToHex(date.substring(27,32)));
-            min = Hex.ParseUintHo(Hex.BinToHex(date.substring(21,27)));
-            hour = Hex.ParseUintHo(Hex.BinToHex(date.substring(16,21)));
+            day = Hex.ParseUint(Hex.BinToHex(date.substring(11,16)), true);
+            month = Hex.ParseUint(Hex.BinToHex(date.substring(7,11)), true);
+            year = Hex.ParseUint(Hex.BinToHex(date.substring(0,7)), true);
+            sec = Hex.ParseUint(Hex.BinToHex(date.substring(27,32)), true);
+            min = Hex.ParseUint(Hex.BinToHex(date.substring(21,27)), true);
+            hour = Hex.ParseUint(Hex.BinToHex(date.substring(16,21)), true);
         }
         else{
             throw new Error("位元数组长度不符合要求. ");

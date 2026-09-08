@@ -15,7 +15,10 @@
     <body>
         <div style="display: flex; flex-direction: column; align-items: flex-start; width: 100%;">
             <div><input type="file" id="btninput"/><button id="btnclear">清空输出</button></div>
-            <textarea id="output" Spellcheck=false style="margin: 8px 0 0 0; width: 100%; height: 32em;"></textarea>
+            <textarea id="output" Spellcheck=false style="margin: 8px 0 0 0; width: 100%; height: 42em;"></textarea>
+            <div style="margin: 8px 0 0 0">解压目标文件: </div>
+            <input id="inputtargetfile" value="." style="margin: 8px 0 0 0; width: 100%;">
+            <button id="btndecomp" style="margin: 8px 0 0 0" disabled>解压</button>
         </div>
         <script type="module">
             window.Debug = true;
@@ -23,12 +26,23 @@
             import Zip from "/JS/Tools/Zip.js";
             import Hex from "/JS/Tools/Hex.js";
             import Command from "/JS/Commands/Command.js";
+            import Conversion from "/JS/Commands/Conversion.js";
             window.zip = Zip;
             window.hex = Hex;
             window.command = Command;
 
-            let outputdlg = document.querySelector("#output");
-            
+            let zipbody;
+            let filedata;
+            window.zipbody = zipbody;
+            window.filedata = filedata;
+
+            //获取控件
+            let outputdlg = document.querySelector("#output");                  //输出          Textarea
+            let btnclear = document.querySelector("#btnclear");                 //清空输出      Button
+            let btninput = document.querySelector("#btninput");                 //导入文件      Button
+            let btndecomp = document.querySelector("#btndecomp");               //解压按钮      Button
+            let inputtargetfile = document.querySelector("#inputtargetfile");   //解压目标文件  TextBox
+
             //打印
             function consolelog(text, sendconsole = true, sendoutput = true){
                 if(sendconsole == true){
@@ -36,22 +50,22 @@
                 }
                 if(sendoutput == true){
                     outputdlg.append(text + "\n");
+                    outputdlg.scrollTop = outputdlg.scrollHeight;
                 }
             }
 
-            consolelog("Zip Version: v" + Zip.Version + "\n");
-
             //添加监听器
-            let btnclear = document.querySelector("#btnclear");
+            //清空输出
             btnclear.addEventListener("click", () => {
                 outputdlg.innerText = "";
-            })
+            });
 
-            let btninput = document.querySelector("#btninput");
+            //导入文件
             btninput.addEventListener("change", () => {
                 btninput.setAttribute("disabled", "");
                 console.log("载入 " + btninput.files.length + " 个");
                 if(btninput.files.length > 0){
+                    btndecomp.setAttribute("disabled", "");
                     let file = btninput.files[0];
                     consolelog("载入文件: " + file.name);
                     let starttime = new Date();
@@ -66,36 +80,37 @@
                         consolelog("文件加载耗时: " + ((now.valueOf() - lasttime) / 1000 ).toString() + "s");
                         lasttime = now.valueOf();
                         // let hex = Hex.StringToHex(reader.result);
-                        let hex = new Uint8Array(reader.result);
+                        filedata = new Uint8Array(reader.result);
                         now = new Date();
                         consolelog("HEX 转换耗时: " + ((now.valueOf() - lasttime) / 1000 ).toString() + "s");
                         lasttime = now.valueOf();
                         // console.log(hex);
-                        let zip = new Zip.Decode(hex, "GBK");
+                        zipbody = new Zip.Decode(filedata, "GBK");
                         now = new Date();
                         consolelog("ZIP 目录解析耗时: " + ((now.valueOf() - lasttime) / 1000 ).toString() + "s");
                         lasttime = now.valueOf();
                         
                         //不是压缩包
-                        if(zip.IsZip == false){
-                            consolelog("不是压缩包文件. ");
+                        if(zipbody.IsZip == false){
+                            consolelog("不是压缩包文件. \n");
                         }
                         else{
                             let array = [
-                                "是否加密: " + zip.IsEnc.toString(),
+                                "是否加密: " + zipbody.IsEnc.toString(),
                                 "\n========== 中央目录尾部区 ==========",
-                                "当前磁盘编号: " + zip.ECDR.DiskNo,
-                                "中央目录开始位置的磁盘编号: " + zip.ECDR.DiskNoOnStart,
-                                "该磁盘上所记录的中央目录数量: " + zip.ECDR.CDRCountOnDisk,
-                                "中央目录结构总数: " + zip.ECDR.CDRCount,
-                                "中央目录的大小: " + zip.ECDR.CDRLength,
-                                "中央目录开始位置相对位移: " + zip.ECDR.CDROffset,
-                                "注释长度: " + zip.ECDR.NodeLength,
-                                "注释内容: " + zip.ECDR.Node,
+                                "当前磁盘编号: " + zipbody.ECDR.DiskNo,
+                                "中央目录开始位置的磁盘编号: " + zipbody.ECDR.DiskNoOnStart,
+                                "该磁盘上所记录的中央目录数量: " + zipbody.ECDR.CDRCountOnDisk,
+                                "中央目录结构总数: " + zipbody.ECDR.CDRCount,
+                                "中央目录的大小: " + zipbody.ECDR.CDRLength,
+                                "中央目录开始位置相对位移: " + zipbody.ECDR.CDROffset,
+                                "注释长度: " + zipbody.ECDR.NodeLength,
+                                "注释内容: " + zipbody.ECDR.Node,
                             ]
                             let array2 = [];
-                            for(let i = 0; i < zip.CDRs.length; i++){
-                                let cdr = zip.CDRs[i];
+                            //便利中央目录记录区
+                            for(let i = 0; i < zipbody.CDRs.length; i++){
+                                let cdr = zipbody.CDRs[i];
                                 let fileattr = [];
                                 if(cdr.FileAttr.ReadOnly == true){
                                     fileattr.push("只读");
@@ -124,17 +139,77 @@
                                 if(fileattr.length == 0){
                                     fileattr.push("无属性");
                                 }
+                                let comptype = "";
+                                switch(cdr.ZipType){
+                                    case 0:
+                                        comptype = "仅存储";
+                                        break;
+                                    case 1:
+                                        comptype = "Shrunk";
+                                        break;
+                                    case 2:
+                                        comptype = "压缩系数1";
+                                        break;
+                                    case 3:
+                                        comptype = "压缩系数2";
+                                        break;
+                                    case 4:
+                                        comptype = "压缩系数3";
+                                        break;
+                                    case 5:
+                                        comptype = "压缩系数4";
+                                        break;
+                                    case 6:
+                                        comptype = "Imploded";
+                                        break;
+                                    case 8:
+                                        comptype = "Deflated";
+                                        break;
+                                    case 9:
+                                        comptype = "Deflated64";
+                                        break;
+                                    case 12:
+                                        comptype = "BZIP2";
+                                        break;
+                                    case 14:
+                                        comptype = "LZMA";
+                                        break;
+                                    case 16:
+                                        comptype = "IBM z/OS CMPSC";
+                                        break;
+                                    case 93:
+                                        comptype = "Zstandard (zstd)";
+                                        break;
+                                    case 94:
+                                        comptype = "MP3";
+                                        break;
+                                    case 95:
+                                        comptype = "XZ";
+                                        break;
+                                    case 96:
+                                        comptype = "JEPG";
+                                        break;
+                                    case 97:
+                                        comptype = "WavPack";
+                                        break;
+                                    case 98:
+                                        comptype = "PPMd v1";
+                                        break;
+                                    default:
+                                        comptype = "未知压缩方法: " + cdr.ZipType.toString();
+                                        break;
+                                }
 
                                 let array = [
                                     "\n========== 中央目录记录区 No." + i.toString(),
                                     "压缩所用版本: " + cdr.VersionFormComp / 10,
                                     "解压所需版本: " + cdr.FuncVer / 10,
                                     "通用位标记: " + cdr.Flags,
-                                    "压缩方法: " + cdr.ZipType,
-                                    "文件最后修改时间: " + command.Conversion.FixDateTime(command.Conversion.GetDateTimeFromMSDOS(cdr.LastEditDate, cdr.LastEditTime)),
+                                    "压缩方法: " + comptype,
+                                    "文件最后修改时间: " + Conversion.FixDateTime(Conversion.GetDateTimeFromMSDOS(cdr.LastEditDate, cdr.LastEditTime)),
                                     "CRC-32校验码: " + cdr.CRC32,
-                                    "压缩后的大小: " + command.Conversion.FixFileSize(cdr.SizeAfter),
-                                    "未压缩的大小: " + command.Conversion.FixFileSize(cdr.SizeBefore),
+                                    "压缩后的大小: " + Conversion.FixFileSize(cdr.SizeAfter) + " (" + cdr.SizeAfter + ")",
+                                    "未压缩的大小: " + Conversion.FixFileSize(cdr.SizeBefore) + " (" + cdr.SizeBefore + ")",
                                     "文件名长度: " + cdr.FileNameLength,
                                     "扩展区长度: " + cdr.ExBlockLength,
                                     "文件注释长度: " + cdr.NoteLength,
@@ -143,16 +218,19 @@
                                     "外部文件属性: " + fileattr.join(", "),
                                     "本地文件头的相对位移: " + cdr.FileOffset,
                                     "文件名: " + cdr.FileName,
-                                    "扩展区: " + cdr.ExBlock,
+                                    "扩展区: " + Hex.Print(cdr.ExBlock).join(" "),
                                     "文件注释: " + cdr.Node
                                 ];
                                 array2.push(array.join("\n"));
+
                             }
+                            //瓶贴字符
+                             let outputmsg = array.join("\n") + "\n" + array2.join("\n") + "\n\n========== 目录 ==========\n" + zipbody.Directory.join("\n") + "\n";
                             now = new Date();
                             consolelog("讯息输出耗时: " + ((now.valueOf() - lasttime) / 1000 ).toString() + "s");
                             consolelog("总耗时: " + ((now.valueOf() - starttime.valueOf()) / 1000 ).toString() + "s");
-                            consolelog(array.join("\n"));
-                            consolelog(array2.join("\n"));
+                            consolelog(outputmsg);
+                            btndecomp.removeAttribute("disabled", "");
                         }
                         
                         btninput.removeAttribute("disabled", "");    
@@ -165,7 +243,52 @@
                     btninput.removeAttribute("disabled", "");
                 }
 
-            })
+            });
+
+            //解压按钮
+            btndecomp.addEventListener("click", () => {
+                btninput.setAttribute("disabled", "");
+                btndecomp.setAttribute("disabled", "");
+                if(zipbody == null || zipbody.IsZip == false){
+                    btninput.removeAttribute("disabled", "");
+                    btndecomp.removeAttribute("disabled", "");
+                    return;
+                }
+
+                //先搜索存不存在, 然后获取目标 CDR
+                let targetfile = inputtargetfile.value;
+                consolelog("尝试解压文件: " +  targetfile);
+                let CDRIndex = -1;
+                for(let i = 0; i < zipbody.Directory.length; i++){
+                    if(targetfile == zipbody.Directory[i]){
+                        CDRIndex = i;
+                        break;
+                    }
+                }
+                if(CDRIndex < 0){
+                    consolelog("目录不存在文件: " +  targetfile + "\n");
+                    btninput.removeAttribute("disabled", "");
+                    btndecomp.removeAttribute("disabled", "");
+                    return;
+                }
+                //如果是文件夹就跳过
+                if(zipbody.CDRs[CDRIndex].FileAttr.Directory == true){
+                    consolelog("这是一个文件夹, 而非文件. \n");
+                    btninput.removeAttribute("disabled", "");
+                    btndecomp.removeAttribute("disabled", "");
+                    return;
+                }
+                let fileoffset = zipbody.CDRs[CDRIndex].FileOffset;
+                let datalength = zipbody.CDRs[CDRIndex].SizeAfter;
+
+                //提取出来
+                let fnl = Hex.ParseInt( Hex.SubHex(filedata, fileoffset + 26, 2) ); //温建名长度
+                let exl = Hex.ParseInt( Hex.SubHex(filedata, fileoffset + 28, 2) ); //拓展区长度
+                let hex = Hex.SubHex(filedata, fileoffset + 30 + fnl + exl, datalength); //数据在这里
+                consolelog(Hex.Print(hex).join(" "));
+            });
+
+            consolelog("Zip Version: v" + Zip.Version + "\n");
 
         </script>
     </body>
